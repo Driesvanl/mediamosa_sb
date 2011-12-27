@@ -1,0 +1,124 @@
+<?php
+/**
+ * SAML 2.0 remote IdP metadata for simpleSAMLphp.
+ *
+ * Remember to remove the IdPs you don't use from this file.
+ *
+ * See: https://rnd.feide.no/content/idp-remote-metadata-reference
+ */
+
+$metadata['https://engine.surfconext.nl/authentication/idp/metadata'] = array (
+  'entityid' => 'https://engine.surfconext.nl/authentication/idp/metadata',
+  'contacts' => 
+  array (
+  ),
+  'metadata-set' => 'saml20-idp-remote',
+  'expire' => 1324565479,
+  'SingleSignOnService' => 
+  array (
+    0 => 
+    array (
+      'Binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
+      'Location' => 'https://engine.surfconext.nl/authentication/idp/single-sign-on',
+    ),
+  ),
+  'SingleLogoutService' => 
+  array (
+  ),
+  'ArtifactResolutionService' => 
+  array (
+  ),
+  'keys' => 
+  array (
+    0 => 
+    array (
+      'encryption' => false,
+      'signing' => true,
+      'type' => 'X509Certificate',
+      'X509Certificate' => 'MIIDyzCCArOgAwIBAgIJAMzixtXMUH1NMA0GCSqGSIb3DQEBBQUAMHwxCzAJBgNV
+BAYTAk5MMRAwDgYDVQQIDAdVdHJlY2h0MRAwDgYDVQQHDAdVdHJlY2h0MRUwEwYD
+VQQKDAxTVVJGbmV0IEIuVi4xEzARBgNVBAsMClNVUkZjb25leHQxHTAbBgNVBAMM
+FGVuZ2luZS5zdXJmY29uZXh0Lm5sMB4XDTExMDEyNDEwMTg1N1oXDTIxMDEyMzEw
+MTg1N1owfDELMAkGA1UEBhMCTkwxEDAOBgNVBAgMB1V0cmVjaHQxEDAOBgNVBAcM
+B1V0cmVjaHQxFTATBgNVBAoMDFNVUkZuZXQgQi5WLjETMBEGA1UECwwKU1VSRmNv
+bmV4dDEdMBsGA1UEAwwUZW5naW5lLnN1cmZjb25leHQubmwwggEiMA0GCSqGSIb3
+DQEBAQUAA4IBDwAwggEKAoIBAQDMJ6v+f3owS3KR5IXSil+3XFwGvCVeYx3jDOFK
+AnwvXlDpTu+t730b8/spHtlopyJVAlb6qBIPN7R4TGTLqiu0zebYsYx/PtqCk5cb
+u9qs3h+p2BBoTXVwXA/ZYi0tqtxp04hcNrRj1TAgLyC0S+KASTF+zzccAcjTBid5
+EMioo+YllgSEobWJ4X33XVRqNrikAPDsNmDrdKUi257JSO2xhVIG5lbtmDaL5ORC
+D56oRmVdp7VQTEQ3Yass8J5Rn+Ub6WmRBYeG+KzFBvtyBput2o0/gvtJn9L+NWeD
+B0LyUPaUYG/X4GF14FcmFQfz7I5jBCNHtPcLJbPYbZKQNhz/AgMBAAGjUDBOMB0G
+A1UdDgQWBBS9QqP8gtMM6nm4oYzNbgqhEDP1aDAfBgNVHSMEGDAWgBS9QqP8gtMM
+6nm4oYzNbgqhEDP1aDAMBgNVHRMEBTADAQH/MA0GCSqGSIb3DQEBBQUAA4IBAQBH
+2qyYwLwesIOxUTj+NJ0VXRBDH8VecNLiUUs9Np4x8A0pxLvlNnv5TdJAruEg1LSV
+mAqqPUdAB2m7CKDeUVM9cwOB7vqelV2GNgOfevXi+DZRMffyyE8qyIcnTqvDOgcR
+8qGTPSVT+SIsOkV9bYrjltrbnal7cJermsA8SC5w/pjLaOHI1xIZHquZzymWoN3Z
+fz2CQg2r5o+AURYd74GrHhHqVa9VrdWtcimB+vTQQihoLt8YciehpJjOMpx2D66e
+FfpC8ix31RRdjAVIo1y33h1yU3gEHePDbOthZE+lpXi2WJqO85H85LqJOtgn2WPI
+3P2Tx32Cq1WXCYkxLaPI
+',
+    ),
+    1 => 
+    array (
+      'encryption' => true,
+      'signing' => false,
+      'type' => 'X509Certificate',
+      'X509Certificate' => 'MIIDyzCCArOgAwIBAgIJAMzixtXMUH1NMA0GCSqGSIb3DQEBBQUAMHwxCzAJBgNV
+BAYTAk5MMRAwDgYDVQQIDAdVdHJlY2h0MRAwDgYDVQQHDAdVdHJlY2h0MRUwEwYD
+VQQKDAxTVVJGbmV0IEIuVi4xEzARBgNVBAsMClNVUkZjb25leHQxHTAbBgNVBAMM
+FGVuZ2luZS5zdXJmY29uZXh0Lm5sMB4XDTExMDEyNDEwMTg1N1oXDTIxMDEyMzEw
+MTg1N1owfDELMAkGA1UEBhMCTkwxEDAOBgNVBAgMB1V0cmVjaHQxEDAOBgNVBAcM
+B1V0cmVjaHQxFTATBgNVBAoMDFNVUkZuZXQgQi5WLjETMBEGA1UECwwKU1VSRmNv
+bmV4dDEdMBsGA1UEAwwUZW5naW5lLnN1cmZjb25leHQubmwwggEiMA0GCSqGSIb3
+DQEBAQUAA4IBDwAwggEKAoIBAQDMJ6v+f3owS3KR5IXSil+3XFwGvCVeYx3jDOFK
+AnwvXlDpTu+t730b8/spHtlopyJVAlb6qBIPN7R4TGTLqiu0zebYsYx/PtqCk5cb
+u9qs3h+p2BBoTXVwXA/ZYi0tqtxp04hcNrRj1TAgLyC0S+KASTF+zzccAcjTBid5
+EMioo+YllgSEobWJ4X33XVRqNrikAPDsNmDrdKUi257JSO2xhVIG5lbtmDaL5ORC
+D56oRmVdp7VQTEQ3Yass8J5Rn+Ub6WmRBYeG+KzFBvtyBput2o0/gvtJn9L+NWeD
+B0LyUPaUYG/X4GF14FcmFQfz7I5jBCNHtPcLJbPYbZKQNhz/AgMBAAGjUDBOMB0G
+A1UdDgQWBBS9QqP8gtMM6nm4oYzNbgqhEDP1aDAfBgNVHSMEGDAWgBS9QqP8gtMM
+6nm4oYzNbgqhEDP1aDAMBgNVHRMEBTADAQH/MA0GCSqGSIb3DQEBBQUAA4IBAQBH
+2qyYwLwesIOxUTj+NJ0VXRBDH8VecNLiUUs9Np4x8A0pxLvlNnv5TdJAruEg1LSV
+mAqqPUdAB2m7CKDeUVM9cwOB7vqelV2GNgOfevXi+DZRMffyyE8qyIcnTqvDOgcR
+8qGTPSVT+SIsOkV9bYrjltrbnal7cJermsA8SC5w/pjLaOHI1xIZHquZzymWoN3Z
+fz2CQg2r5o+AURYd74GrHhHqVa9VrdWtcimB+vTQQihoLt8YciehpJjOMpx2D66e
+FfpC8ix31RRdjAVIo1y33h1yU3gEHePDbOthZE+lpXi2WJqO85H85LqJOtgn2WPI
+3P2Tx32Cq1WXCYkxLaPI
+',
+    ),
+    2 => 
+    array (
+      'encryption' => true,
+      'signing' => true,
+      'type' => 'X509Certificate',
+      'X509Certificate' => '
+MIIEfzCCA2egAwIBAgIQbNTMh1hzkHgBpjphnO4uazANBgkqhkiG9w0BAQUFADA2
+MQswCQYDVQQGEwJOTDEPMA0GA1UEChMGVEVSRU5BMRYwFAYDVQQDEw1URVJFTkEg
+U1NMIENBMB4XDTEwMTIxNjAwMDAwMFoXDTEzMTIxNTIzNTk1OVowVjELMAkGA1UE
+BhMCTkwxFTATBgNVBAoTDFNVUkZuZXQgQi5WLjERMA8GA1UECxMIU2VydmljZXMx
+HTAbBgNVBAMTFGVuZ2luZS5zdXJmY29uZXh0Lm5sMIIBIjANBgkqhkiG9w0BAQEF
+AAOCAQ8AMIIBCgKCAQEA7AH5IZLKXj+2ncDwxzlYgtJChT46zjkPG5lCF8mMGJt0
+Vo4UhUqvPEi7+T6Qq4PBibCQ823bx6Z/ZpdRL3/H5NtcpXfK7Cucu1EEoYZHgmM1
+bFzLPNVuCeBEBUKx2sC1wv0ag+nhSX4nMGudLTm9IK+YfalNFZoO3JBNE7ucQJk4
+Mt5FxQ0ZlMoH3VQsLmZpqBCoLjZrQLBpa/X/hHCaP9F3w9oRjBiqq0EaMao3/VSL
+EzIJV67KYD4MXHtcwI2zS0jueuSxWxvbPwCLYneZtewHmKFO4hzjN7KhbzG3uSd8
+vXn7PmB3RAT4OXJGrmLFPumULEJNRWc3texmVrbYBQIDAQABo4IBZzCCAWMwHwYD
+VR0jBBgwFoAUDL2TaAzz3qujSWsrN1dH6pDjue0wHQYDVR0OBBYEFBSGlOCpf30p
+rLO1lapbl5H7+t/uMA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMB0GA1Ud
+JQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjAYBgNVHSAEETAPMA0GCysGAQQBsjEB
+AgIdMDoGA1UdHwQzMDEwL6AtoCuGKWh0dHA6Ly9jcmwudGNzLnRlcmVuYS5vcmcv
+VEVSRU5BU1NMQ0EuY3JsMG0GCCsGAQUFBwEBBGEwXzA1BggrBgEFBQcwAoYpaHR0
+cDovL2NydC50Y3MudGVyZW5hLm9yZy9URVJFTkFTU0xDQS5jcnQwJgYIKwYBBQUH
+MAGGGmh0dHA6Ly9vY3NwLnRjcy50ZXJlbmEub3JnMB8GA1UdEQQYMBaCFGVuZ2lu
+ZS5zdXJmY29uZXh0Lm5sMA0GCSqGSIb3DQEBBQUAA4IBAQAXuMweHe95Hu/0eiKq
+hC3E7rnZXKj1CT/ASkQGNSW/qAlnapP4hVO7UR+u6JBbBJl5Mx7bwcPkrJWB/n/R
+pnhcvNL8V0D5PpQcuolnOICNBrU9WHqAwEgL06RTP1T59PcjVnkaZ3nsXezCfgg9
+fYHfeYYCvciO/Q7bgQ3VCrnv4OCwxStHNAHyGCYBRQ8apd9TOXerrbpy0kJKzX1E
+MkvLcVMeVe/yVIDCPE//QoCkDscrKfMcbiq0xjGapOuKaEHQwU1xze5UHC+FFEuE
+C1sKK6k7PY2VR5c44qbJoMVH3A13T61CBA3jnLiacr9d/Hu9+kOKHxm1qv8qr+Pm
+xIqF
+
+',
+    ),
+  ),
+);

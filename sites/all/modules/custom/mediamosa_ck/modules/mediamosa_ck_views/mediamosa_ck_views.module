@@ -1,0 +1,118 @@
+<?php
+/**
+ * MediaMosa is a Full Featured, Webservice Oriented Media Management and
+ * Distribution platform (http://www.vpcore.nl)
+ *
+ * Copyright (C) 2011 SURFnet BV (http://www.surfnet.nl)
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, you can find it at:
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ */
+
+/**
+ * Implements hook_views_api().
+ */
+function mediamosa_ck_views_views_api() {
+  list($module, $api) = func_get_args();
+  if ($module == 'views' && $api == 'views_default') {
+    return array('version' => '3.0');
+  }
+}
+
+/**
+ * Implements hook_views_plugins().
+ */
+function mediamosa_ck_views_views_plugins() {
+  return array(
+    'module' => 'mediamosa_ck_views',
+    'query' => array(
+      'mediamosa_asset_featured' => array(
+        'title' => t('MediaMosa Asset Featured'),
+        'help' => t('Query will be run on MediaMosa REST interface and processed back for usage in views.'),
+        'handler' => 'mediamosa_ck_views_rest_asset_featured',
+      ),
+      'mediamosa_asset_new' => array(
+        'title' => t('MediaMosa Asset New'),
+        'help' => t('Query will be run on MediaMosa REST interface and processed back for usage in views.'),
+        'handler' => 'mediamosa_ck_views_rest_asset_new',
+      ),
+      'mediamosa_asset_popular' => array(
+        'title' => t('MediaMosa Asset Popular'),
+        'help' => t('Query will be run on MediaMosa REST interface and processed back for usage in views.'),
+        'handler' => 'mediamosa_ck_views_rest_asset_popular',
+      ),
+      'mediamosa_asset_search' => array(
+        'title' => t('MediaMosa Asset Search'),
+        'help' => t('Query will be run on MediaMosa REST interface and processed back for usage in views.'),
+        'handler' => 'mediamosa_ck_views_rest_asset_search',
+      ),
+      'mediamosa_collection_search' => array(
+        'title' => t('MediaMosa Collection Search2'),
+        'help' => t('Query will be run on MediaMosa REST interface and processed back for usage in views.'),
+        'handler' => 'mediamosa_ck_views_rest_collection_search',
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_views_data().
+ */
+function mediamosa_ck_views_views_data() {
+  // Asset featured.
+  $data['mediamosa_asset_featured'] = mediamosa_ck_views_rest_asset_featured::get_views_data('MediaMosa Asset Featured', 'mediamosa_asset_featured');
+  // Asset search REST call (/asset).
+  $data['mediamosa_asset_search'] = mediamosa_ck_views_rest_asset_search::get_views_data('MediaMosa: Asset search', 'mediamosa_asset_search');
+  // Asset new.
+  $data['mediamosa_asset_new'] = mediamosa_ck_views_rest_asset_new::get_views_data('MediaMosa Asset New', 'mediamosa_asset_new');
+  // Asset popular.
+  $data['mediamosa_asset_popular'] = mediamosa_ck_views_rest_asset_popular::get_views_data('MediaMosa Asset Popular', 'mediamosa_asset_popular');
+  // Collection search REST call (/asset).
+  $data['mediamosa_collection_search'] = mediamosa_ck_views_rest_collection_search::get_views_data('MediaMosa: Collection search', 'mediamosa_collection_search');
+
+  return $data;
+}
+
+/**
+ * Theme Preprocess Function
+ * Converts the unthemed display to thumbnails linking to the media base page.
+ * @param  $elements
+ * @return void
+ *
+function mediamosa_ck_views_preprocess_views_view_unformatted(&$elements) {
+
+  //@todo:find out how to implement a new row formatter so that the rows are only rendered once.
+  $view = $elements['view'];
+  if ($view->current_display === 'default') {
+    $fids = array();
+    foreach ($view->result as $delta => $row) {
+      $asset_ids[] = $row->asset_id;
+    }
+    $files = file_load_multiple($fids);
+
+   // TO DO: We have to get file IDs from Drupal DB and perform the following code to assign stills.
+   //
+//    foreach ($view->result as $delta => $row) {
+//      $preview = media_get_thumbnail_preview($files[$row->fid], TRUE);
+//
+//      if (!isset($row->grant) || !$row->grant) {
+//        $preview['#markup'] = '<span id="styles-0-0" class="styles file-styles medium"> <img typeof="foaf:Image" src="http://xmages.net/storage/10/1/0/9/7/upload/d08921a0.png" /></span>';
+//        unset($preview['#theme']);
+//      }
+//      $rendered_thumbnail = drupal_render($preview);
+//      $elements['rows'][$delta] = $rendered_thumbnail;
+//    }
+//    drupal_add_css(drupal_get_path('module', 'views_media_browser') . '/css/media_thumbs_view.css', array('preprocess' => FALSE));
+//    drupal_add_js(drupal_get_path('module', 'views_media_browser') . '/js/media_thumbs_smart_wrap.js');
+  }
+}
+*/
