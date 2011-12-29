@@ -123,7 +123,7 @@ function mediamosa_ck_transcode_mediamosa_ck_configuration_collect() {
   );
 
   try {
-    $profiles = MediaMosaCkConnectorTranscodeWrapper::transcode_profiles_get();
+    $profiles = MediaMosaCkConnectorTranscodeWrapper::request_get_transcode_profiles();
   }
   catch (Exception $e) {
     drupal_set_message(t('Unable to retrieve transcode profiles, check MediaMosa Connector.'), 'error');
@@ -173,7 +173,7 @@ function mediamosa_ck_transcode_mediamosa_ck_configuration_collect_submit($form,
 
   mediamosa_connector::variable_set('media_mediamosa_transcode_profile_default_options', $values['media_mediamosa_transcode_profile_default_options']);
 
-  $profiles = MediaMosaCkConnectorTranscodeWrapper::transcode_profiles_get();
+  $profiles = MediaMosaCkConnectorTranscodeWrapper::request_get_transcode_profiles();
   $options = array(
     'none' => t('---'),
   );
@@ -254,7 +254,7 @@ function _mediamosa_ck_transcode_generate_form_helper(&$form, $collapsed = TRUE,
   );
 
   // Get default transcode profile and the options.
-  $profiles = MediaMosaCkConnectorTranscodeWrapper::transcode_profiles_get();
+  $profiles = MediaMosaCkConnectorTranscodeWrapper::request_get_transcode_profiles();
   $options = array(
     'none' => t('---'),
   );
@@ -317,7 +317,7 @@ function _mediamosa_ck_transcode_generate_form_submit($form, &$form_state) {
     $data = array(
       'profile_id' => $profile_id,
     );
-    MediaMosaCkConnectorTranscodeWrapper::transcode_create($media_data['mediafile_id'], mediamosa_ck::setting_user_id(), $data);
+    MediaMosaCkConnectorTranscodeWrapper::transcode_create($media_data['mediafile_id'], mediamosa_ck::session_user_id(), $data);
   }
 
   // Notify the user about the new job.
@@ -420,10 +420,11 @@ function _mediamosa_ck_transcode_list_form($form, &$form_state) {
             $headers['operations'] = array('data' => t('Operations'));
           }
 
-          $row = array();
+
           $rows = array();
 
           foreach ($jobs as $job) {
+            $row = array();
             $row['id'] = $job['id'];
             $row['type'] = $job['job_type'];
             $row['status'] = ($job['status'] == 'FAILED') && !empty($job['error_description']) ? theme('media_mediamosa_versions_failed_job_status', $job) : $job['status'];

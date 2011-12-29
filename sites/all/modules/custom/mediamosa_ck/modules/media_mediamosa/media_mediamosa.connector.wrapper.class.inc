@@ -33,16 +33,18 @@ class MediaMosaConnectorMediaWrapper extends MediaMosaCkConnectorWrapper {
   /**
    * Update the metadata for given asset ID.
    *
-   * @param string $asset_id
-   * @param array $changed_metadata
+   * @param $asset_id
+   * @param $changed_metadata
    */
   static public function request_post_metadata($asset_id, $changed_metadata) {
 
     // Add action.
-    $changed_metadata['action'] = 'update';
+    $changed_metadata += array(
+      'action' => 'update'
+    );
 
     $options = array(
-      'user_id' => mediamosa_ck::setting_user_id(),
+      'user_id' => mediamosa_ck::session_user_id(),
       'data' => $changed_metadata,
     );
 
@@ -116,7 +118,7 @@ class MediaMosaConnectorMediaWrapper extends MediaMosaCkConnectorWrapper {
    *
    * @return $assets
    */
-  static public function request_current_assets_get($time_last = 0, $offset = 0, $limit = 100) {
+  static public function request_get_current_assets($time_last = 0, $offset = 0, $limit = 100) {
     // We used 'changed' parameter here before, but at the moment
     // 'videotimestampmodified' is much better option. Despite of its name, it
     // reflects also cases when we change only metadata.

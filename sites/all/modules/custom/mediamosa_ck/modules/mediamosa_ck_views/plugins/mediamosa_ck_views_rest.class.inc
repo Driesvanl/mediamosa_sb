@@ -34,9 +34,9 @@ abstract class mediamosa_ck_views_rest extends views_plugin_query {
 
   // ----------------------------------------------------- Functions (abstract).
   // Execute the rest call.
-  //abstract protected function do_rest_call($view, $params, array $options = array());
+  abstract protected function do_rest_call($view, $params, array $options = array());
   // Return information for the views_data hook.
- // abstract static public function get_views_data($title, $class);
+  abstract static public function get_views_data($title, $class);
 
   // ---------------------------------------------------------------- Functions.
   /**
@@ -165,4 +165,409 @@ abstract class mediamosa_ck_views_rest extends views_plugin_query {
   public function get_params() {
     return $this->params;
   }
+
+  public function add_where($group, $field, $value = NULL, $operator = NULL) {
+  }
+
+  /**
+   * Generates a unique placeholder used in the db query.
+   */
+  public function placeholder($base = 'views') {
+    static $placeholders = array();
+    if (!isset($placeholders[$base])) {
+      $placeholders[$base] = 0;
+      return ':' . $base;
+    }
+    else {
+      return ':' . $base . ++$placeholders[$base];
+    }
+  }
+  // -------------------------------------------------------- MediaMosa related.
+  /**
+   * Add metadata fields to the view data.
+   *
+   * @param $data
+   *   The data array to add metadata definitions to.
+   */
+  static public function get_views_data_metadata(&$data) {
+    // Add metadata.
+    foreach (mediamosa_ck::get_metadata_fields() as $set => $metadata) {
+      // Add the whole set as an block.
+      $data[$set] = array(
+        'title' => t($metadata['title']),
+        'help' => t('Metadata block for set @set_label.', array('@set_label' => $metadata['title'])),
+        'field' => array(
+          'handler' => 'mediamosa_ck_views_field_text_metadata',
+        ),
+      );
+
+      foreach ($metadata['fields'] as $name => $type) {
+        //
+        switch ($type) {
+          case 'DATETIME':
+            $data[$set . '_' . $name] = array(
+              'title' => t($set . '.' . $name),
+              'help' => t('Metadata date field in @set_label.', array('@set_label' => $metadata['title'])),
+              'field' => array(
+                'handler' => 'mediamosa_ck_views_field_date',
+                'click sortable' => TRUE,
+              ),
+              'sort' => array(
+                'handler' => 'mediamosa_ck_views_sort',
+              ),
+            );
+            break;
+
+          case 'CHAR':
+          case 'INT':
+          default:
+            $data[$set . '_' . $name] = array(
+              'title' => t($set . '.' . $name),
+              'help' => t('Metadata field in @set_label.', array('@set_label' => $metadata['title'])),
+              'field' => array(
+                'handler' => 'mediamosa_ck_views_field_text',
+                'click sortable' => TRUE,
+              ),
+              'filter' => array(
+                'handler' => 'mediamosa_ck_views_filter_text',
+              ),
+              'sort' => array(
+                'handler' => 'mediamosa_ck_views_sort',
+              ),
+            );
+            break;
+        }
+      }
+    }
+  }
+
+  /**
+   * Simple conversion from the data in get_views_data to fields in the output.
+   *
+   * For now this only works on data that is in the root of the output.
+   */
+  static public function get_fields($data) {
+    $fields = array();
+
+    foreach ($data as $field_name => $field) {
+      // Include all that have a field handler.
+      if (empty($field['field']['handler'])) {
+        continue;
+      }
+
+      $fields[] = array('name' => $field_name);
+    }
+
+    return $fields;
+  }
+
+  /**
+   * Add fields for owner and group.
+   */
+  static public function get_views_data_owner_stuff(&$data) {
+    $data += array(
+      'owner_id' => array(
+        'title' => t('Owner'),
+        'help' => t('The owner of the collection.'),
+        'field' => array(
+          'handler' => 'mediamosa_ck_views_field_text',
+        ),
+        'filter' => array(
+          'handler' => 'mediamosa_ck_views_filter_text',
+        ),
+        'sort' => array(
+          'handler' => 'mediamosa_ck_views_sort',
+        ),
+      ),
+
+      'group_id' => array(
+        'title' => t('Group'),
+        'help' => t('The user group of the collection.'),
+        'field' => array(
+          'handler' => 'mediamosa_ck_views_field_text',
+        ),
+      ),
+    );
+  }
+
+  static public function get_views_data_collection_common(&$data) {
+    $data += array(
+      // Fields.
+      'coll_id' => array(
+        'title' => t('Collection ID'),
+        'help' => t('Unique Identifier of each collection.'),
+        'field' => array(
+          'handler' => 'mediamosa_ck_views_field_text',
+          'click sortable' => TRUE,
+        ),
+        'filter' => array(
+          'handler' => 'mediamosa_ck_views_filter_text',
+          'mediamosa_filter_keys' => array('filter_key' => 'granted'),
+        ),
+        'sort' => array(
+          'handler' => 'mediamosa_ck_views_sort',
+        ),
+      ),
+
+      'title' => array(
+        'title' => t('Title'),
+        'help' => t('The title of the collection.'),
+        'field' => array(
+          'handler' => 'mediamosa_ck_views_field_text',
+        ),
+        'filter' => array(
+          'handler' => 'mediamosa_ck_views_filter_text',
+        ),
+        'sort' => array(
+          'handler' => 'mediamosa_ck_views_sort',
+        ),
+      ),
+
+      'description' => array(
+        'title' => t('Description'),
+        'help' => t('The description of the collection.'),
+        'field' => array(
+          'handler' => 'mediamosa_ck_views_field_text',
+        ),
+        'filter' => array(
+          'handler' => 'mediamosa_ck_views_filter_text',
+        ),
+        'sort' => array(
+          'handler' => 'mediamosa_ck_views_sort',
+        ),
+      ),
+
+      'private' => array(
+        'title' => t('private'),
+        'help' => t('Collection is marked private.'),
+        'field' => array(
+          'handler' => 'mediamosa_ck_views_field_text',
+        ),
+        'filter' => array(
+          'handler' => 'mediamosa_ck_views_filter_text',
+        ),
+      ),
+
+      'public' => array(
+        'title' => t('public'),
+        'help' => t('Collection is marked public.'),
+        'field' => array(
+          'handler' => 'mediamosa_ck_views_field_text',
+        ),
+        'filter' => array(
+          'handler' => 'mediamosa_ck_views_filter_text',
+        ),
+      ),
+
+      'category' => array(
+        'title' => t('category'),
+        'help' => t('Collection is marked for main category.'),
+        'field' => array(
+          'handler' => 'mediamosa_ck_views_field_text',
+        ),
+        'filter' => array(
+          'handler' => 'mediamosa_ck_views_filter_text',
+        ),
+      ),
+
+      'is_unappropriate' => array(
+        'title' => t('is_unappropriate'),
+        'help' => t('Collection is marked for not appropriate.'),
+        'field' => array(
+          'handler' => 'mediamosa_ck_views_field_text',
+        ),
+        'filter' => array(
+          'handler' => 'mediamosa_ck_views_filter_text',
+        ),
+      ),
+
+      'numofvideos' => array(
+        'title' => t('numofvideos'),
+        'help' => t('The number of videos in the collection.'),
+        'field' => array(
+          'handler' => 'mediamosa_ck_views_field_text',
+        ),
+        'filter' => array(
+          'handler' => 'mediamosa_ck_views_filter_text',
+        ),
+        'sort' => array(
+          'handler' => 'mediamosa_ck_views_sort',
+        ),
+      ),
+
+      'created' => array(
+        'title' => t('Created'),
+        'help' => t('The date when collection was created.'),
+        'field' => array(
+          'handler' => 'mediamosa_ck_views_field_date',
+        ),
+//        'filter' => array(
+//          'handler' => 'mediamosa_ck_views_filter_text',
+//        ),
+        'sort' => array(
+          'handler' => 'mediamosa_ck_views_sort',
+        ),
+      ),
+      'changed' => array(
+        'title' => t('Changed'),
+        'help' => t('The date when collection was changed.'),
+        'field' => array(
+          'handler' => 'mediamosa_ck_views_field_date',
+        ),
+//        'filter' => array(
+//          'handler' => 'mediamosa_ck_views_filter_text',
+//        ),
+        'sort' => array(
+          'handler' => 'mediamosa_ck_views_sort',
+        ),
+      ),
+    );
+  }
+
+  /**
+   * Add common fields for asset.
+   *
+   * @param $data
+   *   The data array to add asset definitions to.
+   */
+  static public function get_views_data_asset_common(&$data) {
+    $data += array(
+      // Fields.
+      'asset_id' => array(
+        'title' => t('Asset ID'),
+        'help' => t('Unique Identifier of each asset.'),
+        'field' => array(
+          'handler' => 'mediamosa_ck_views_field_text',
+          'click sortable' => TRUE,
+        ),
+        'filter' => array(
+          'handler' => 'mediamosa_ck_views_filter_text',
+          'mediamosa_filter_keys' => array('filter_key' => 'granted'),
+        ),
+        'sort' => array(
+          'handler' => 'mediamosa_ck_views_sort',
+        ),
+      ),
+
+      'granted' => array(
+        'title' => t('Granted'),
+        'help' => t('Granted value indicates if you are allowed to see and play mediafile.'),
+        'field' => array(
+          'handler' => 'mediamosa_ck_views_field_text',
+        ),
+        'filter' => array(
+          'handler' => 'mediamosa_ck_views_filter_boolean',
+        ),
+      ),
+
+      'viewed' => array(
+        'title' => t('Viewed'),
+        'help' => t('Number of times viewed.'),
+        'field' => array(
+          'handler' => 'mediamosa_ck_views_field_text',
+          'click sortable' => TRUE,
+        ),
+        'sort' => array(
+          'handler' => 'mediamosa_ck_views_sort',
+        ),
+      ),
+
+      'played' => array(
+        'title' => t('Played'),
+        'help' => t('Number of times played.'),
+        'field' => array(
+          'handler' => 'mediamosa_ck_views_field_text',
+          'click sortable' => TRUE,
+        ),
+        'sort' => array(
+          'handler' => 'mediamosa_ck_views_sort',
+        ),
+      ),
+
+      'videotimestamp' => array(
+        'title' => t('Videotimestamp'),
+        'help' => t('When asset got a video.'),
+        'field' => array(
+          'handler' => 'mediamosa_ck_views_field_date',
+        ),
+        'sort' => array(
+          'handler' => 'mediamosa_ck_views_sort',
+        ),
+      ),
+
+      'videotimestampmodified' => array(
+        'title' => t('Videotimestamp modified'),
+        'help' => t('When asset was modified.'),
+        'field' => array(
+          'handler' => 'mediamosa_ck_views_field_date',
+        ),
+        'sort' => array(
+          'handler' => 'mediamosa_ck_views_sort',
+        ),
+      ),
+
+      // Fields.
+      'title' => array(
+        'title' => t('Title'),
+        'help' => t('The title of the asset. Is for display purpose only.'),
+        'field' => array(
+          'handler' => 'mediamosa_ck_views_field_text',
+          'click sortable' => FALSE,
+        ),
+      ),
+
+      'still_url' => array(
+        'title' => t('Still'),
+        'help' => t('The thumbnail of the media.'),
+        'field' => array(
+          'handler' => 'mediamosa_ck_views_field_still',
+        ),
+      ),
+
+      'player' => array(
+        'title' => t('Video player'),
+        'help' => t('The video (or media) player allows you to get either a play link (URL) or the HTML object code to include a player.'),
+        'field' => array(
+          'handler' => 'mediamosa_ck_views_field_player',
+        ),
+      ),
+    );
+  }
+
+  /**
+   * Fields that only are in the asset call.
+   *
+   * @param $data
+   *   The data array to add asset definitions to.
+   */
+  static public function get_views_data_asset_specific(&$data) {
+    $data += array(
+    );
+  }
+
+  /**
+   * Simple conversion from xmlobject to array.
+   */
+  static public function xmlobject2array($simplexmlelement) {
+    $array = json_decode(json_encode($simplexmlelement), TRUE);
+    self::_xmlobject2array_helper($array);
+    return $array;
+  }
+
+  /**
+   * Fixes empty array's.
+   */
+  static private function _xmlobject2array_helper(&$array) {
+    foreach ($array as $key => &$child_array) {
+      if (is_array($child_array)) {
+        if (empty($child_array)) {
+          $array[$key] = '';
+        }
+        else {
+          self::_xmlobject2array_helper($child_array);
+        }
+      }
+    }
+  }
+
 }

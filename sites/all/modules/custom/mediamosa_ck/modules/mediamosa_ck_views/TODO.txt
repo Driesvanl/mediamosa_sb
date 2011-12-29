@@ -1,0 +1,10 @@
+TODO list
+---------
+
+Just a list so we know what still needs to be done in the future.
+
+
+- Caching needs development. Caching should be off for now.
+- Fields like created/changed need a filter class for searching on dates.
+
+

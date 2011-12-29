@@ -148,7 +148,7 @@ function _mediamosa_ck_access_generate_form_submit($form, &$form_state) {
     // Set the access rules to all the mediafiles.
     if (!empty($asset_get->items->item->mediafiles->mediafile) && $asset_get->items->item->mediafiles->mediafile) {
       foreach ($asset_get->items->item->mediafiles->mediafile as $mediafile_get) {
-        MediaMosaCkConnectorAccessWrapper::set_access_control($mediafile_get->mediafile_id, mediamosa_ck::setting_user_id(), $values['domain_realm']);
+        MediaMosaCkConnectorAccessWrapper::set_access_control($mediafile_get->mediafile_id, mediamosa_ck::session_user_id(), $values['domain_realm']);
       }
     }
   }

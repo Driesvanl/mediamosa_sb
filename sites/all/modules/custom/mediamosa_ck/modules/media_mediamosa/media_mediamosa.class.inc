@@ -32,7 +32,7 @@ class MediaMediaMosa {
   // Settings;
 
   // Expire default for thumbnails in seconds.
-  const THUMBNAIL_EXPIRE_TIME = 300;
+  const THUMBNAIL_EXPIRE_TIME = 600;
 
 
   /**

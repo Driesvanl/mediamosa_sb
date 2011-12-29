@@ -112,6 +112,23 @@ class MediaMosaStreamWrapper extends MediaReadOnlyStreamWrapper {
   }
 
   /**
+   * Some mimetypes are valid, but might not match some of the Media definition
+   * of mimetypes. So are some mimetypes not seen as video types, because they
+   * don't start with 'video/'.
+   *
+   * @param $mimetype
+   *   Get the mimetype.
+   */
+  static public function translateMimeType($mimetype) {
+    static $translate = array(
+      'application/ogg' => 'video/ogg',
+    );
+
+    // Translate.
+    return (isset($translate[$mimetype]) ? $translate[$mimetype] : $mimetype);
+  }
+
+  /**
    * The mimetype returned is based on the URI and content we return.
    *
    * @param string $uri
@@ -132,7 +149,7 @@ class MediaMosaStreamWrapper extends MediaReadOnlyStreamWrapper {
         }
 
         $mediafile_xml = MediaMosaCkConnectorWrapper::request_get_mediafile($params['mediafile_id']);
-        $mimetypes[$params['mediafile_id']] = empty($mediafile_xml->items->item->metadata->mime_type) ? 'application/octet-stream' : (string) $mediafile_xml->items->item->metadata->mime_type;
+        $mimetypes[$params['mediafile_id']] = self::translateMimeType(empty($mediafile_xml->items->item->metadata->mime_type) ? 'application/octet-stream' : (string) $mediafile_xml->items->item->metadata->mime_type);
 
         // return the mime-type, if any.
         return $mimetypes[$params['mediafile_id']];
@@ -146,26 +163,57 @@ class MediaMosaStreamWrapper extends MediaReadOnlyStreamWrapper {
     return 'application/octet-stream';
   }
 
-  public function getOriginalThumbnailPath() {
-    $parts = $this->get_parameters();
-
+  /**
+   * Returns the still url of the asset. Made static for external access.
+   *
+   * @param $asset_id
+   *   The asset_id for the still.
+   *
+   * @return
+   *   The url to the still.
+   *
+   * @see getOriginalThumbnailPath()
+   */
+  static public function mediamosa_getOriginalThumbnailPath($asset_id) {
     try {
       // Get the still url.
-      $asset = MediaMosaCkConnectorWrapper::request_get_asset($parts['asset_id']);
+      $asset = MediaMosaCkConnectorWrapper::request_get_asset($asset_id);
       $thumb = (string) $asset->items->item->vpx_still_url;
     }
     catch (Exception $e) {
     }
 
     return empty($thumb) ? FALSE : $thumb; // Return FALSE when no still.
- }
+  }
 
-  public function getLocalThumbnailPath() {
+  /**
+   * Returns the still url of the asset.
+   *
+   * @return
+   *   The url to the still.
+   *
+   * @see mediamosa_getOriginalThumbnailPath()
+   */
+  public function getOriginalThumbnailPath() {
     $parts = $this->get_parameters();
+    return self::mediamosa_getOriginalThumbnailPath($parts['asset_id']);
+  }
 
-    $local_path = 'public://media-mediamosa/' . $parts['asset_id'] . '.jpg';
+  /**
+   * Returns the local version path of the still.
+   *
+   * @param $asset_id
+   *   The asset_id for the still.
+   *
+   * @return
+   *   The local path of the still.
+   *
+   * @see getLocalThumbnailPath()
+   */
+  static public function mediamosa_getLocalThumbnailPath($asset_id) {
+    $local_path = 'public://media-mediamosa/' . $asset_id . '.jpg';
     if (!file_exists($local_path) || time() - filectime($local_path) > MediaMediaMosa::THUMBNAIL_EXPIRE_TIME) {
-      $original_thumb = $this->getOriginalThumbnailPath();
+      $original_thumb = self::mediamosa_getOriginalThumbnailPath($asset_id);
       if (empty($original_thumb)) {
         return NULL;
       }
@@ -175,5 +223,18 @@ class MediaMosaStreamWrapper extends MediaReadOnlyStreamWrapper {
       @copy($original_thumb, $local_path);
     }
     return $local_path;
+  }
+
+  /**
+   * Returns the local version path of the still.
+   *
+   * @return
+   *   The local path of the still.
+   *
+   * @see mediamosa_getLocalThumbnailPath()
+   */
+  public function getLocalThumbnailPath() {
+    $parts = $this->get_parameters();
+    return self::mediamosa_getLocalThumbnailPath($parts['asset_id']);
   }
 }

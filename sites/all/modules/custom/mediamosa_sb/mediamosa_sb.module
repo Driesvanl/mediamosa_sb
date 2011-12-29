@@ -22,3 +22,130 @@
  * @file
  * The main module file for MediaMosa Site Builder.
  */
+
+/**
+ * Implements hook_menu().
+ *
+ * Here we set up the URLs (menu entries) for the
+ * form examples. Note that most of the menu items
+ * have page callbacks and page arguments set, with
+ * page arguments set to be functions in external files.
+ */
+function mediamosa_sb_menu() {
+  $items = array();
+
+  $items['asset/upload'] = array(
+    'title' => 'Upload',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('mediamosa_sb_upload_form'),
+    'access callback' => TRUE,
+    'description' => 'Upload a new video.',
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'mediamosa_sb.asset.inc',
+  );
+
+  $items['asset/upload/edit/%/%'] = array(
+    'title' => 'Edit asset',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('mediamosa_sb_upload_steps_form', 3, 4),
+    'access callback' => TRUE,
+    'description' => 'Edit the properties of the video',
+    'type' => MENU_CALLBACK,
+    'visible' => FALSE,
+    'file' => 'mediamosa_sb.asset.inc',
+  );
+
+  $items['collection/add'] = array(
+    'title' => 'Add collection',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('mediamosa_sb_collection_add_form'),
+    'access callback' => TRUE,
+    'description' => 'Edit the properties of the collection.',
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'mediamosa_sb.collection.inc',
+  );
+
+  $items['collection/edit/%'] = array(
+    'title' => 'Edit collection',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('mediamosa_sb_collection_edit_form', 2),
+    'access callback' => TRUE,
+    'description' => 'Edit the properties of the collection.',
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'mediamosa_sb.collection.inc',
+  );
+
+  $items['collection/delete/%'] = array(
+    'title' => 'Delete collection',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('mediamosa_sb_collection_delete_confirm_form', 2),
+    'access callback' => TRUE,
+    'description' => 'Delete the collection, but not the assets.',
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'mediamosa_sb.collection.inc',
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function mediamosa_sb_theme() {
+  return array(
+    'mediamosa_sb_profile_select' => array(
+      'render element' => 'element',
+    ),
+  );
+}
+
+/**
+ * Custom theme for profile.
+ *
+ * @param type $variables
+ * @return type
+ */
+function theme_mediamosa_sb_profile_select($variables) {
+
+  $element = $variables['element'];
+
+  $element += array(
+    '#empty' => t('No profiles found.'),
+  );
+
+  $rows = array();
+  $header = array(
+    'active' => t('Active'),
+    'profile' => t('Profile'),
+    'downloadable' => t('Downloadable'),
+  );
+
+  if (!empty($element['#options'])) {
+    foreach ($element['#options'] as $option) {
+      $row = array();
+
+      // Checkbox select transcode.
+      $checkbox = array(
+        '#name' => 'active_' . $option['profile_id'],
+        '#type' => 'checkbox',
+        '#value' => $option['active'],
+      );
+      $row[] = array('data' => drupal_render($checkbox));
+
+      // Title.
+      $row[] = array('data' => check_plain($option['title']));
+
+
+      // Checkbox select transcode.
+      $checkbox = array(
+        '#name' => 'downloadable_' . $option['profile_id'],
+        '#type' => 'checkbox',
+        '#value' => $option['active'],
+      );
+      $row[] = array('data' => drupal_render($checkbox));
+
+      $rows[] = $row;
+    }
+  }
+
+  return theme('table', array('header' => $header, 'rows' => $rows, 'empty' => $element['#empty'], 'attributes' => $element['#attributes']));
+}

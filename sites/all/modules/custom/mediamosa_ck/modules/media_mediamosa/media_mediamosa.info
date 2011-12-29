@@ -17,3 +17,4 @@ files[] = media_mediamosa.internetbase.handler.class.inc
 files[] = media_mediamosa.stream.wrapper.class.inc
 files[] = media_mediamosa.styles.class.inc
 files[] = media_mediamosa.sync.class.inc
+files[] = media_mediamosa.thumb.wrapper.class.inc

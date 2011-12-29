@@ -95,6 +95,12 @@ function media_mediamosa_stream_wrappers() {
       'description' => t('Media provided by MediaMosa.'),
       'type' => STREAM_WRAPPERS_READ_VISIBLE,
     ),
+/*    'mediamosa-thumb' => array(
+      'name' => t('MediaMosa videos'),
+      'class' => 'MediaMosaThumbWrapper',
+      'description' => t('Media thumbnail provided by MediaMosa.'),
+      'type' => STREAM_WRAPPERS_READ_VISIBLE,
+    ),*/
   );
 }
 

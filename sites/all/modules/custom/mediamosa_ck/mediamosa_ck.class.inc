@@ -106,12 +106,14 @@ class mediamosa_ck extends mediamosa_sdk {
   }
 
   /**
-   * Get the default user / owner for assets and mediafiles.
+   * Get the current session user ID to use for ownership or calls where
+   * user_id is required.
    */
-  static public function setting_user_id() {
+  static public function session_user_id() {
     global $user;
 
-    return $user->uid;
+    // We use mail address as owner.
+    return $user->mail;
   }
 
   /*

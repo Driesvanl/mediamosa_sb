@@ -35,7 +35,7 @@ class MediaMosaCkConnectorTranscodeWrapper extends MediaMosaCkConnectorWrapper {
    *
    * @return $profiles
    */
-  static public function transcode_profiles_get() {
+  static public function request_get_transcode_profiles() {
     $data = array();
 
     try {

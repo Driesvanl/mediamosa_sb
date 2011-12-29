@@ -455,9 +455,9 @@ function mediamosa_ck_stats_theme() {
 }
 
 /**
- * Our table wrapper.
+ * Our theme table wrapper.
  *
- * @param array $variables
+ * @param $variables
  */
 function theme_mediamosa_ck_stats_table($variables) {
   drupal_add_css(drupal_get_path('module', 'mediamosa_ck.stats') . '/mediamosa_ck.stats.css');

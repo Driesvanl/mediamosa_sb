@@ -50,6 +50,7 @@ class mediamosa_ck_views_rest_asset_search extends mediamosa_ck_views_rest {
     $fields = array(
       'viewed', 'played',
       'videotimestamp', 'videotimestampmodified',
+      'owner_id', 'group_id',
     );
 
     // Now process the xml into an object views can work with.
@@ -102,140 +103,24 @@ class mediamosa_ck_views_rest_asset_search extends mediamosa_ck_views_rest {
         ),
       ),
 
-      // Fields.
-      'asset_id' => array(
-        'title' => t('Asset ID'),
+      // Search fields.
+      'keywords' => array(
+        'title' => t('The search box'),
         'help' => t('Unique Identifier of each asset.'),
-        'field' => array(
-          'handler' => 'mediamosa_ck_views_field_text',
-          'click sortable' => TRUE,
-        ),
         'filter' => array(
           'handler' => 'mediamosa_ck_views_filter_text',
-          'mediamosa_filter_keys' => array('filter_key' => 'granted'),
-        ),
-        'sort' => array(
-          'handler' => 'mediamosa_ck_views_sort',
-        ),
-      ),
-
-      'granted' => array(
-        'title' => t('Granted'),
-        'help' => t('Granted value indicates if you are allowed to see and play mediafile.'),
-        'field' => array(
-          'handler' => 'mediamosa_ck_views_field_text',
-        ),
-        'filter' => array(
-          'handler' => 'mediamosa_ck_views_filter_text',
-        ),
-      ),
-
-      'viewed' => array(
-        'title' => t('Viewed'),
-        'help' => t('Number of times viewed.'),
-        'field' => array(
-          'handler' => 'mediamosa_ck_views_field_text',
-          'click sortable' => TRUE,
-        ),
-        'sort' => array(
-          'handler' => 'mediamosa_ck_views_sort',
-        ),
-      ),
-
-      'played' => array(
-        'title' => t('Played'),
-        'help' => t('Number of times played.'),
-        'field' => array(
-          'handler' => 'mediamosa_ck_views_field_text',
-          'click sortable' => TRUE,
-        ),
-        'sort' => array(
-          'handler' => 'mediamosa_ck_views_sort',
-        ),
-      ),
-
-      'videotimestamp' => array(
-        'title' => t('Videotimestamp'),
-        'help' => t('When asset got a video.'),
-        'field' => array(
-          'handler' => 'mediamosa_ck_views_field_date',
-        ),
-        'sort' => array(
-          'handler' => 'mediamosa_ck_views_sort',
-        ),
-      ),
-
-      'videotimestampmodified' => array(
-        'title' => t('Videotimestamp modified'),
-        'help' => t('When asset was modified.'),
-        'field' => array(
-          'handler' => 'mediamosa_ck_views_field_date',
-        ),
-        'sort' => array(
-          'handler' => 'mediamosa_ck_views_sort',
-        ),
-      ),
-
-      // Fields.
-      'title' => array(
-        'title' => t('Title'),
-        'help' => t('The title of the asset. Is for display purpose only.'),
-        'field' => array(
-          'handler' => 'mediamosa_ck_views_field_text',
-          'click sortable' => FALSE,
-        ),
-      ),
-
-      'still_url' => array(
-        'title' => t('Still'),
-        'help' => t('The thumbnail of the media.'),
-        'field' => array(
-          'handler' => 'mediamosa_ck_views_field_still',
         ),
       ),
     );
 
+    // Add asset stuff.
+    self::get_views_data_asset_common($data);
+
+    // Owner / group.
+    self::get_views_data_owner_stuff($data);
+
     // Add metadata.
-    foreach (mediamosa_ck::get_metadata_fields() as $set => $metadata) {
-      foreach ($metadata['fields'] as $name => $type) {
-
-        //
-        switch ($type) {
-          case 'DATETIME':
-            $data[$set . '_' . $name] = array(
-              'title' => t($set . '.' . $name),
-              'help' => t('Metadata date field in @set_label.', array('@set_label' => $metadata['title'])),
-              'field' => array(
-                'handler' => 'mediamosa_ck_views_field_date',
-                'click sortable' => TRUE,
-              ),
-              'sort' => array(
-                'handler' => 'mediamosa_ck_views_sort',
-              ),
-            );
-            break;
-
-          case 'CHAR':
-          case 'INT':
-          default:
-            $data[$set . '_' . $name] = array(
-              'title' => t($set . '.' . $name),
-              'help' => t('Metadata field in @set_label.', array('@set_label' => $metadata['title'])),
-              'field' => array(
-                'handler' => 'mediamosa_ck_views_field_text',
-                'click sortable' => TRUE,
-              ),
-              'filter' => array(
-                'handler' => 'mediamosa_ck_views_filter_text',
-              ),
-              'sort' => array(
-                'handler' => 'mediamosa_ck_views_sort',
-              ),
-            );
-            break;
-        }
-      }
-    }
+    self::get_views_data_metadata($data);
 
     return $data;
   }

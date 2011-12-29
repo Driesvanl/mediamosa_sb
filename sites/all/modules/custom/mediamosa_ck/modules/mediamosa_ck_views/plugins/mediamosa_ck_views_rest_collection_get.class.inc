@@ -24,7 +24,7 @@
  * uses the Views 3 plugin option to query another source instead of the normal
  * Drupal database.
  */
-class mediamosa_ck_views_rest_collection_search extends mediamosa_ck_views_rest {
+class mediamosa_ck_views_rest_collection_get extends mediamosa_ck_views_rest {
 
   /**
    * Execute the REST call.
@@ -35,19 +35,30 @@ class mediamosa_ck_views_rest_collection_search extends mediamosa_ck_views_rest 
    *   Array of options and settings.
    */
   public function do_rest_call($view, $params, array $options = array()) {
-    $options += array(
-      'offset' => $params['start'],
-      'limit' => $params['rows'],
-    );
+    // Total results.
+    $view->total_rows = 0;
 
-    // Do the search.
-    $response = MediaMosaCkConnectorWrapper::request_collection_search($options);
+    // Get the asset_id.
+    $coll_id = empty($view->args) ? '' : $view->args[0];
+
+    if (empty($coll_id)) {
+      return;
+    }
+
+    try {
+      // Get the asset.
+      $xml = MediaMosaCkConnectorWrapper::request_get_collection($coll_id, $options);
+    }
+    catch (Exception $e) {
+      mediamosa_ck::watchdog_error('Unable to retrieve collection from MediaMosa, message: @message.', array('@message' => $e->getMessage()));
+      return;
+    }
 
     // Get the fields.
     $fields = self::get_fields(self::get_views_data('foo', 'foo'));
 
     // Now process the xml into an object views can work with.
-    foreach($response->xml->xpath('items/item') as $item) {
+    foreach($xml->xpath('items/item') as $item) {
       $object = new stdClass();
 
       foreach ($fields as $field) {
@@ -60,7 +71,7 @@ class mediamosa_ck_views_rest_collection_search extends mediamosa_ck_views_rest 
     }
 
     // Assign total number of records to get pager.
-    $view->total_rows = (int) $response->xml->header->item_count_total;
+    $view->total_rows = (int) $xml->header->item_count_total;
   }
 
   /**
@@ -75,7 +86,7 @@ class mediamosa_ck_views_rest_collection_search extends mediamosa_ck_views_rest 
         'base' => array(
           'field' => 'id',
           'title' => t($title),
-          'help' => t('Search a collection using the MediaMosa backend'),
+          'help' => t('Retrieve a collection using the MediaMosa backend'),
           'query class' => $class,
         ),
       ),
@@ -86,6 +97,11 @@ class mediamosa_ck_views_rest_collection_search extends mediamosa_ck_views_rest 
 
     // Owner / group.
     self::get_views_data_owner_stuff($data);
+
+    // Make coll_id contextual.
+    $data['coll_id']['argument'] = array(
+      'handler' => 'views_handler_argument_string',
+    );
 
     return $data;
   }

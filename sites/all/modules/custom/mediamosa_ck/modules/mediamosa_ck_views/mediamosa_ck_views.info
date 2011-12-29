@@ -10,8 +10,13 @@ dependencies[] = mediamosa_ck (>=1.99)
 features[ctools][] = "views:views_default:3.0"
 
 files[] = handlers/mediamosa_ck_views_field_date.class.inc
-files[] = handlers/mediamosa_ck_views_field_text.class.inc
+files[] = handlers/mediamosa_ck_views_field_player.class.inc
 files[] = handlers/mediamosa_ck_views_field_still.class.inc
+files[] = handlers/mediamosa_ck_views_field_text.class.inc
+files[] = handlers/mediamosa_ck_views_field_text_collections.class.inc
+files[] = handlers/mediamosa_ck_views_field_text_mediafiles.class.inc
+files[] = handlers/mediamosa_ck_views_field_text_metadata.class.inc
+files[] = handlers/mediamosa_ck_views_field_text_technical_metadata.class.inc
 files[] = handlers/mediamosa_ck_views_filter_boolean.class.inc
 files[] = handlers/mediamosa_ck_views_filter_text.class.inc
 files[] = handlers/mediamosa_ck_views_sort.class.inc
@@ -19,7 +24,10 @@ files[] = handlers/mediamosa_ck_views_sort.class.inc
 ; REST view classes.
 files[] = plugins/mediamosa_ck_views_rest.class.inc
 files[] = plugins/mediamosa_ck_views_rest_asset_featured.class.inc
+files[] = plugins/mediamosa_ck_views_rest_asset_get.class.inc
 files[] = plugins/mediamosa_ck_views_rest_asset_new.class.inc
 files[] = plugins/mediamosa_ck_views_rest_asset_popular.class.inc
 files[] = plugins/mediamosa_ck_views_rest_asset_search.class.inc
+files[] = plugins/mediamosa_ck_views_rest_collection_asset.class.inc
+files[] = plugins/mediamosa_ck_views_rest_collection_get.class.inc
 files[] = plugins/mediamosa_ck_views_rest_collection_search.class.inc

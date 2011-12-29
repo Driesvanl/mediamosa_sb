@@ -187,7 +187,7 @@ function _media_mediamosa_get_media_id($asset_id) {
  * @param $job_type
  */
 function _media_mediamosa_get_running_jobs(&$form, $mediafile_id, $job_type) {
-  $jobs = MediaMosaCkConnectorWrapper::request_job_get($mediafile_id, mediamosa_ck::setting_user_id());
+  $jobs = MediaMosaCkConnectorWrapper::request_get_job($mediafile_id, mediamosa_ck::session_user_id());
   $jobs_count = 0;
   if ($jobs->items->item) {
     foreach ($jobs->items->item as $job) {

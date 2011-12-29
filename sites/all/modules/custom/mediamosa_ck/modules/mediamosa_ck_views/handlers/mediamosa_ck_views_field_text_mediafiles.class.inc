@@ -18,7 +18,42 @@
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
-class mediamosa_ck_views_field_still extends views_handler_field {
+class mediamosa_ck_views_field_text_mediafiles extends views_handler_field_xss {
+
+  function option_definition() {
+    $options = parent::option_definition();
+
+    $options['mediafile_theme'] = array('default' => 'mediamosa_ck_view_theme_asset_mediafiles');
+
+    return $options;
+  }
+
+  function options_form(&$form, &$form_state) {
+    parent::options_form($form, $form_state);
+    $form['mediafile_theme'] = array(
+      '#title' => t('Theme function to use'),
+      '#type' => 'textfield',
+      '#default_value' => $this->options['mediafile_theme'],
+    );
+  }
+
+  /**
+   * Get the value that's supposed to be rendered.
+   *
+   * @param $values
+   *   An object containing all retrieved values.
+   * @param $field
+   *   Optional name of the field where the value is stored.
+   */
+  function get_value($values, $field = NULL) {
+
+    // Get the data.
+    $mediafiles = parent::get_value($values, $field);
+
+    return theme($this->options['mediafile_theme'], array('mediafiles' => $mediafiles));
+  }
+
+
   // The following methods express strong SQLisms in the base field handler
   // class. Override and blank them out.
   function pre_render() {
@@ -41,46 +76,5 @@ class mediamosa_ck_views_field_still extends views_handler_field {
     if (!empty($this->additional_fields)) {
       $this->add_additional_fields($this->additional_fields);
     }
-  }
-
-  /**
-   * Setup default for options.
-   */
-  function option_definition() {
-    $options = parent::option_definition();
-
-    $options['still_style'] = array('default' => TRUE);
-
-    return $options;
-  }
-
-  /**
-   * Still options.
-   */
-  function options_form(&$form, &$form_state) {
-
-    // File the options.
-    $styles = array();
-    foreach (image_styles() as $style_name => $image_style) {
-      $styles[$style_name] = $style_name;
-    }
-
-    $form['still_style'] = array(
-      '#title' => t('Select image style'),
-      '#type' => 'select',
-      '#options' => $styles,
-      '#default_value' => !empty($this->options['still_style']),
-    );
-    parent::options_form($form, $form_state);
-  }
-
-  function render($values) {
-    $variables = array(
-      'style_name' => $this->options['still_style'],
-      // @todo: should be an real path instead of public://.
-      'path' => MediaMosaStreamWrapper::mediamosa_getLocalThumbnailPath($values->asset_id),
-    );
-
-    return theme('image_style', $variables);
   }
 }

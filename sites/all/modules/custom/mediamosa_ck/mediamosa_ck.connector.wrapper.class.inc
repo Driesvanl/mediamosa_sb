@@ -77,7 +77,7 @@ class MediaMosaCkConnectorWrapper extends mediamosa_connector {
   static public function request_create_upload_ticket(array $options = array()) {
     try {
       // Get the user_id for the owner.
-      $user_id = mediamosa_ck::setting_user_id();
+      $user_id = mediamosa_ck::session_user_id();
 
       // Create the asset.
       $response = mediamosa_ck::request_post_fatal('asset/create', array('user_id' => $user_id));
@@ -158,16 +158,51 @@ class MediaMosaCkConnectorWrapper extends mediamosa_connector {
    * @param $options
    *  - show_stills (Default TRUE).
    *    TRUE / FALSE to include stills.
+   *  - show_collections (Default FALSE).
+   *    TRUE / FALSE to include collections.
    */
   static public function request_get_asset($asset_id, array $options = array()) {
     $options += array(
       'show_stills' => TRUE,
+      'show_collections' => FALSE,
     );
 
     // Convert bool to strings.
-    $options = self::bool2string($options, array('show_stills'));
+    $options = self::bool2string($options, array('show_stills', 'show_collections'));
 
     return mediamosa_ck::request_get_fatal('asset/' . rawurlencode($asset_id), array('data' => $options))->xml;
+  }
+
+  /**
+   * Get the collection.
+   *
+   * @param string $coll_id
+   *  The ID of the collection to get.
+   * @param array $options
+   *  - hide_empty_assets
+   *    TRUE / FALSE include empty assets (have no mediafiles).
+   */
+  static public function request_get_collection($coll_id, array $options = array(), $reset = FALSE) {
+
+    // Save results.
+    $collections = &drupal_static(__CLASS__ . '::' . __FUNCTION__, array());
+
+    if ($reset) {
+      $collections = array();
+    }
+    elseif (empty($collections[$coll_id])) {
+      $options += array(
+        'hide_empty_assets' => TRUE,
+      );
+
+      // Convert bool to strings.
+      $options = self::bool2string($options, array('hide_empty_assets'));
+
+      // Create the asset.
+      $collections[$coll_id] = mediamosa_ck::request_get_fatal('collection/' . rawurlencode($coll_id), $options)->xml;
+    }
+
+    return $collections[$coll_id];
   }
 
   /**
@@ -186,17 +221,30 @@ class MediaMosaCkConnectorWrapper extends mediamosa_connector {
   /**
    * Create a play link.
    *
-   * @param string $asset_id
-   * @param string $mediafile_id
-   * @param string $user_id
-   * @param array $options
+   * @param $asset_id
+   *   The asset ID.
+   * @param $mediafile_id
+   *   The mediafile ID.
+   * @param $user_id
+   *   The user ID of the watcher. Best is to use
+   *   mediamosa_ck::session_user_id() to get current user_id.
+   * @param $options
+   *   Set of options for the REST call.
+   *   - response
+   *     plain, object, metafile, still, download.
+   *
    */
   static public function request_get_play_link($asset_id, $mediafile_id = '', $user_id = '', array $options = array()) {
 
     $play_links = &drupal_static(__CLASS__ . '::' . __FUNCTION__, array());
 
+    // Setup default.
+    $options += array(
+      'response' => 'plain',
+    );
+
     try {
-      // If now user_id is present, then we need the owner from the asset_id. We
+      // If no user_id is present, then we need the owner from the asset_id. We
       // don't fix this by using the is_app_admin, because it will then allow to
       // play unapropriate videos.
       if (empty($user_id)) {
@@ -205,19 +253,20 @@ class MediaMosaCkConnectorWrapper extends mediamosa_connector {
 
       $options['user_id'] = $user_id;
       $options['mediafile_id'] = $mediafile_id;
+      $response_type = $options['response'];
 
-      if (!empty($play_links[$asset_id][$mediafile_id])) {
-        return $play_links[$asset_id][$mediafile_id];
+      if (!empty($play_links[$asset_id][$mediafile_id][$response_type])) {
+        return $play_links[$asset_id][$mediafile_id][$response_type];
       }
 
       $xml = mediamosa_ck::request_get_fatal('asset/' . rawurlencode($asset_id) . '/play', array('data' => $options))->xml;
 
-      $play_links[$asset_id][$mediafile_id] = empty($xml->items->item->output) ? FALSE : (string) $xml->items->item->output;
-      return $play_links[$asset_id][$mediafile_id];
+      $play_links[$asset_id][$mediafile_id][$response_type] = empty($xml->items->item->output) ? FALSE : (string) $xml->items->item->output;
+      return $play_links[$asset_id][$mediafile_id][$response_type];
     }
     catch (Exception $e) {
       // Don't display error to user, just log.
-      mediamosa_ck::watchdog('Unable to create upload ticket; @message.', array('@message' => $e->getMessage()));
+      mediamosa_ck::watchdog('Unable to create play ticket; @message.', array('@message' => $e->getMessage()));
       return FALSE;
     }
   }
@@ -229,7 +278,7 @@ class MediaMosaCkConnectorWrapper extends mediamosa_connector {
    *
    * @return $jobs
    */
-  static public function request_job_get($mediafile_id, $user_id = NULL) {
+  static public function request_get_job($mediafile_id, $user_id = NULL) {
     if (!$user_id) {
       $mediafile = MediaMosaCkConnectorWrapper::request_get_mediafile($mediafile_id);
       $user_id = (string) $mediafile->items->item->owner_id;
@@ -326,6 +375,8 @@ class MediaMosaCkConnectorWrapper extends mediamosa_connector {
       'orderby' => 'videotimestampmodified',
       // Direction either descending or ascending.
       'direction' => 'ascending',
+      // Search within these collection(s).
+      'coll_id' => array(),
     );
 
     // CQL search.
@@ -418,5 +469,65 @@ class MediaMosaCkConnectorWrapper extends mediamosa_connector {
 
     // Get the assets.
     return !empty($response) ? $response : array();
+  }
+
+  /**
+   * Create a basic collection.
+   *
+   * @param $options
+   *   The options for the collection.
+   *   - title
+   *     The title of the collection.
+   *   - description
+   *     The description of the collection.
+   *
+   * @return type
+   */
+  static public function request_post_collection_add($options = array()) {
+    try {
+      $options += array(
+        'user_id' => mediamosa_ck::session_user_id(),
+      );
+
+      // Create the asset.
+      $response = mediamosa_ck::request_post_fatal('collection/create', array('data' => $options));
+
+      // Return the collection ID.
+      return (string) $response->xml->items->item->coll_id;
+    }
+    catch (Exception $e) {
+      mediamosa_ck::watchdog_error('Unable to create collection; @message.', array('@message' => $e->getMessage()));
+      return FALSE;
+    }
+  }
+
+  /**
+   * Update a collection.
+   *
+   * @param $options
+   *   The options for the collection.
+   *   - title
+   *     The title of the collection.
+   *   - description
+   *     The description of the collection.
+   *
+   * @return type
+   */
+  static public function request_post_collection_update($coll_id, $options = array()) {
+    try {
+      $options += array(
+        'user_id' => mediamosa_ck::session_user_id(),
+      );
+
+      // Create the asset.
+      $response = mediamosa_ck::request_post_fatal('collection/' . rawurlencode($coll_id), array('data' => $options));
+
+      // Return the collection ID.
+      return (string) $response->xml->items->item->coll_id;
+    }
+    catch (Exception $e) {
+      mediamosa_ck::watchdog_error('Unable to create collection; @message.', array('@message' => $e->getMessage()));
+      return FALSE;
+    }
   }
 }

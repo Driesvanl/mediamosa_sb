@@ -1,4 +1,3 @@
-; $Id:$
 name = "MediaMosa Site Builder"
 description = "MediaMosa Site Builer is a standard front-end application for MediaMosa with very powerful tools to customize your MediaMosa website."
 package = "MediaMosa Site Builder"
@@ -15,8 +14,8 @@ dependencies[] = mediamosa_ck_transcode
 dependencies[] = mediamosa_ck_views
 
 ; Dependencies (contrib).
-dependencies[] = panels (>=2.99)
-dependencies[] = panels_mini (>=2.99)
+;dependencies[] = panels (>=2.99)
+;dependencies[] = panels_mini (>=2.99)
 
 files[] = mediamosa_sb.class.inc
 files[] = mediamosa_sb.connector.wrapper.class.inc
