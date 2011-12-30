@@ -45,7 +45,7 @@ class mediamosa_ck_views_rest_asset_search extends mediamosa_ck_views_rest {
     );
 
     // Do the search.
-    $response = MediaMosaCkConnectorWrapper::request_asset_search($options);
+    $response = MediaMosaCkConnectorWrapper::search_asset($options);
 
     $fields = array(
       'viewed', 'played',

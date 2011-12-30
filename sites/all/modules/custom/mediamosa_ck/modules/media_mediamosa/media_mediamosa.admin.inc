@@ -43,7 +43,7 @@ function _media_mediamosa_uploaded_file($asset_id, $mediafile_id) {
 
   try {
     // Need to get info of mediafile/asset.
-    $mediafile_xml = MediaMosaCkConnectorWrapper::request_get_mediafile($mediafile_id);
+    $mediafile_xml = MediaMosaCkConnectorWrapper::get_mediafile($mediafile_id);
 
     // Get filename.
     $filename = (string) $mediafile_xml->items->item->filename;

@@ -58,7 +58,7 @@ class mediamosa_ck_views_rest_asset_get extends mediamosa_ck_views_rest {
 
     try {
       // Get the asset.
-      $xml = MediaMosaCkConnectorWrapper::request_get_asset($asset_id, $options);
+      $xml = MediaMosaCkConnectorWrapper::get_asset($asset_id, $options);
     }
     catch (Exception $e) {
       mediamosa_ck::watchdog_error('Unable to retrieve asset from MediaMosa, message: @message.', array('@message' => $e->getMessage()));

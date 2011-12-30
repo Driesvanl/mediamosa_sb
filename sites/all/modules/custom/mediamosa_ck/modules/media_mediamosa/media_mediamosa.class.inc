@@ -103,7 +103,7 @@ class MediaMediaMosa {
    */
   static public function create_media($asset) {
     try {
-      $mediafiles = MediaMosaConnectorMediaWrapper::request_get_asset_mediafiles($asset['asset_id']);
+      $mediafiles = MediaMosaConnectorMediaWrapper::get_asset_mediafiles($asset['asset_id']);
 
       $mediafile = FALSE;
       foreach ($mediafiles as $mediafile) {
@@ -176,7 +176,7 @@ class MediaMediaMosa {
 
     // We have done with DC/QDC fields. Now lets take care about mediafiles itself and mediafiles tech info.
 
-    $mediafiles = MediaMosaConnectorMediaWrapper::request_get_asset_mediafiles($asset['asset_id']);
+    $mediafiles = MediaMosaConnectorMediaWrapper::get_asset_mediafiles($asset['asset_id']);
     // We get array of arrays for each asset. But we need one global array for all essets. So pick just
     // first element of each. It doesn't seem like a best solution.
     $mediafiles = reset($mediafiles);
@@ -263,7 +263,7 @@ class MediaMediaMosa {
    *   The number of assets in MediaMosa.
    */
   static public function assets_in_mediamosa() {
-    return MediaMosaConnectorMediaWrapper::request_get_number_of_assets();
+    return MediaMosaConnectorMediaWrapper::get_number_of_assets();
   }
 
   /**

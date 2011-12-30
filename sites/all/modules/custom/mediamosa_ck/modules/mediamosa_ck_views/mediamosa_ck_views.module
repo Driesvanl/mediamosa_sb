@@ -28,6 +28,7 @@ function mediamosa_ck_views_views_api() {
   }
 }
 
+
 /**
  * Implements hook_views_plugins().
  */
@@ -179,6 +180,10 @@ function theme_mediamosa_ck_view_theme_asset_mediafiles($variables) {
 function theme_mediamosa_ck_view_theme_asset_collections($variables) {
   // Empty.
   $output = array();
+
+  if (empty($variables['collections'])) {
+    return;
+  }
 
   // Loop.
   foreach ($variables['collections'] as $collection) {

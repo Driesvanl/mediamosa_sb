@@ -52,6 +52,7 @@ function _mediamosa_sb_collection_form($values) {
  */
 function mediamosa_sb_collection_add_form($form, $form_state) {
 
+  // Set default.
   $form_state += array(
     'values' => array(),
   );
@@ -60,7 +61,7 @@ function mediamosa_sb_collection_add_form($form, $form_state) {
   $form = _mediamosa_sb_collection_form($form_state['values']);
 
   // Submit button.
-  $form['next'] = array(
+  $form['save'] = array(
     '#type' => 'submit',
     '#value' => t('Save'),
   );
@@ -85,7 +86,7 @@ function mediamosa_sb_collection_add_form_submit($form, $form_state) {
   );
 
   // Add the collection.
-  $coll_id = MediaMosaSbConnectorWrapper::request_post_collection_add($options);
+  $coll_id = MediaMosaSbConnectorWrapper::create_collection($options);
   if ($coll_id) {
     drupal_goto('collection/' . rawurlencode($coll_id));
   }
@@ -100,7 +101,7 @@ function mediamosa_sb_collection_add_form_submit($form, $form_state) {
 function mediamosa_sb_collection_edit_form($form, $form_state, $coll_id) {
 
   // Get the collection.
-  $collection = MediaMosaSbConnectorWrapper::request_get_collection($coll_id);
+  $collection = MediaMosaSbConnectorWrapper::get_collection($coll_id);
 
   // Can't find collection?
   if (!$collection) {
@@ -122,12 +123,12 @@ function mediamosa_sb_collection_edit_form($form, $form_state, $coll_id) {
   $form = _mediamosa_sb_collection_form($form_state['values']);
 
   $form['coll_id'] = array(
-    '#type' => 'hidden',
-    '#default_value' => $coll_id,
+    '#type' => 'value',
+    '#value' => $coll_id,
   );
 
   // Submit button.
-  $form['next'] = array(
+  $form['save'] = array(
     '#type' => 'submit',
     '#value' => t('Save'),
   );
@@ -165,7 +166,7 @@ function mediamosa_sb_collection_edit_form_submit($form, $form_state) {
       );
 
       // Add the collection.
-      MediaMosaSbConnectorWrapper::request_post_collection_update($coll_id, $options);
+      MediaMosaSbConnectorWrapper::update_collection($coll_id, $options);
       break;
 
     case t('Delete'):
@@ -185,7 +186,7 @@ function mediamosa_sb_collection_edit_form_submit($form, $form_state) {
 function mediamosa_sb_collection_delete_confirm_form($form, &$form_state, $coll_id) {
 
   // Get the collection.
-  $collection = MediaMosaSbConnectorWrapper::request_get_collection($coll_id);
+  $collection = MediaMosaSbConnectorWrapper::get_collection($coll_id);
 
   if (!$collection) {
     drupal_set_message(t('Unable to find collection.'), 'warning');
@@ -195,7 +196,7 @@ function mediamosa_sb_collection_delete_confirm_form($form, &$form_state, $coll_
   }
 
   $form['coll_id'] = array(
-    '#type' => 'hidden',
+    '#type' => 'value',
     '#value' => $coll_id,
   );
 
@@ -217,38 +218,41 @@ function mediamosa_sb_collection_delete_confirm_form_submit($form, &$form_state)
   // Remove all links
   $coll_id = $form_state['values']['coll_id'];
 
-  // Get the collection.
-  $collection = MediaMosaSbConnectorWrapper::request_get_collection($coll_id);
-/*
-    // Get all asset_ids.
-    $asset_ids = mediamosa_asset_collection::get_asset_ids_by_coll_ids(array($coll_id))->fetchCol();
+  // Get the current user.
+  $user_id = mediamosa_ck::session_user_id();
+
+  do {
+    // Get the asset_ids.
+    $xml = MediaMosaSbConnectorWrapper::get_collection_asset_ids($coll_id);
+    if (!$xml) {
+      drupal_goto('collection/' . rawurlencode($coll_id));
+    }
+
+    // Collect the asset_ids;
+    $asset_ids = array();
+
+    // Collect the asset_ids.
+    foreach ($xml->items->item as $item) {
+      $asset_ids[] = (string) $item->asset_id;
+    }
 
     if (!empty($asset_ids)) {
-      $url = strtr('collection/@coll_id/asset_relation/delete', array('@coll_id' => $coll_id));
-
-      $asset_ids_todo = array();
-
-      // As long we got ids, we'll continue.
-      while (count($asset_ids)) {
-        for ($x = 0; $x < 5000 && count($asset_ids); $x++) {
-          $asset_ids_todo[] = array_pop($asset_ids);
-        }
-
-        // Do request to get total of assets in collection.
-        mediamosa_response_connector::static_do_restcall_drupal($url, 'POST', array('app_id' => $collection[mediamosa_collection_db::APP_ID], 'asset_id' => $asset_ids_todo, 'user_id' => $collection[mediamosa_collection_db::OWNER_ID]));
+      // Delete relations.
+      if (!MediaMosaSbConnectorWrapper::delete_collection_asset_relations($coll_id, $user_id, $asset_ids)) {
+        mediamosa_sb::watchdog_error('Unable to remove assets from collection.');
+        drupal_goto('collection/' . rawurlencode($coll_id));
       }
     }
   }
+  while (!empty($asset_ids));
 
-  // Delete the collection.
-  $url = strtr('collection/@coll_id/delete', array('@coll_id' => $coll_id));
-  $result = mediamosa_response_connector::static_do_restcall_drupal($url, 'POST', array('app_id' => $collection[mediamosa_collection_db::APP_ID], 'user_id' => $collection[mediamosa_collection_db::OWNER_ID]));
-
-  if (in_array((int)$result->request_result_id, array(mediamosa_error::ERRORCODE_OKAY, mediamosa_error::ERRORCODE_EMPTY_RESULT))) {
-    drupal_set_message(t('The collection has been deleted.'));
-    drupal_goto('admin/mediamosa/browse/collection');
+  // No more assets in collection, now remove collection.
+  if (!MediaMosaSbConnectorWrapper::delete_collection($coll_id, $user_id)) {
+    mediamosa_sb::watchdog_error('Unable to delete collection.');
+    drupal_goto('collection/' . rawurlencode($coll_id));
   }
-*/
-  drupal_goto('collection/' . rawurlencode($coll_id));
 
+  // All ok.
+  drupal_set_message(t('Collection has been deleted.'));
+  drupal_goto('collections');
 }

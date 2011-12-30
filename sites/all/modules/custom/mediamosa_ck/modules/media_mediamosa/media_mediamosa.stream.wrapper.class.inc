@@ -50,7 +50,7 @@ class MediaMosaStreamWrapper extends MediaReadOnlyStreamWrapper {
       return FALSE;
     }
 
-    return MediaMosaCkConnectorWrapper::request_get_play_link($parameters['asset_id'], $parameters['mediafile_id']);
+    return MediaMosaCkConnectorWrapper::get_play_link($parameters['asset_id'], $parameters['mediafile_id']);
   }
 
   /**
@@ -148,7 +148,7 @@ class MediaMosaStreamWrapper extends MediaReadOnlyStreamWrapper {
           return $mimetypes[$params['mediafile_id']];
         }
 
-        $mediafile_xml = MediaMosaCkConnectorWrapper::request_get_mediafile($params['mediafile_id']);
+        $mediafile_xml = MediaMosaCkConnectorWrapper::get_mediafile($params['mediafile_id']);
         $mimetypes[$params['mediafile_id']] = self::translateMimeType(empty($mediafile_xml->items->item->metadata->mime_type) ? 'application/octet-stream' : (string) $mediafile_xml->items->item->metadata->mime_type);
 
         // return the mime-type, if any.
@@ -177,7 +177,7 @@ class MediaMosaStreamWrapper extends MediaReadOnlyStreamWrapper {
   static public function mediamosa_getOriginalThumbnailPath($asset_id) {
     try {
       // Get the still url.
-      $asset = MediaMosaCkConnectorWrapper::request_get_asset($asset_id);
+      $asset = MediaMosaCkConnectorWrapper::get_asset($asset_id);
       $thumb = (string) $asset->items->item->vpx_still_url;
     }
     catch (Exception $e) {

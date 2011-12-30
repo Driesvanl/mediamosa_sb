@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 /**
  * MediaMosa is a Full Featured, Webservice Oriented Media Management and
  * Distribution platform (http://www.vpcore.nl)
@@ -249,6 +247,104 @@ class mediamosa_ck extends mediamosa_sdk {
   }
 
   /**
+   * Opposite of parse_url.
+   *
+   * @param $urls
+   * @param $return_parts
+   *  Return the array with host and uri.
+   */
+  static public function build_url($urls, $return_parts = FALSE) {
+
+    $result = array(
+      'host' => array($urls['scheme'] . '://'),
+      'uri' => array(),
+    );
+
+    // Setup default.
+    $urls += array(
+      'user' => '',
+      'pass' => '',
+      'port' => 0,
+      'path' => '',
+      'query' => '',
+      'fragment' => '',
+    );
+
+    // Add user : pass
+    if ($urls['user'] != '' || $urls['pass'] != '') {
+      $result['host'][] = $urls['user'];
+      $result['host'][] = ':';
+      $result['host'][] = $urls['pass'];
+      $result['host'][] = '@';
+    }
+
+    // Host.
+    $result['host'][] = trim($urls['host'], '/');
+
+    // Optional port
+    if ($urls['port']) {
+      $result['host'][] = ':' . $urls['port'];
+    }
+
+    // Path.
+    if ($urls['path'] != '') {
+      $result['uri'][] = '/' . trim($urls['path'], '/');
+    }
+
+    // Query.
+    if ($urls['query'] != '') {
+      $result['uri'][] = '?' . $urls['query'];
+    }
+
+    // Fragment.
+    if ($urls['fragment'] != '') {
+      $result['uri'][] = $urls['fragment'];
+    }
+
+    // Now rebuild url.
+    return $return_parts ? array('host' => implode('', $result['host']), 'uri' => implode('', $result['uri'])) : (implode('', $result['host']) . implode('', $result['uri']));
+  }
+
+  /**
+   * Wrapper around http_build_query().
+   *
+   * @param array $query
+   */
+  static public function http_build_query($query) {
+    return strtr(http_build_query($query, '', '&'), array('%5B' => '[', '%5D' => ']', '%5b' => '[', '%5d' => ']'));
+  }
+
+  /**
+   * Opposite of http_build_query()
+   *
+   * @param $query_str
+   */
+  static public function parse_query($query_str) {
+    // Split the url.
+    $query = array();
+
+    // Split values.
+    foreach (explode('&', $query_str) as $valuepair) {
+      if (strpos($valuepair, '=')) {
+        list($name, $value) = explode('=', $valuepair, 2);
+        $query[urldecode($name)][] = urldecode($value);
+      }
+      else {
+        $query[urldecode($valuepair)][] = '';
+      }
+    }
+
+    // Now make single item queries with 0 keys no array.
+    foreach ($query as $name => $value) {
+      if (count($value) == 1 && key($value) == 0) {
+        $query[$name] = reset($value);
+      }
+    }
+
+    return $query;
+  }
+
+  /**
    * This function will return the active metadata fields on the active
    * MediaMosa connection. For now we return DC/QDC, but in future we need to
    * find out or query MediaMosa what metadata is allowed. MediaMosa does not
@@ -303,8 +399,30 @@ class mediamosa_ck extends mediamosa_sdk {
 
   /**
    * Returns the metadata field that is used for title.
+   *
+   * @see get_asset_title()
    */
   static public function get_metadata_title() {
     return 'dc.title';
+  }
+
+  /**
+   * Returns the title of the asset using the metadata.
+   *
+   * @param simplexmlelement $asset
+   *   The asset in simplexmlelement.
+   *
+   * @return
+   *   The title or ''.
+   *
+   * @see get_metadata_title()
+   */
+  static public function get_asset_title($asset) {
+    $title = '';
+    if (isset($asset->items) && isset($asset->items->item) && isset($asset->items->item->dublin_core) && isset($asset->items->item->dublin_core->title)) {
+      $title = trim((string) $asset->items->item->dublin_core->title);
+    }
+
+    return $title;
   }
 }

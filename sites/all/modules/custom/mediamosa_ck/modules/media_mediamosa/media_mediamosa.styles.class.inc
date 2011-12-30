@@ -73,7 +73,7 @@ class MediaMediaMosaFileStyles extends FileStyles {
         @unlink($local_path);
         try {
           // Get the still url.
-          $asset = MediaMosaCkConnectorWrapper::request_get_asset($asset_id);
+          $asset = MediaMosaCkConnectorWrapper::get_asset($asset_id);
           $still_url = (string) $asset->items->item->vpx_still_url;
 
           // Test before usage.
@@ -101,7 +101,7 @@ class MediaMediaMosaFileStyles extends FileStyles {
     $mediafile_id = $params['mediafile_id'];
     $mediafile_id_transcoded = $mediafile_id;
 
-    $asset = MediaMosaCkConnectorWrapper::request_get_asset($asset_id);
+    $asset = MediaMosaCkConnectorWrapper::get_asset($asset_id);
     $user_id = (string) $asset->items->item->owner_id;
     if (isset($asset->items->item->mediafiles->mediafile)) {
       foreach ($asset->items->item->mediafiles->mediafile as $mediafile) {
@@ -119,7 +119,7 @@ class MediaMediaMosaFileStyles extends FileStyles {
       //'fullscreen' => $this->get_fullscreen(),
       'response' => 'object',
     );
-    $output = MediaMosaCkConnectorWrapper::request_get_play_link($asset_id, $mediafile_id_transcoded, $user_id, $options);
+    $output = MediaMosaCkConnectorWrapper::get_play_link($asset_id, $mediafile_id_transcoded, $user_id, $options);
 
     $this->setOutput($output);
   }

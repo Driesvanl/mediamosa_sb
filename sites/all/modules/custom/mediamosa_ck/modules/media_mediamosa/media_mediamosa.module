@@ -201,9 +201,9 @@ function media_mediamosa_file_delete($file) {
   $asset_id = $params['asset_id'];
 
   try {
-    $asset = MediaMosaConnectorMediaWrapper::request_get_asset($asset_id, array('show_stills' => FALSE));
+    $asset = MediaMosaConnectorMediaWrapper::get_asset($asset_id, array('show_stills' => FALSE));
     $user_id = (string) $asset->items->item->owner_id;
-    MediaMosaConnectorMediaWrapper::asset_delete($asset_id, $user_id);
+    MediaMosaConnectorMediaWrapper::delete_asset($asset_id, $user_id);
   }
   catch (Exception $e) {
     // Ignore, at this point we expect that the asset is either gone already
@@ -437,7 +437,7 @@ function media_mediamosa_media_edit_submit($form, &$form_state) {
     }
 
     // Use REST to store the metadata.
-    MediaMosaConnectorMediaWrapper::request_post_metadata($uri['asset_id'], $changed_metadata);
+    MediaMosaConnectorMediaWrapper::update_metadata($uri['asset_id'], $changed_metadata);
   }
 }
 
@@ -519,7 +519,7 @@ function _media_mediamosa_sync_batch_finished($success, $results, $operations) {
       $items[] = t('Syncronized @count media with MediaMosa, created @count_created new Media and updated @count_updated Media.', array('@count' => $results['synced'], '@count_created' => $results['synced_created'], '@count_updated' => $results['synced_updated']));
 
       // We are synced, set cron to last modified date (if any).
-      $videotimestampmodified = MediaMosaConnectorMediaWrapper::request_get_highest_videotimestamp_modified();
+      $videotimestampmodified = MediaMosaConnectorMediaWrapper::get_highest_videotimestamp_modified();
       if (!empty($videotimestampmodified)) {
         $time_last = MediaMediaMosa::date2unix($videotimestampmodified) + 1;
         variable_set('media_mediamosa_sync_time_' . MediaMosaConnectorMediaWrapper::build_connection_id(), $time_last);

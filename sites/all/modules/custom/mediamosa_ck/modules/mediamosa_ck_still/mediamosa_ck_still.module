@@ -261,7 +261,7 @@ function _mediamosa_ck_still_show_stills_form($media_data) {
   try {
     $asset_id = $media_data['asset_id'];
     $mediafile_id = $media_data['mediafile_id'];
-    $mediafile = MediaMosaCkConnectorWrapper::request_get_mediafile($mediafile_id);
+    $mediafile = MediaMosaCkConnectorWrapper::get_mediafile($mediafile_id);
 
     $form['show_stills'] = array(
       '#type' => 'fieldset',
@@ -375,7 +375,7 @@ function _mediamosa_ck_still_show_stills_form_submit($form, &$form_state) {
   if ($media_data) {
     $asset_id = $media_data['asset_id'];
     $mediafile_id = $media_data['mediafile_id'];
-    $mediafile = MediaMosaCkConnectorWrapper::request_get_mediafile($mediafile_id);
+    $mediafile = MediaMosaCkConnectorWrapper::get_mediafile($mediafile_id);
     $user_id = (string) $mediafile->items->item->owner_id;
 
     // Set default still.
@@ -542,7 +542,7 @@ function _mediamosa_ck_stills_form_submit($form, &$form_state) {
 
   if ($media_data) {
     $mediafile_id = $media_data['mediafile_id'];
-    $mediafile = MediaMosaCkConnectorWrapper::request_get_mediafile($mediafile_id);
+    $mediafile = MediaMosaCkConnectorWrapper::get_mediafile($mediafile_id);
     $user_id = (string) $mediafile->items->item->owner_id;
     $data = array(
       'still_type' => $values['still_type'],

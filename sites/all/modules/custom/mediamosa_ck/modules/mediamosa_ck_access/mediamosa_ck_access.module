@@ -80,7 +80,7 @@ function _mediamosa_ck_access_generate_form() {
       $mediafile_id = $media_data['mediafile_id'];
 
       if ($mediafile_id) {
-        $mediafile = MediaMosaCkConnectorWrapper::request_get_mediafile($mediafile_id);
+        $mediafile = MediaMosaCkConnectorWrapper::get_mediafile($mediafile_id);
         $user_id = (string) $mediafile->items->item->owner_id;
         $access = MediaMosaCkConnectorAccessWrapper::get_access_control($mediafile_id, $user_id);
       }
@@ -144,7 +144,7 @@ function _mediamosa_ck_access_generate_form_submit($form, &$form_state) {
 
   if ($media_data) {
     // Get the asset with all the mediafiles.
-    $asset_get = MediaMosaCkConnectorWrapper::request_get_asset($media_data['asset_id']);
+    $asset_get = MediaMosaCkConnectorWrapper::get_asset($media_data['asset_id']);
     // Set the access rules to all the mediafiles.
     if (!empty($asset_get->items->item->mediafiles->mediafile) && $asset_get->items->item->mediafiles->mediafile) {
       foreach ($asset_get->items->item->mediafiles->mediafile as $mediafile_get) {

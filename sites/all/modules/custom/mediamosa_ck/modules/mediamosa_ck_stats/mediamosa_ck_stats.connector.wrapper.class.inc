@@ -36,7 +36,7 @@ class MediaMosaCkConnectorStatsWrapper extends MediaMosaCkConnectorWrapper {
    *
    * @param array $options
    */
-  static public function request_stats_popular_mediafiles($options) {
+  static public function get_stats_popular_mediafiles($options) {
 
     $options += array(
       'limit' => 50,

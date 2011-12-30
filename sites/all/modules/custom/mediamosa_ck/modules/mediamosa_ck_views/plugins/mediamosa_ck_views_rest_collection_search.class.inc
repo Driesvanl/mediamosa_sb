@@ -41,13 +41,16 @@ class mediamosa_ck_views_rest_collection_search extends mediamosa_ck_views_rest 
     );
 
     // Do the search.
-    $response = MediaMosaCkConnectorWrapper::request_collection_search($options);
+    $xml = MediaMosaCkConnectorWrapper::search_collection($options);
+    if (empty($xml)) {
+      return;
+    }
 
     // Get the fields.
     $fields = self::get_fields(self::get_views_data('foo', 'foo'));
 
     // Now process the xml into an object views can work with.
-    foreach($response->xml->xpath('items/item') as $item) {
+    foreach($xml->xpath('items/item') as $item) {
       $object = new stdClass();
 
       foreach ($fields as $field) {
@@ -60,7 +63,7 @@ class mediamosa_ck_views_rest_collection_search extends mediamosa_ck_views_rest 
     }
 
     // Assign total number of records to get pager.
-    $view->total_rows = (int) $response->xml->header->item_count_total;
+    $view->total_rows = (int) $xml->header->item_count_total;
   }
 
   /**

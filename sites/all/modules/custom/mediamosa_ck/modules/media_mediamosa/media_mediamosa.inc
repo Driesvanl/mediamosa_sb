@@ -47,7 +47,7 @@ define('MEDIA_MEDIAMOSA_JOB_STATUS_WAITING', 'WAITING');
 function _media_mediamosa_upload_form($form, &$form_state, $types = NULL) {
 
   // Try to create upload ticket.
-  $result = MediaMosaCkConnectorWrapper::request_create_upload_ticket();
+  $result = MediaMosaCkConnectorWrapper::create_upload_ticket();
   if (!$result) {
     $form['upload'] = array(
       '#markup' => t('Unable to upload to MediaMosa; @reason', array('@reason' => mediamosa_ck::get_connector_last_error_text())),
@@ -187,7 +187,7 @@ function _media_mediamosa_get_media_id($asset_id) {
  * @param $job_type
  */
 function _media_mediamosa_get_running_jobs(&$form, $mediafile_id, $job_type) {
-  $jobs = MediaMosaCkConnectorWrapper::request_get_job($mediafile_id, mediamosa_ck::session_user_id());
+  $jobs = MediaMosaCkConnectorWrapper::get_job($mediafile_id, mediamosa_ck::session_user_id());
   $jobs_count = 0;
   if ($jobs->items->item) {
     foreach ($jobs->items->item as $job) {
@@ -230,12 +230,12 @@ function _media_mediamosa_time_to_rfc_3339($time = NULL) {
 function _media_mediamosa_delete_mediafile_transcoded($asset_id) {
   $mediafile_ids = array();
 
-  $asset = MediaMosaCkConnectorWrapper::request_get_asset($asset_id);
+  $asset = MediaMosaCkConnectorWrapper::get_asset($asset_id);
 
   if (isset($asset->items->item->mediafiles->mediafile) && $asset->items->item->mediafiles->mediafile) {
     foreach ($asset->items->item->mediafiles->mediafile as $mediafile) {
       if ((string) $mediafile->is_original_file != 'TRUE') {
-        MediaMosaCkConnectorWrapper::mediafile_delete((string) $mediafile->mediafile_id, (string) $mediafile->owner_id);
+        MediaMosaCkConnectorWrapper::delete_mediafile((string) $mediafile->mediafile_id, (string) $mediafile->owner_id);
       }
     }
   }

@@ -37,22 +37,60 @@ function mediamosa_sb_menu() {
   $items['asset/upload'] = array(
     'title' => 'Upload',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('mediamosa_sb_upload_form'),
-    'access callback' => TRUE,
+    'page arguments' => array('mediamosa_sb_asset_upload_form'),
     'description' => 'Upload a new video.',
     'type' => MENU_NORMAL_ITEM,
     'file' => 'mediamosa_sb.asset.inc',
+    'access callback' => TRUE,
   );
 
   $items['asset/upload/edit/%/%'] = array(
     'title' => 'Edit asset',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('mediamosa_sb_upload_steps_form', 3, 4),
+    'page arguments' => array('mediamosa_sb_asset_upload_steps_form', 3, 4),
     'access callback' => TRUE,
     'description' => 'Edit the properties of the video',
     'type' => MENU_CALLBACK,
     'visible' => FALSE,
     'file' => 'mediamosa_sb.asset.inc',
+  );
+
+  $items['asset/edit/%'] = array(
+    'title' => 'Info',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('mediamosa_sb_asset_edit_metadata_form', 2),
+    'access callback' => TRUE,
+    'description' => 'Edit metadata of the asset.',
+    'type' => MENU_CALLBACK,
+    'file' => 'mediamosa_sb.asset.inc',
+    'weight' => -6,
+  );
+  $items['asset/edit/%/info'] = array(
+    'title' => 'Info',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -6,
+  );
+
+  $items['asset/edit/%/access'] = array(
+    'title' => 'Access',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('mediamosa_sb_asset_edit_access_form', 2),
+    'access callback' => TRUE,
+    'description' => 'Edit metadata of the asset.',
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'mediamosa_sb.asset.inc',
+    'weight' => -4,
+  );
+
+  $items['asset/edit/%/media'] = array(
+    'title' => 'Video',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('mediamosa_sb_asset_edit_media_form', 2),
+    'access callback' => TRUE,
+    'description' => 'Control the transcode and stills of the asset.',
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'mediamosa_sb.asset.inc',
+    'weight' => -4,
   );
 
   $items['collection/add'] = array(

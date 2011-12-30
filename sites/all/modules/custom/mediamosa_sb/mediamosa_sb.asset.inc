@@ -22,13 +22,11 @@
  * Step 1: Upload file to MediaMosa.
  */
 function mediamosa_sb_asset_upload_form($form, &$form_state) {
-  // If you are familiar with how browsers handle files, you know that
-  // enctype="multipart/form-data" is required. Drupal takes care of that, so
-  // you don't need to include it yourself.
+  // Set title.
   drupal_set_title(t('Step 1/4: Upload'));
 
   // Try to create upload ticket.
-  $result = MediaMosaCkConnectorWrapper::request_create_upload_ticket();
+  $result = MediaMosaCkConnectorWrapper::create_upload_ticket();
   if (!$result) {
     $form['upload'] = array(
       '#markup' => t('Unable to upload to MediaMosa; @reason', array('@reason' => mediamosa_ck::get_connector_last_error_text())),
@@ -64,7 +62,7 @@ function mediamosa_sb_asset_upload_form($form, &$form_state) {
   // Drupal.
   $form['redirect_uri'] = array(
     '#type' => 'hidden',
-    '#value' => url('mediamosa/upload/edit/' . rawurlencode($result['asset_id']) . '/' . rawurlencode($result['mediafile_id']), array('absolute' => TRUE)),
+    '#value' => url('asset/upload/edit/' . rawurlencode($result['asset_id']) . '/' . rawurlencode($result['mediafile_id']), array('absolute' => TRUE)),
   );
 
   $form['submit'] = array(
@@ -106,7 +104,7 @@ function mediamosa_sb_asset_upload_steps_form($form, &$form_state, $asset_id, $m
         'name' => 'Access & Visibility',
       ),
       3 => array(
-        'form' => 'mediamosa_sb_asset_upload_step_transcode_form',
+        'form' => 'mediamosa_sb_asset_upload_step_media_form',
         'name' => 'Define formats',
       ),
     );
@@ -178,7 +176,7 @@ function _mediamosa_sb_asset_upload_steps_cancel_submit($form, &$form_state) {
  * @param $form_state
  */
 function _mediamosa_sb_asset_upload_steps_next_submit($form, &$form_state) {
-  $form_state['step_information'][$form_state['step']]['stored_values'] = $form_state['values'];
+  $form_state['step_information'][$form_state['step']]['stored_values'] = $form_state['input'];
 
   if ($form_state['step'] < count($form_state['step_information'])) {
     $form_state['step']++;
@@ -196,255 +194,15 @@ function _mediamosa_sb_asset_upload_steps_next_submit($form, &$form_state) {
 }
 
 /**
- * The metadata step form.
+ * The info (metadata) step form.
  */
-function mediamosa_sb_asset_upload_step_metadata_form($form, &$form_state) {
-  $form = array();
-
-  $form['basic'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Basic Information'),
+function mediamosa_sb_asset_upload_step_metadata_form($form, $form_state) {
+  // Set default.
+  $form_state += array(
+    'values' => array(),
   );
 
-  $form['basic']['title'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Title'),
-    '#required' => TRUE,
-  );
-
-  $form['basic']['description'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Description'),
-    '#required' => FALSE,
-  );
-
-  $form['collections'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Collections'),
-  );
-
-  $form['collections']['collections'] = array(
-    '#type' => 'select',
-    '#title' => t('My collections'),
-    '#required' => FALSE,
-    '#size'=> 5,
-    '#options' => array(
-       0 => t('Farmacologie dagen 2011'),
-       1 => t('Rondom Uithof'),
-     ),
-  );
-
-  $form['add'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Additional metadata <span>(According Dublin Metadata Initiative)</span>'),
-  );
-
-  $form['add']['dc'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Dublin core'),
-    '#collapsible' => TRUE,
-    '#collapsed' => FALSE,
-  );
-
-  $form['add']['dc']['type'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Type'),
-    '#required' => FALSE,
-    '#description' => t('The nature or genre of the resource e.g. Image, MovingImage'),
-  );
-
-  $form['add']['dc']['format'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Format'),
-    '#required' => FALSE,
-    '#description' => t('The file format, physical medium e.g. video, image'),
-  );
-
-  $form['add']['dc']['language'] = array(
-    '#type' => 'select',
-    '#title' => t('Language'),
-    '#required' => FALSE,
-    '#description' => t('The language of the resource'),
-    '#options'  => mediamosa_sb::get_metdata_languages_options(),
-  );
-
-  $form['add']['dc']['creator'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Creator'),
-    '#required' => FALSE,
-    '#description' => t('Responsible for making the resource'),
-  );
-
-  $form['add']['dc']['publisher'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Publisher'),
-    '#required' => FALSE,
-    '#description' => t('Responsible for making the resource available'),
-  );
-
-  $form['add']['dc']['subject'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Subject'),
-    '#required' => FALSE,
-    '#description' => t('The topic of the resource'),
-  );
-
-  // Provide a default date in the format YYYY-MM-DD HH:MM:SS.
-  $date = '';
-
-  // Provide a format using regular PHP format parts (see documentation on php.net).
-  // If you're using a date_select, the format will control the order of the date parts in the selector,
-  // rearrange them any way you like. Parts left out of the format will not be displayed to the user.
-  $format = 'Y-m-d';
-
-  $form['add']['dc']['date'] = array(
-    '#type' => 'date_popup',
-    '#title' => t('Date'),
-    '#description' => t('Date of the resource'),
-    '#required' => FALSE,
-    '#default_value' => $date,
-    '#date_format' => $format,
-    '#size' => 40,
-    '#date_label_position' => 'within', // See other available attributes and what they do in date_api_elements.inc
-
-  );
-
-  $form['add']['dc']['identifier'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Indentifier'),
-    '#required' => FALSE,
-    '#description' => t('An unambiguous reference to the resource within a given context'),
-  );
-
-  $form['add']['dc']['source'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Source'),
-    '#required' => FALSE,
-    '#description' => t('A related resource from which the described resource is derived'),
-  );
-
-  $form['add']['dc']['relation'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Relation'),
-    '#required' => FALSE,
-    '#description' => t('A related resource from which the described resource is derived'),
-  );
-
-  $form['add']['dc']['coverage_temporal'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Temporal coverage'),
-    '#required' => FALSE,
-    '#description' => t('The spatial or temporal topic of the resource, the spatial applicability of the resource, or the jurisdiction under which the resource is relevant'),
-  );
-
-  $form['add']['dc']['coverage_spatial'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Spatial coverage'),
-    '#required' => FALSE,
-    '#description' => t('The spatial or temporal topic of the resource, the spatial applicability of the resource, or the jurisdiction under which the resource is relevant'),
-  );
-
-  $form['add']['dc']['rights'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Rights'),
-    '#required' => FALSE,
-    '#description' => t('Information about rights held in and over the resource.'),
-  );
-
-  $form['add']['qdc'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Qualified Dublin core'),
-    '#collapsible' => TRUE,
-    '#collapsed' => FALSE,
-  );
-
-  $form['add']['qdc']['title_alternative'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Alternative title'),
-    '#required' => FALSE,
-    '#description' => t('Alternative title of the resource'),
-  );
-
-  $form['add']['qdc']['description_abstra'] = array(
-    '#type' => 'textarea',
-    '#title' => t('Abstract description'),
-    '#required' => FALSE,
-    '#rows' => 5,
-    '#description' => t('An abstract description of the resource'),
-  );
-
-  $form['add']['qdc']['created'] = array(
-    '#type' => 'date_popup',
-    '#title' => t('Created'),
-    '#description' => t('Date of creation of the resource.'),
-    '#required' => FALSE,
-    '#default_value' => $date,
-    '#date_format' => $format,
-    '#size' => 40,
-    '#date_label_position' => 'within',
-  );
-
-  $form['add']['qdc']['issued'] = array(
-    '#type' => 'date_popup',
-    '#title' => t('Issued'),
-    '#description' => t('Date of formal issuance (e.g., publication) of the resource'),
-    '#required' => FALSE,
-    '#default_value' => $date,
-    '#date_format' => $format,
-    '#size' => 40,
-    '#date_label_position' => 'within',
-  );
-
-  $form['add']['qdc']['hasformat'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Has format'),
-    '#required' => FALSE,
-    '#description' => t('The described resource pre-existed the referenced resource'),
-  );
-
-  $form['add']['qdc']['isformat'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Is format of'),
-    '#required' => FALSE,
-    '#description' => t('The described resource is the same intellectual content of the referenced resource, but presented in another format'),
-  );
-
-  $form['add']['qdc']['format_medium'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Medium'),
-    '#required' => FALSE,
-    '#description' => t('The material or physical carrier of the resource'),
-  );
-
-  $form['add']['qdc']['format_extent'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Extent'),
-    '#required' => FALSE,
-    '#description' => t('The size or duration of the resource'),
-  );
-
-  $form['add']['qdc']['license'] = array(
-    '#type' => 'textfield',
-    '#title' => t('License'),
-    '#required' => FALSE,
-    '#description' => t('License of the resource'),
-  );
-
-  $form['add']['qdc']['rightsholder'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Rights'),
-    '#required' => FALSE,
-    '#description' => t('Rights holder of the resource'),
-  );
-
-  $form['add']['qdc']['isreferencedby'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Is referenced by'),
-    '#required' => FALSE,
-    '#description' => t('The described resource is referenced, cited, or otherwise pointed to by the referenced resource.'),
-  );
-
-  return $form;
+  return mediamosa_sb_asset_forms::metadata_form($form_state['values']);
 }
 
 /**
@@ -460,47 +218,12 @@ function mediamosa_sb_asset_upload_step_metadata_form_validate($form, $form_stat
  * @ingroup upload_form
  */
 function mediamosa_sb_asset_upload_step_access_form($form, $form_state) {
-  $form = array();
-
-  $form['visibility'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Visibility'),
+  // Set default.
+  $form_state += array(
+    'values' => array(),
   );
 
-  $form['visibility']['title'] = array(
-    '#prefix' => t('Visible in lists'),
-    '#type' => 'checkbox',
-    '#title' => t('Visible in lists'),
-    '#required' => FALSE,
-  );
-
-  $form['control'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Access control'),
-  );
-
-  $form['control']['domain'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Domain'),
-    '#required' => FALSE,
-    '#description' => t('Define which domains can view this video'),
-  );
-
-  $form['control']['realm'] = array(
-    '#type' => 'textfield',
-    '#title' => t('By realm'),
-    '#required' => FALSE,
-    '#description' => t('Select wich registered users based on there email domain have access to this video'),
-  );
-
-  $form['control']['mail'] = array(
-    '#type' => 'textfield',
-    '#title' => t('By email'),
-    '#required' => FALSE,
-    '#description' => t('Select wich registered users based on there email adress have access to this video'),
-  );
-
-  return $form;
+  return mediamosa_sb_asset_forms::access_form($form_state['values']);
 }
 
 /**
@@ -509,60 +232,13 @@ function mediamosa_sb_asset_upload_step_access_form($form, $form_state) {
  *
  * @ingroup upload_form
  */
-function mediamosa_sb_asset_upload_step_transcode_form($form, &$form_state) {
-  $form = array();
-
-  $form['transcode'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Visibility'),
+function mediamosa_sb_asset_upload_step_media_form($form, &$form_state) {
+  // Set default.
+  $form_state += array(
+    'values' => array(),
   );
 
-  try {
-    $profiles = MediaMosaCkConnectorTranscodeWrapper::request_get_transcode_profiles();
-  }
-  catch (Exception $e) {
-    drupal_set_message(t('Unable to retrieve transcode profiles, check MediaMosa Connector.'), 'error');
-    return $form;
-  }
-
-  $options = array();
-
-  $transcode_profile_default = 0;
-  if (!empty($profiles->xml->items->item)) {
-    foreach ($profiles->xml->items->item as $profile) {
-      $profile_id = (int) $profile->profile_id;
-
-      // Is default profile?
-      $options[$profile_id]['is_default'] = drupal_strtoupper((string) $profile->default) == 'TRUE';
-
-      $options[$profile_id]['active'] = FALSE;
-      $options[$profile_id]['downloadable'] = FALSE;
-      $options[$profile_id]['title'] = (string) $profile->profile;
-      $options[$profile_id]['profile_id'] = (int) $profile->profile_id;
-    }
-  }
-
-  $form['transcode']['table'] = array(
-    '#theme' => 'mediamosa_sb_profile_select',
-    '#options' => $options, //mediamosa_connector::variable_get('media_mediamosa_transcode_profile_default_options_value', $options),
-    '#default_value' => reset($options),
-  );
-
-  $form['still'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Still generation for this video'),
-  );
-
-  $form['still']['title'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Time for still generation'),
-    '#required' => FALSE,
-    '#size' => 5,
-    '#value' => '00.00', // added default value.
-    '#description' => t('Enter the time for the frame on which the still wil be generated'),
-  );
-
-  return $form;
+  return mediamosa_sb_asset_forms::media_form($form_state['values']);
 }
 
 /**
@@ -586,17 +262,305 @@ function _mediamosa_sb_asset_upload_steps_finish_validation($form, &$form_state)
  */
 function _mediamosa_sb_asset_upload_steps_finish_submit($form, &$form_state) {
   // Store the last step.
-  $form_state['step_information'][$form_state['step']]['stored_values'] = $form_state['values'];
+  $form_state['step_information'][$form_state['step']]['stored_values'] = $form_state['input'];
 
   // Run function for posting metadata to MediaMosa.
-  mediamosa_sb::post_metadata($form_state['step_information'][1]['stored_values'], $form_state['asset_id'], $form_state['mediafile_id']);
+  mediamosa_sb::post_metadata($form_state['step_information'][1]['stored_values'], $form_state['asset_id']);
 
   // Run function for posting access rules to MediaMosa.
   mediamosa_sb::post_access($form_state['step_information'][2]['stored_values'], $form_state['asset_id'], $form_state['mediafile_id']);
 
   // Run function for posting transcode jobs to MediaMosa.
-  mediamosa_sb::post_transcode($form_state['step_information'][3]['stored_values'], $form_state['asset_id'], $form_state['mediafile_id']);
+  mediamosa_sb::post_media($form_state['step_information'][3]['stored_values'], $form_state['asset_id'], $form_state['mediafile_id']);
 
   // Go to view page.
   drupal_goto('asset/' . rawurlencode( $form_state['asset_id']));
+}
+
+/**
+ * Build the metadata form.
+ *
+ * @param $form
+ * @param $form_state
+ * @param $asset_id
+ * @return
+ *   The metadata form.
+ */
+function mediamosa_sb_asset_edit_metadata_form($form, &$form_state, $asset_id) {
+
+  $values = array();
+
+  // Get the asset.
+  $asset = MediaMosaSbConnectorWrapper::get_asset($asset_id, array('show_collections' => TRUE));
+  if (!$asset) {
+    drupal_set_message('Media not found');
+    return;
+  }
+
+  // Get title.
+  $title = mediamosa_ck::get_asset_title($asset);
+
+  // Set the title.
+  drupal_set_title(mediamosa_sb::get_asset_title($asset));
+
+  // Get the metadata setup.
+  $metadata_fields = mediamosa_ck::get_metadata_fields();
+
+  // Fill values with metadata.
+  foreach ($metadata_fields as $prefix => $metadata_field) {
+
+    // Must exists.
+    if (!isset($asset->items->item->{$metadata_field['xpath']})) {
+      continue;
+    }
+
+    // Loop through fields.
+    foreach ($asset->xpath('items/item/' . $metadata_field['xpath']) as $metadata) {
+      foreach ($metadata as $name => $value) {
+        $values[$prefix . '_' . (string) $name] = (string) $value;
+      }
+    }
+  }
+
+  // Get the collections of the asset.
+  foreach ($asset->xpath('items/item/collections/collection') as $collection) {
+    $values['mycollections'][] = (string) $collection->attributes()->id;
+  }
+
+  $form = mediamosa_sb_asset_forms::metadata_form($values);
+
+  $form['asset_id'] = array(
+    '#type' => 'value',
+    '#value' => $asset_id,
+  );
+
+    // Submit button.
+  $form['save'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save'),
+  );
+
+  $form['delete'] = array(
+    '#type' => 'submit',
+    '#value' => t('Delete'),
+  );
+
+  return $form;
+}
+
+/**
+ * Validation for asset info page.
+ */
+function mediamosa_sb_asset_edit_metadata_form_validation($form, &$form_state) {
+}
+
+/**
+ * Submit for asset info page.
+ */
+function mediamosa_sb_asset_edit_metadata_form_submit($form, $form_state) {
+  // What was pressed.
+  $op = isset($form_state['values']['op']) ? $form_state['values']['op'] : '';
+
+  // The collection ID.
+  $asset_id = $form_state['values']['asset_id'];
+
+  switch ($op) {
+    case t('Save'):
+      // Run function for posting metadata to MediaMosa.
+      mediamosa_sb::post_metadata($form_state['input'], $asset_id);
+      break;
+
+    case t('Delete'):
+      drupal_goto('asset/delete/' . rawurlencode($asset_id));
+  }
+
+  // Redirect.
+  drupal_goto('asset/' . rawurlencode($asset_id));
+}
+
+function mediamosa_sb_asset_edit_access_form($form, $form_state, $asset_id) {
+  $values = array();
+
+  // Get the asset.
+  $asset = MediaMosaSbConnectorWrapper::get_asset($asset_id);
+  if (!$asset) {
+    drupal_set_message('Media not found');
+    return;
+  }
+
+  // Set the title.
+  drupal_set_title(mediamosa_sb::get_asset_title($asset));
+
+  // Set values. Use the original mediafile.
+  $mediafile_ids = MediaMosaSbConnectorWrapper::get_asset_mediafile_ids($asset_id, array('get_original_only' => TRUE));
+  $mediafile_id = reset($mediafile_ids);
+
+  if (!empty($mediafile_id)) {
+    $access = MediaMosaSbConnectorWrapper::get_access_control($mediafile_id, mediamosa_ck::session_user_id());
+
+    $values['acl_domain'] = implode(', ', $access['acl_domain']);
+    $values['acl_realm'] = implode(', ', $access['acl_realm']);
+    $values['acl_user'] = implode(', ', $access['acl_user']);
+  }
+
+  // isprivate = !is_visible.
+  $values['is_visible'] = drupal_strtoupper((string) $asset->items->item->isprivate) == 'TRUE' ? FALSE : TRUE;
+
+  // Get the form.
+  $form = mediamosa_sb_asset_forms::access_form($values);
+
+  $form['asset_id'] = array(
+    '#type' => 'value',
+    '#value' => $asset_id,
+  );
+
+    // Submit button.
+  $form['save'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save'),
+  );
+
+  return $form;
+}
+
+/**
+ * Validation for asset access page.
+ */
+function mediamosa_sb_asset_edit_access_form_validation($form, &$form_state) {
+}
+
+/**
+ * Submit for asset access page.
+ */
+function mediamosa_sb_asset_edit_access_form_submit($form, $form_state) {
+  // What was pressed.
+  $op = isset($form_state['values']['op']) ? $form_state['values']['op'] : '';
+
+  // The collection ID.
+  $asset_id = $form_state['values']['asset_id'];
+
+  switch ($op) {
+    case t('Save'):
+      // Run function for posting access to MediaMosa.
+      mediamosa_sb::post_access($form_state['input'], $asset_id);
+      break;
+  }
+
+  // Redirect.
+  drupal_goto('asset/' . rawurlencode($asset_id));
+}
+
+function mediamosa_sb_asset_edit_media_form($form, $form_state, $asset_id) {
+  $values = array();
+
+  // Get the asset.
+  $asset = MediaMosaSbConnectorWrapper::get_asset($asset_id);
+  if (!$asset) {
+    drupal_set_message('Media not found');
+    return;
+  }
+
+  // Set the title.
+  drupal_set_title(mediamosa_sb::get_asset_title($asset));
+
+  // Get the form.
+  $form = mediamosa_sb_asset_forms::media_form($values);
+
+  $form['asset_id'] = array(
+    '#type' => 'value',
+    '#value' => $asset_id,
+  );
+
+    // Submit button.
+  $form['save'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save'),
+  );
+
+  return $form;
+}
+
+/**
+ * Validation for asset media page.
+ */
+function mediamosa_sb_asset_edit_media_form_validation($form, &$form_state) {
+}
+
+/**
+ * Submit for asset media page.
+ */
+function mediamosa_sb_asset_edit_media_form_submit($form, $form_state) {
+  // What was pressed.
+  $op = isset($form_state['values']['op']) ? $form_state['values']['op'] : '';
+
+  // The collection ID.
+  $asset_id = $form_state['values']['asset_id'];
+
+  switch ($op) {
+    case t('Save'):
+      // Run function for posting media to MediaMosa.
+      mediamosa_sb::post_media($form_state['input'], $asset_id);
+      break;
+  }
+
+  // Redirect.
+  drupal_goto('asset/' . rawurlencode($asset_id));
+}
+
+
+/**
+ * Deletion confirm.
+ *
+ * @param $asset_id
+ *   ID of the asset to delete.
+ *
+ * @see mediamosa_sb_collection_delete_confirm_form_submit()
+ */
+function mediamosa_sb_delete_delete_confirm_form($form, &$form_state, $asset_id) {
+
+  // Get the collection.
+  $asset = MediaMosaSbConnectorWrapper::get_asset($asset_id);
+
+  if (!$asset) {
+    drupal_set_message(t('Unable to find asset.'), 'warning');
+
+    // Failed.
+    drupal_goto('assets');
+  }
+
+  $form['asset_id'] = array(
+    '#type' => 'value',
+    '#value' => $asset_id,
+  );
+
+  return confirm_form($form,
+                      t('Are you sure you want to delete this asset?'),
+                      url('asset/' . rawurlencode($asset_id), array('absolute' => TRUE)),
+                      t('This action cannot be undone.'),
+                      t('Delete'), t('Cancel')
+  );
+}
+
+/**
+ * Submit handler for deletion collection.
+ *
+ * @see mediamosa_sb_delete_delete_confirm_form()
+ */
+function mediamosa_sb_collection_delete_confirm_form_submit($form, &$form_state) {
+
+  // Remove all links
+  $asset_id = $form_state['values']['asset_id'];
+
+  // Get the current user.
+  $user_id = mediamosa_ck::session_user_id();
+
+  // No more assets in collection, now remove collection.
+  if (!MediaMosaSbConnectorWrapper::delete_asset($asset_id, $user_id)) {
+    mediamosa_sb::watchdog_error('Unable to delete asset.');
+    drupal_goto('asset/' . rawurlencode($asset_id));
+  }
+
+  // All ok.
+  drupal_set_message(t('Asset has been deleted.'));
+  drupal_goto('myassets');
 }

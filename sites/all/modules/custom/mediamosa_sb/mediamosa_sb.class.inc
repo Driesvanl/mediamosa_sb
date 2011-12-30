@@ -25,6 +25,22 @@
 class mediamosa_sb {
 
   /**
+   * Returns the title of the asset using the metadata.
+   *
+   * @param simplexmlelement $asset
+   *   The asset in simplexmlelement.
+   *
+   * @return
+   *   The title or ''.
+   *
+   * @see mediamosa_ck::get_asset_title()
+   */
+  static public function get_asset_title($asset) {
+    $title = mediamosa_ck::get_asset_title($asset);
+    return $title === '' ? t('[no title]') : t($title);
+  }
+
+  /**
    * This wrapper is indended when in the future if we want to tell the user
    * that something went wrong and log the problem. We might want to make
    * options for the admin in which we log the error, but will not bore the user
@@ -231,38 +247,34 @@ class mediamosa_sb {
   /**
    * Post the metadata from form submited fields.
    */
-  static public function post_metadata($values, $asset_id, $mediafile_id) {
-    // Init metadata array.
-    $changed_metadata = array();
+  static public function post_metadata($values, $asset_id) {
+    // Options + metadata for write.
+    $options = array('action' => 'replace');
 
-    // Get names convertor.
-    $drupal_to_mediamosa = _media_mediamosa_metadata_get_default_mapped();
+    // Get the metadata def.
+    $metadata_fields = mediamosa_ck::get_metadata_fields();
 
+    foreach ($metadata_fields as $prefix => $metadata_field) {
+      foreach ($metadata_field['fields'] as $name => $type) {
+        // Build name.
+        $prefixed_name = $prefix . '_' . $name;
 
-    foreach ($values as $name => $value) {
-      if (!isset($drupal_to_mediamosa['field_mm_meta_' . $name]) || $value === '') {
-        continue;
+        if (!isset($values[$prefixed_name]) || $values[$prefixed_name] === '') {
+          continue;
+        }
+
+        // Set.
+        $options[$name] = $values[$prefixed_name];
       }
-
-      // Store.
-      $changed_metadata[$name] = $value;
     }
 
-    if (empty($changed_metadata)) {
-      // Metadata unchanged.
-      return;
+    // Do request.
+    if (!MediaMosaSbConnectorWrapper::update_metadata($asset_id, $options)) {
+      mediamosa_sb::watchdog_error('Unable to save metadata.');
+      return FALSE;
     }
 
-    // Replace.
-    $changed_metadata['action'] = 'replace';
-
-    try {
-      // Do request.
-      MediaMosaConnectorMediaWrapper::request_post_metadata($asset_id, $changed_metadata);
-    }
-    catch (Exception $e) {
-      drupal_set_message('Unable to save metadata; ' . $e->getMessage(), 'error');
-    }
+    return TRUE;
   }
 
   /**
@@ -274,39 +286,54 @@ class mediamosa_sb {
    *
    * @return
    */
-  static public function post_access($values, $asset_id, $mediafile_id) {
-    // init string of rules.
-    $acl = "";
+  static public function post_access($values, $asset_id) {
 
-    foreach ($values as $name => $value) {
-      if (!empty($value)) {
-        if ($name == 'domain' || $name == 'realm') {
+    // Save state isprivate to asset.
+    $options = array(
+      'isprivate' => (isset($values['is_visible']) && !empty($values['is_visible']) ? FALSE : TRUE),
+    );
 
-          // Get the values.
-          $acl_values = explode(',', $value);
+    MediaMosaSbConnectorWrapper::update_asset($asset_id, $options);
 
-          foreach ($acl_values as $acl_value) {
-            try {
-              // Do request.
-              MediaMosaCkConnectorAccessWrapper::set_access_control($mediafile_id, mediamosa_ck::session_user_id(), $acl);
-            }
-            catch (Exception $e) {
-              drupal_set_message(t('Unable to store acl rule for @acl_value; @message', array('@message' => $e->getMessage(), '@acl_value' => $acl_value)), 'error');
-            }
-          }
-        }
+    // Get the mediafiles.
+    $mediafile_ids = MediaMosaSbConnectorWrapper::get_asset_mediafile_ids($asset_id);
+
+    // Domains and realms.
+    $acl_domain_realm = array();
+
+    // acl users.
+    $acl_user_id = array();
+
+    $acl_domain = trim($values['acl_domain']);
+    $acl_realm = trim($values['acl_realm']);
+    $acl_user = trim($values['acl_user']);
+
+    if (!empty($acl_domain)) {
+      $acl_domain_realm[] = $acl_domain;
+    }
+    if (!empty($acl_realm)) {
+      $acl_domain_realm[] = $acl_realm;
+    }
+    $acl_domain_realm = implode(',', $acl_domain_realm);
+
+    foreach ($mediafile_ids as $mediafile_id) {
+      if (!MediaMosaSbConnectorWrapper::set_access_control($mediafile_id, mediamosa_ck::session_user_id(), $acl_domain_realm, $acl_user)) {
+        mediamosa_sb::watchdog_error('Unable to save access for mediafile with ID @mediafile_id.', array('@mediafile_id' => $mediafile_id));
+        return FALSE;
       }
     }
+
+    return TRUE;
   }
 
   /**
-   * Post transcode.
+   * Post transcode & still.
    *
    * @param $values
    * @param $asset_id
    * @param $mediafile_id
    */
-  static public function post_transcode($values, $asset_id, $mediafile_id) {
+  static public function post_media($values, $asset_id) {
     // @todo.
     return;
 

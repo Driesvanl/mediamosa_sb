@@ -17,6 +17,7 @@ dependencies[] = mediamosa_ck_views
 ;dependencies[] = panels (>=2.99)
 ;dependencies[] = panels_mini (>=2.99)
 
+files[] = mediamosa_sb.asset.forms.class.inc
 files[] = mediamosa_sb.class.inc
 files[] = mediamosa_sb.connector.wrapper.class.inc
 

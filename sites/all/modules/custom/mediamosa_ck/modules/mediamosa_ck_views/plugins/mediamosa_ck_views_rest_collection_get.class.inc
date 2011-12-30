@@ -45,12 +45,8 @@ class mediamosa_ck_views_rest_collection_get extends mediamosa_ck_views_rest {
       return;
     }
 
-    try {
-      // Get the asset.
-      $xml = MediaMosaCkConnectorWrapper::request_get_collection($coll_id, $options);
-    }
-    catch (Exception $e) {
-      mediamosa_ck::watchdog_error('Unable to retrieve collection from MediaMosa, message: @message.', array('@message' => $e->getMessage()));
+    $xml = MediaMosaCkConnectorWrapper::get_collection($coll_id, $options);
+    if (!$xml) {
       return;
     }
 

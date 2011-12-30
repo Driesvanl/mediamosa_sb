@@ -46,7 +46,7 @@ class MediaMediaMosaSync {
     $assets_updated = 0;
 
     // Get the assets.
-    $assets = MediaMosaConnectorMediaWrapper::request_get_current_assets(0, $offset, $limit);
+    $assets = MediaMosaConnectorMediaWrapper::get_current_assets(0, $offset, $limit);
 
     // Now loop through the found assets.
     foreach ($assets as $asset) {
@@ -237,7 +237,7 @@ class MediaMediaMosaSync {
     $limit = max(min(variable_get('media_mediamosa_cron_sync_throttle_cron_limit', 100), 199), 10);
 
     // Get the assets.
-    $assets = MediaMosaConnectorMediaWrapper::request_get_current_assets($time_last, $offset_last, $limit + 1);
+    $assets = MediaMosaConnectorMediaWrapper::get_current_assets($time_last, $offset_last, $limit + 1);
 
     if (!empty($assets)) {
       // Get the first asset.

@@ -31,32 +31,13 @@
 
 class MediaMosaCkConnectorTranscodeWrapper extends MediaMosaCkConnectorWrapper {
   /**
-   * Get transcode profiles.
-   *
-   * @return $profiles
-   */
-  static public function request_get_transcode_profiles() {
-    $data = array();
-
-    try {
-      // Do request.
-      return mediamosa_ck::request_get_fatal('transcode/profile', array('data' => $data));
-    }
-    catch (Exception $e) {
-      mediamosa_ck::watchdog_error('Unable to retrieve the transcode profiles; @message.', array('@message' => $e->getMessage()));
-    }
-
-    return FALSE;
-  }
-
-  /**
    * Create transcoded mediafile.
    *
    * @param string $mediafile_id
    * @param string $user_id
    * @param array $data
    */
-  static public function transcode_create($mediafile_id, $user_id, $data = array()) {
+  static public function create_transcode($mediafile_id, $user_id, $data = array()) {
     // Check the parameters.
     if (empty($mediafile_id) || empty($user_id)) {
       return FALSE;
@@ -84,7 +65,7 @@ class MediaMosaCkConnectorTranscodeWrapper extends MediaMosaCkConnectorWrapper {
    *
    * @return profile names
    */
-  static public function request_get_profile_names() {
+  static public function get_profile_names() {
 
     try {
       // Do request.
@@ -114,12 +95,12 @@ class MediaMosaCkConnectorTranscodeWrapper extends MediaMosaCkConnectorWrapper {
    * @return
    *   Array with jobs.
    */
-  static public function request_get_asset_actual_jobs($asset_id, $owner_id = FALSE) {
+  static public function get_asset_actual_jobs($asset_id, $owner_id = FALSE) {
 
     $uri = strtr('asset/@asset_id/joblist', array('@asset_id' => $asset_id));
 
     if (!$owner_id) {
-      $owner_id = self::request_get_asset_owner($asset_id);
+      $owner_id = self::get_asset_owner($asset_id);
     }
 
     $data = array(
@@ -151,7 +132,7 @@ class MediaMosaCkConnectorTranscodeWrapper extends MediaMosaCkConnectorWrapper {
    *
    * @return bool.
    */
-  static public function request_post_job_delete($job_id, $owner_id) {
+  static public function delete_job($job_id, $owner_id) {
 
     // REST uri.
     $uri = strtr('job/@job_id/delete', array('@job_id' => $job_id));
@@ -166,29 +147,5 @@ class MediaMosaCkConnectorTranscodeWrapper extends MediaMosaCkConnectorWrapper {
 
     return $result->code == 200;
 
-  }
-
-  /**
-   * Delete mediafile.
-   *
-   * @param string $job_id
-   * @param string $owner_id
-   *
-   * @return bool.
-   */
-  static public function request_post_mediafile_delete($mediafile_id, $owner_id) {
-
-    // REST uri.
-    $uri = strtr('mediafile/@mediafile_id/delete', array('@mediafile_id' => $mediafile_id));
-
-    try {
-      $result = mediamosa_ck::request_post_fatal($uri, array('user_id' => $owner_id));
-    }
-    catch (Exception $e) {
-      mediamosa_ck::watchdog_error('Unable to delete mediafile; @message.', array('@message' => $e->getMessage()));
-      return FALSE;
-    }
-
-    return $result->code == 200;
   }
 }

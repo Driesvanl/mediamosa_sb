@@ -102,13 +102,18 @@ class mediamosa_ck_views_field_player extends views_handler_field {
     }
 
     // What mediafile to play?
-    $mediafile_id_to_play = empty($values->mediafile_id) ? $values->mediafile_id_original : $values->mediafile_id;
+    $mediafile_id_to_play = empty($values->mediafile_id) ? NULL : $values->mediafile_id;
 
     // Take user_id of current watcher.
     $user_id = mediamosa_ck::session_user_id();
 
     // Response.
     $options['response'] = $this->options['response'];
+
+    // Not specified? Then use default transcode profile ID.
+    if (empty($mediafile_id_to_play)) {
+      $options['profile_id'] = mediamosa_ck_transcode::get_default_transcode_profile();
+    }
 
     // Both not empty.
     if (!empty($this->options['player_width']) && !empty($this->options['player_height'])) {
@@ -118,6 +123,6 @@ class mediamosa_ck_views_field_player extends views_handler_field {
     }
 
     // Accept as is.
-    return MediaMosaCkConnectorWrapper::request_get_play_link($values->asset_id, $mediafile_id_to_play, $user_id, $options);
+    return MediaMosaCkConnectorWrapper::get_play_link($values->asset_id, $mediafile_id_to_play, $user_id, $options);
   }
 }
