@@ -51,6 +51,7 @@ class mediamosa_ck_views_rest_asset_search extends mediamosa_ck_views_rest {
       'viewed', 'played',
       'videotimestamp', 'videotimestampmodified',
       'owner_id', 'group_id',
+      'mediafile_duration',
     );
 
     // Now process the xml into an object views can work with.

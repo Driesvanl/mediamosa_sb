@@ -26,7 +26,7 @@ function mediamosa_sb_asset_upload_form($form, &$form_state) {
   drupal_set_title(t('Step 1/4: Upload'));
 
   // Try to create upload ticket.
-  $result = MediaMosaCkConnectorWrapper::create_upload_ticket();
+  $result = MediaMosaCkConnectorWrapper::create_upload_ticket(array('create_still' => TRUE));
   if (!$result) {
     $form['upload'] = array(
       '#markup' => t('Unable to upload to MediaMosa; @reason', array('@reason' => mediamosa_ck::get_connector_last_error_text())),

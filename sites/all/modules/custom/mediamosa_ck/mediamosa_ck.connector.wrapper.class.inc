@@ -76,12 +76,26 @@ class MediaMosaCkConnectorWrapper extends mediamosa_connector {
   }
 
   /**
+   * Convert the boolean string to boolean version.
+   *
+   * @param $str
+   *   'TRUE', 'true', 'FALSE', 'false'.
+   *
+   * @return
+   *   The boolean value.
+   */
+  static public function string2bool($str) {
+    return (drupal_strtoupper($str) === 'TRUE' ? TRUE : FALSE);
+  }
+
+  /**
    * Create a upload ticket and return the upload POST URL.
    */
   static public function create_upload_ticket(array $options = array()) {
 
     $options += array(
-      'transcode_inherits_acl' => FALSE,
+      'transcode_inherits_acl' => TRUE,
+      'create_still' => FALSE,
     );
 
     try {
@@ -115,16 +129,23 @@ class MediaMosaCkConnectorWrapper extends mediamosa_connector {
       // Get the Action url from the result.
       $action = (string) $response->xml->items->item->action;
 
-      // Inherit ACL.
-      if ($options['transcode_inherits_acl']) {
+      // Inherit ACL / Create still.
+      if ($options['transcode_inherits_acl'] || $options['create_still']) {
         // Rebuild url.
         $parse_url = parse_url($action);
 
         // Split up query_string.
         $parse_url['query'] = mediamosa_ck::parse_query(empty($parse_url['query']) ? '' : $parse_url['query']);
 
-        // Set inherit acl.
-        $parse_url['query']['transcode_inherits_acl'] = 'TRUE';
+        if ($options['transcode_inherits_acl']) {
+          // Set inherit acl.
+          $parse_url['query']['transcode_inherits_acl'] = 'TRUE';
+        }
+
+        if ($options['create_still']) {
+          // Set inherit acl.
+          $parse_url['query']['create_still'] = 'TRUE';
+        }
 
         // Rebuild.
         $parse_url['query'] = mediamosa_ck::http_build_query($parse_url['query']);

@@ -345,6 +345,40 @@ class mediamosa_ck extends mediamosa_sdk {
   }
 
   /**
+   * Convert any date into unix timestamp.
+   *
+   * @param $any_date
+   *   The date to convert.
+   *
+   * @return
+   *   The number of seconds since 1970 (UTC/GMT).
+   */
+  static public function date2unix($any_date) {
+    // Parse the date, date_parse is new in 5.2.
+    $date_parsed = date_parse($any_date);
+
+    // Convert to integer
+    return gmmktime($date_parsed['hour'], $date_parsed['minute'], $date_parsed['second'], $date_parsed['month'], $date_parsed['day'], $date_parsed['year']);
+  }
+
+  /**
+   * Converts mediafile duration format into unix timestamp.
+   *
+   * @param $any_date
+   *   The date to convert.
+   *
+   * @return
+   *   The number of seconds since 1970 (UTC/GMT).
+   */
+  static public function duration2unix($mediafile_duration) {
+    // Split into pieces.
+    list($hour, $minute, $second, $milisecond) = preg_split("/[:.]/", $mediafile_duration, 4);
+
+    // Convert to # of seconds.
+    return ((int) $hour * 3600) + ((int) $minute * 60) + (int) $second; + round((int) $milisecond / 100);
+  }
+
+  /**
    * This function will return the active metadata fields on the active
    * MediaMosa connection. For now we return DC/QDC, but in future we need to
    * find out or query MediaMosa what metadata is allowed. MediaMosa does not
