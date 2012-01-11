@@ -1,6 +1,16 @@
 
 Mediamosa CK, 7.x-2.x-dev
 -------------------------
+- Renamed MediaMosaCkConnectorWrapper::get_job() to
+  MediaMosaCkConnectorWrapper::get_mediafile_jobs().
+- Moved mediamosa_ck_transcode::get_default_transcode_profile() to the
+  MediaMosaCkConnectorWrapper class.
+- Moved mediamosa_ck_transcode::get_allowed_transcode_profiles() to the
+  MediaMosaCkConnectorWrapper class.
+- Moved mediamosa_ck_transcode::create_transcode() to the
+  MediaMosaCkConnectorWrapper class.
+- Switched from storing the Drupal user ID as owner to Drupal email address as
+  owner of the Mediafiles and other MediaMosa objects.
 - Update info to reflect dependencies.
 - Moved functions to mediamosa_ck.connector class.
 - Updated function names to reflect their purposes.

@@ -48,7 +48,8 @@ function mediamosa_sb_menu() {
     'title' => 'Edit asset',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('mediamosa_sb_asset_upload_steps_form', 3, 4),
-    'access callback' => TRUE,
+    'access callback' => '_mediamosa_sb_is_owner_asset',
+    'access arguments' => array(3),
     'description' => 'Edit the properties of the video',
     'type' => MENU_CALLBACK,
     'visible' => FALSE,
@@ -59,7 +60,8 @@ function mediamosa_sb_menu() {
     'title' => 'Info',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('mediamosa_sb_asset_edit_metadata_form', 2),
-    'access callback' => TRUE,
+    'access callback' => '_mediamosa_sb_is_owner_asset',
+    'access arguments' => array(2),
     'description' => 'Edit metadata of the asset.',
     'type' => MENU_CALLBACK,
     'file' => 'mediamosa_sb.asset.inc',
@@ -75,7 +77,8 @@ function mediamosa_sb_menu() {
     'title' => 'Access',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('mediamosa_sb_asset_edit_access_form', 2),
-    'access callback' => TRUE,
+    'access callback' => '_mediamosa_sb_is_owner_asset',
+    'access arguments' => array(2),
     'description' => 'Edit metadata of the asset.',
     'type' => MENU_LOCAL_TASK,
     'file' => 'mediamosa_sb.asset.inc',
@@ -86,7 +89,8 @@ function mediamosa_sb_menu() {
     'title' => 'Video',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('mediamosa_sb_asset_edit_media_form', 2),
-    'access callback' => TRUE,
+    'access callback' => '_mediamosa_sb_is_owner_asset',
+    'access arguments' => array(2),
     'description' => 'Control the transcode and stills of the asset.',
     'type' => MENU_LOCAL_TASK,
     'file' => 'mediamosa_sb.asset.inc',
@@ -107,7 +111,8 @@ function mediamosa_sb_menu() {
     'title' => 'Edit collection',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('mediamosa_sb_collection_edit_form', 2),
-    'access callback' => TRUE,
+    'access callback' => '_mediamosa_sb_is_owner_asset',
+    'access arguments' => array(2),
     'description' => 'Edit the properties of the collection.',
     'type' => MENU_NORMAL_ITEM,
     'file' => 'mediamosa_sb.collection.inc',
@@ -117,7 +122,8 @@ function mediamosa_sb_menu() {
     'title' => 'Delete collection',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('mediamosa_sb_collection_delete_confirm_form', 2),
-    'access callback' => TRUE,
+    'access callback' => '_mediamosa_sb_is_owner_asset',
+    'access arguments' => array(2),
     'description' => 'Delete the collection, but not the assets.',
     'type' => MENU_NORMAL_ITEM,
     'file' => 'mediamosa_sb.collection.inc',
@@ -132,58 +138,24 @@ function mediamosa_sb_theme() {
   return array(
     'mediamosa_sb_profile_select' => array(
       'render element' => 'element',
+      'file' => 'mediamosa_sb.theme.inc'
     ),
   );
 }
 
 /**
- * Custom theme for profile.
+ * Access function to asset.
  *
- * @param type $variables
- * @return type
+ * @param $asset_id
  */
-function theme_mediamosa_sb_profile_select($variables) {
+function _mediamosa_sb_is_owner_asset($asset_id) {
+  // Get the asset cached.
+  $asset = MediaMosaSbConnectorWrapper::get_asset($asset_id, array('show_stills' => FALSE, 'show_collections' => FALSE));
 
-  $element = $variables['element'];
-
-  $element += array(
-    '#empty' => t('No profiles found.'),
-  );
-
-  $rows = array();
-  $header = array(
-    'active' => t('Active'),
-    'profile' => t('Profile'),
-    'downloadable' => t('Downloadable'),
-  );
-
-  if (!empty($element['#options'])) {
-    foreach ($element['#options'] as $option) {
-      $row = array();
-
-      // Checkbox select transcode.
-      $checkbox = array(
-        '#name' => 'active_' . $option['profile_id'],
-        '#type' => 'checkbox',
-        '#value' => $option['active'],
-      );
-      $row[] = array('data' => drupal_render($checkbox));
-
-      // Title.
-      $row[] = array('data' => check_plain($option['title']));
-
-
-      // Checkbox select transcode.
-      $checkbox = array(
-        '#name' => 'downloadable_' . $option['profile_id'],
-        '#type' => 'checkbox',
-        '#value' => $option['active'],
-      );
-      $row[] = array('data' => drupal_render($checkbox));
-
-      $rows[] = $row;
-    }
+  // Check if we are owner of the asset.
+  if (!empty($asset) && !empty($asset->items->item->owner_id)) {
+    return $asset->items->item->owner_id == mediamosa_ck::session_user_id();
   }
 
-  return theme('table', array('header' => $header, 'rows' => $rows, 'empty' => $element['#empty'], 'attributes' => $element['#attributes']));
+  return FALSE;
 }

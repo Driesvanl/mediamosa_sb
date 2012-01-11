@@ -62,9 +62,18 @@ function mediamosa_sb_kickstart_install() {
   $full_html_format = (object) $full_html_format;
   filter_format_save($full_html_format);
 
-  // Enable some standard blocks.
-  $default_theme = variable_get('theme_default', 'garland');
+
+  // Enable default theme, disable bartik, garland.
+  theme_enable(array('mediamosa_sb_theme'));
+  theme_disable(array('bartik'));
+
+  $default_theme = 'mediamosa_sb_theme';
   $admin_theme = 'garland';
+  variable_set('theme_default', $default_theme);
+  variable_set('admin_theme', $admin_theme);
+  variable_set('node_admin_theme', 1);
+
+  // Enable some standard blocks.
   $values = array(
     array(
       'module' => 'system',
@@ -417,7 +426,4 @@ function mediamosa_sb_kickstart_install() {
 
   // Update the menu router information.
   menu_rebuild();
-
-  variable_set('admin_theme', 'garland');
-  variable_set('node_admin_theme', '1');
 }

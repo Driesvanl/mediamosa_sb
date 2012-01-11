@@ -67,7 +67,7 @@ function mediamosa_sb_kickstart_connector_form() {
   $form['other']['check_connection'] = array(
     '#type' => 'checkbox',
     '#title' => t('Check the connection before saving my connection settings.'),
-    '#description' => t('Enable this checkbox to verify the entered login. If will return to this form when login failed.'),
+    '#description' => t('Enable this checkbox to verify the entered login. It will return to this form again when login fails.'),
     '#default_value' => TRUE,
   );
 

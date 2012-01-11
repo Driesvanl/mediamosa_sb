@@ -29,9 +29,9 @@ class MediaMosaSbConnectorWrapper extends MediaMosaCkConnectorWrapper {
    *
    * @see MediaMosaCkConnectorWrapper::get_asset()
    */
-  static public function get_asset($asset_id, array $options = array()) {
+  static public function get_asset($asset_id, array $options = array(), $cached = TRUE, $reset = FALSE) {
     try {
-      return parent::get_asset($asset_id, $options);
+      return parent::get_asset($asset_id, $options, $cached, $reset);
     }
     catch(Exception $e) {
       return FALSE;
@@ -82,14 +82,16 @@ class MediaMosaSbConnectorWrapper extends MediaMosaCkConnectorWrapper {
     // Get access.
     $xml = parent::get_access_control($mediafile_id, $user_id);
 
-    foreach ($xml->xpath('items/item/acl_domain') as $item) {
-      $access['acl_domain'][] = (string) $item;
-    }
-    foreach ($xml->xpath('items/item/acl_realm') as $item) {
-      $access['acl_realm'][] = (string) $item;
-    }
-    foreach ($xml->xpath('items/item/acl_user') as $item) {
-      $access['acl_user'][] = (string) $item;
+    if ($xml) {
+      foreach ($xml->xpath('items/item/acl_domain') as $item) {
+        $access['acl_domain'][] = (string) $item;
+      }
+      foreach ($xml->xpath('items/item/acl_realm') as $item) {
+        $access['acl_realm'][] = (string) $item;
+      }
+      foreach ($xml->xpath('items/item/acl_user') as $item) {
+        $access['acl_user'][] = (string) $item;
+      }
     }
 
     return $access;

@@ -334,20 +334,27 @@ class mediamosa_sb {
    * @param $mediafile_id
    */
   static public function post_media($values, $asset_id) {
-    // @todo.
-    return;
 
-    print '<pre>Debug in ' . __FILE__ . ', line ' . __LINE__ . "\n"; // @TODO: Remove me!
-    print htmlspecialchars(print_r($values, TRUE));
-    print '</pre>';
-    exit('Exit in ' . __FUNCTION__ . '(), in file ' . __FILE__ . ' on line ' . __LINE__); // @TODO: remove me!
+    // Get existing mediafiles transcodes.
+    $current_used_transcode_profiles = MediaMosaSbConnectorWrapper::get_asset_current_used_transcode_profiles($asset_id);
 
-    // Set the transcode.
-    $data = array(
-      'profile_id' => $form['transcode']['table']['#value'],
-    );
+    // Get the original mediafile_id.
+    $mediafile_id_original = reset(MediaMosaSbConnectorWrapper::get_asset_mediafile_ids_original($asset_id));
+/*
+    if (!empty($mediafile_id_original)) {
+      foreach ($values as $name => $profile_id) {
+        if (drupal_substr($name, 0, strlen('active_')) == 'active_') {
+          // If not in $current_used_transcode_profiles, then we can start it.
+          if ($current_used_transcode_profiles[$profile_id]) {
+            continue;
+          }
 
-    MediaMosaCkConnectorTranscodeWrapper::transcode_create($mediafile_id, mediamosa_ck::session_user_id(), $data);
+          // Start transcode job.
+          MediaMosaSbConnectorWrapper::create_transcode($mediafile_id_original, array('profile_id' => $profile_id));
+        }
+      }
+    }
+*/
   }
 }
 

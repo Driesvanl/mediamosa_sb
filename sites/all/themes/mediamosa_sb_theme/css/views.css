@@ -1,0 +1,515 @@
+
+/**********************************************************
+ * Views defaults
+ *********************************************************/
+
+.view .views-field-title .field-content {
+  font-size: 14px;
+}
+
+.view .views-row {
+  margin-bottom: 11px;
+  padding: 10px;
+  border: 1px solid #eee;
+  overflow: hidden;
+  clear: both;
+  position: relative;
+}
+
+.view .views-field-still-url {
+  float: left;
+  margin-right: 20px;
+  overflow: hidden;
+  position: relative;
+}
+
+.view .views-field-still-url:after {
+  content: url('../images/sprite.png');
+  position: absolute;
+  left: 188px;
+  top: -47px;
+}
+
+.view .views-field-mediafile-duration {
+  padding: 5px;
+  position: absolute;
+  top: 134px;
+  left: 184px;
+  font-size: 12px;
+  font-weight: bold;
+  background: #000;
+}
+
+.not-front .view .views-field-mediafile-duration {
+  top: 123px;
+}
+
+.view .views-field-mediafile-duration .field-content {
+  color: #fff;
+}
+
+#page_content .block-views .view {
+  padding-right: 10px;
+}
+
+#page_content .block-views:first-child .view {
+  padding-left: 10px;
+  padding-right: 0;
+}
+
+.view .asset-information {
+  width: 198px;
+  float: left;
+}
+
+.view .asset-information .views-field-nothing {
+  font-size: 12px;
+}
+
+.view .asset-information .views-field-title .field-content a {
+  font-size: 14px;
+}
+
+.view .asset-information .views-field-played .field-content {
+  display: block;
+  margin-top: 6px;
+  color: #000;
+  font-size: 18px;
+}
+
+.view .asset-information .views-field-videotimestamp {
+  font-size: 12px;
+}
+
+
+/**********************************************************
+ * Views exposed forms
+ *********************************************************/
+
+.views-exposed-form {
+  margin-bottom: 11px;
+  padding: 12px 10px;
+  border: 2px solid #eaeaf3;
+}
+
+.views-exposed-form .form-item {
+  margin: 0;
+}
+
+.views-exposed-form label {
+  margin-right: 19px;
+  line-height: 35px;
+  float: left;
+}
+
+.views-exposed-form input[type="text"] {
+  padding: 8px;
+  width: 224px;
+  border: 1px solid #ccc;
+  box-shadow: inset -1px 1px 3px 0 #c3c3c3;
+}
+
+.views-exposed-form .views-submit-button {
+  margin-top: -30px;
+  float: right;
+}
+
+/**********************************************************
+ * Featured assets
+ *********************************************************/
+
+#spotlight .view {
+  padding-left: 10px;
+  overflow: hidden;
+}
+
+#spotlight .view .views-field-title .field-content {
+  font-size: 18px;
+}
+
+#spotlight .view .views-row {
+  width: 298px;
+  margin-right: 20px;
+  border: 1px solid #ccc;
+  padding: 0;
+  float: left;
+  clear: none;
+  background: #fff;
+}
+
+#spotlight .view .views-row-last {
+  margin-right: 0;
+}
+
+#spotlight .view .views-field-still-url {
+  float: none;
+  margin-right: 0;
+  position: relative;
+}
+
+#spotlight .view .views-field-still-url:after {
+  content: url('../images/sprite.png');
+  position: absolute;
+  left: -205px;
+  top: -150px;
+}
+
+#spotlight .views-field-mediafile-duration {
+  padding: 5px;
+  position: absolute;
+  top: -34px;
+  left: 251px;
+  font-size: 12px;
+  font-weight: bold;
+  background: #000;
+}
+
+#spotlight .views-field-mediafile-duration .field-content {
+  color: #fff;
+}
+
+#spotlight .view .asset-information {
+  min-height: 70px;
+  padding: 9px;
+  position: relative;
+}
+
+#spotlight .view .asset-information .views-field-title a {
+  font-size: 18px;
+}
+
+#spotlight .view .asset-information .views-field-videotimestamp {
+  font-size: 12px;
+  position: absolute;
+  bottom: 7px;
+}
+
+#spotlight .view .asset-information .views-field-videotimestamp .field-content {
+  color: #666;
+}
+
+
+/**********************************************************
+ * Asset detail Page
+ *********************************************************/
+
+.page-asset .view {
+  position: relative;
+}
+
+.page-asset .view .views-row {
+  padding: 0;
+  border: none;
+  position: relative;
+}
+
+.page-asset .view .asset-video-player {
+  width: 640px;
+  margin-right: 20px;
+  float: left;
+}
+
+/**********************************************************
+ * Item navigation
+ *********************************************************/
+
+.item-navigation {
+  margin-bottom: 15px;
+  position: absolute;
+  top: 0;
+  right: 5px;
+  z-index: 2;
+}
+
+.item-navigation li {
+  margin-right: 7px;
+  float: left;
+  /* background declaration in sprite.css */
+}
+
+.item-navigation li a {
+  padding-right: 4px;
+  font-size: 14px;
+  color: #000;
+}
+
+
+/**********************************************************
+ * Asset detail information block
+ *********************************************************/
+
+.page-asset h1,
+.page-collection h1 {
+  max-width: 750px;
+  margin-bottom: 20px;
+  font-size: 32px;
+  color: #000;
+}
+
+.page-asset .asset-detail-information {
+  width: 274px;
+  float: left;
+  border-width: 7px 7px 1px 7px;
+  border-color: #eaeaf3;
+  border-style: solid;
+}
+
+.page-asset .asset-detail-information strong {
+  color: #000;
+}
+
+.asset-detail-information .information-row {
+  border-bottom: 6px solid #eaeaf3;
+}
+
+.asset-detail-information .asset-view-count {
+  padding: 10px 0 10px 25px;
+  font-size: 18px;
+  border-bottom: 2px solid #eaeaf3;
+  /* background declaration in sprite.css */
+}
+
+.asset-detail-information .asset-uploaded-info {
+  margin: 10px 0;
+  padding: 0 0 0 25px;
+  font-size: 14px;
+  /* background declaration in sprite.css */
+}
+
+.asset-detail-information .asset-view-count .count .field-content {
+  font-size: 28px;
+  color: #000;
+}
+
+/**********************************************************
+ * Asset collections & formats
+ *********************************************************/
+
+.asset-detail-information .asset-collections,
+.asset-detail-information .asset-formats {
+  padding: 12px 25px;
+}
+
+.asset-detail-information .asset-collections h3,
+.asset-detail-information .asset-formats h3 {
+  margin-bottom: 11px;
+  font-size: 18px;
+  /* background declaration in sprite.css */
+}
+
+.asset-detail-information .asset-collections p,
+.asset-detail-information .asset-formats p {
+  color: #000;
+  font-size: 12px;
+}
+
+.asset-detail-information .asset-collections ul,
+.asset-detail-information .asset-formats ul {
+  margin: 10px 0;
+}
+
+.asset-detail-information .asset-collections ul li,
+.asset-detail-information .asset-formats ul li {
+  padding-left: 12px;
+  margin-bottom: 5px;
+  /* background declaration in sprite.css */
+}
+
+.asset-detail-information .asset-collections ul li a,
+.asset-detail-information .asset-formats ul li a {
+  padding-right: 20px;
+  font-size: 12px;
+}
+
+/**********************************************************
+ * Asset information
+ *********************************************************/
+
+.asset-technical-information {
+  width: 640px;
+  margin-top: 20px;
+  float: left;
+  overflow: hidden;
+  clear: both;
+}
+
+.asset-technical-information #asset-tabs {
+  clear: both;
+  height: 38px;
+  overflow: visible;
+  padding-left: 10px;
+  margin-bottom: 25px;
+  border-bottom: 1px solid #d9d9d9;
+}
+
+.asset-technical-information #asset-tabs li {
+  float: left;
+  margin-right: 5px;
+  background: #eaeaf3;
+}
+
+.asset-technical-information #asset-tabs li.active {
+  border-top: 1px solid #d9d9d9;
+  border-left: 1px solid #d9d9d9;
+  border-right: 1px solid #d9d9d9;
+  border-bottom: 1px solid #fff;
+  background: #fff;
+}
+
+.asset-technical-information #asset-tabs li a {
+  display: block;
+  color: #000;
+  font-size: 12px;
+  padding: 13px 15px;
+}
+
+.asset-technical-information #asset-tabs li.active a {
+  padding: 12px 14px 12px 14px;
+  border-bottom: 1px solid #fff;
+}
+
+.asset-technical-information .tab {
+  border-top: 7px solid #ebecf4;
+  border-bottom: 7px solid #ebecf4;
+  border-left: 6px solid #ebecf4;
+  border-right: 6px solid #ebecf4;
+}
+
+.asset-technical-information .tab h2 {
+  margin-bottom: 0;
+  padding-left: 27px;
+  color: #8e8e8e;
+  border-bottom: 6px solid #ebecf4;
+  font-size: 18px;
+  font-weight: normal;
+}
+
+.asset-technical-information .tab table {
+  border-collapse: separate;
+}
+
+.asset-technical-information .tab table tr td {
+  vertical-align: top;
+  padding: 9px;
+  font-size: 12px;
+  border-collapse: collapse;
+  border-top: 1px solid #fcfcfe;
+  border-bottom: 1px solid #ebecf4;
+  background: #fff;
+}
+
+.asset-technical-information .tab table tr td:first-child {
+  color: #000;
+}
+
+/**********************************************************
+ * Asset / video overview
+ *********************************************************/
+
+.page-assets .view {
+}
+
+.page-assets .view .view-content {
+  margin-left: 9px;
+  display: block;
+}
+
+.page-assets .view .item-list {
+  overflow: hidden;
+  clear: both;
+  position: relative;
+  margin-top: 34px;
+  padding-top: 14px;
+  border-top: 2px solid #eaeaf3;
+}
+
+.page-assets .views-row {
+  width: 220px;
+  height: 220px;
+  padding: 0;
+  margin-right: 18px;
+  float: left;
+  clear: none;
+  position: relative;
+}
+
+.page-assets .view .views-row:nth-child(4n+4) {
+  margin-right: 8px;
+}
+
+.view .views-row.fourth-child {
+  margin-right: 8px;
+  /* IE fix through jquery */
+}
+
+.page-assets .view .views-field-still-url:after {
+  left: 188px;
+}
+
+.page-assets .views-row .asset-information {
+  width: 206px;
+  padding: 8px 7px;
+}
+
+.page-assets .views-row .asset-information .views-field-title {
+  max-width: 170px;
+}
+
+.page-assets .views-row .asset-information .views-field-viewed {
+  float: right;
+  text-align: right;
+  display: block;
+}
+
+.page-assets .views-row .asset-information .views-field-viewed .field-content {
+  color: #000;
+  font-size: 12px;
+}
+
+.page-assets .views-row .asset-information .views-field-viewed .field-content span {
+  margin-top: -3px;
+  display: block;
+  color: #9f9f9f;
+}
+
+.page-assets .views-row .asset-information .views-field-videotimestamp {
+  position: absolute;
+  bottom: 4px;
+  right: 7px;
+}
+
+
+/**********************************************************
+ * Asset / video overview
+ *********************************************************/
+
+.page-collections .view .views-table {
+  width: 100%;
+}
+
+.page-collections .view .views-table tr th {
+  padding: 11px 0 11px 11px;
+  color: #000;
+  font-size: 12px;
+  background: #eaeaf3;
+}
+
+.page-collections .view .views-table tr td {
+  padding: 11px 0 11px 11px;
+  font-size: 12px;
+  border-bottom: 2px solid #eaeaf3;
+  background: #fff;
+}
+
+.page-collections .view .views-table tr td.views-field-title a {
+  font-size: 18px;
+}
+
+.page-collections .view .views-table tr td.views-field-description {
+  color: #000;
+}
+
+.page-collections .view .views-table tr td.views-field-numofvideos {
+  color: #000;
+  font-size: 14px;
+}

@@ -1,0 +1,126 @@
+/**********************************************************
+ * Search
+ *********************************************************/
+
+#header #block-search-form {
+  margin-top: 38px;
+  margin-left: 11px;
+}
+
+#header #block-search-form .form-text {
+  border: 1px #c8c8c8 solid;
+  width: 235px;
+  height: 31px;
+  padding: 0;
+  float: left;
+  padding-left: 9px;
+  color: #b6b6b6;
+}
+
+#header #block-search-form #edit-actions {
+  background: transparent url(../images/btn_bg.png);
+  background-repeat: repeat-x;
+  height: 33px;
+  width: 34px;
+  float: left;
+}
+
+#header #block-search-form .form-submit {
+  background: transparent url(../images/search_icon.png) no-repeat center center;
+  line-height:80px;
+  border: 0;
+  height: 33px;
+  width: 34px;
+  text-indent:-9999px;
+}
+
+/**********************************************************
+ * Pager
+ *********************************************************/
+
+.item-list .pager li {
+  margin: 0;
+  padding: 0;
+  display: inline-block;
+}
+
+.item-list .pager .pager-item {
+  background: #eaeaf3;
+}
+
+.item-list .pager .pager-item a {
+  padding: 4px 6px;
+  font-size: 13px;
+  display: block;
+}
+
+.item-list .pager .pager-item a:hover {
+  background: #fff;
+  text-decoration: none;
+}
+
+.item-list .pager .pager-current {
+  padding: 4px 6px;
+  color: #fff;
+  font-size: 13px;
+  background: #f1761e;
+}
+
+.item-list .pager .pager-first {
+  position: absolute;
+  left: 10px;
+}
+.item-list .pager .pager-previous {
+  position: absolute;
+  left: 75px;
+}
+
+.item-list .pager .pager-next {
+  position: absolute;
+  right: 75px;
+}
+.item-list .pager .pager-last {
+  position: absolute;
+  right: 10px;
+}
+
+.item-list .pager .pager-first a,
+.item-list .pager .pager-previous a,
+.item-list .pager .pager-next a,
+.item-list .pager .pager-last a {
+  color: #f1761e;
+  font-size: 12px;
+}
+
+
+/**********************************************************
+ * Breadcrumbs
+ *********************************************************/
+
+#breadcrumbs {
+  height: 31px;
+  border-bottom: 1px solid #d9d9d9;
+  background: #eaeaf3;
+}
+
+#breadcrumbs .breadcrumb {
+  width: 960px;
+  padding-top: 10px;
+  margin: 0 auto;
+}
+
+#breadcrumbs .breadcrumb li {
+  padding-right: 15px;
+  margin-right: 15px;
+  float: left;
+  font-size: 12px;
+  /* background declared in sprite.css */
+}
+
+#breadcrumbs .breadcrumb li.active {
+  background: none;
+}
+
+#breadcrumbs .breadcrumb a {
+  font-size: 12px;
+}

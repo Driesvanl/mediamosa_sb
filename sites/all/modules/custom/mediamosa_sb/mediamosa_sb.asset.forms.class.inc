@@ -388,30 +388,75 @@ class mediamosa_sb_asset_forms {
   static public function media_form($values) {
     $form = array();
 
+    // The asset ID.
+    $asset_id = $values['asset_id'];
+
     $form['transcode'] = array(
       '#type' => 'fieldset',
       '#title' => t('Visibility'),
     );
 
-    try {
-      $xml = MediaMosaCkConnectorTranscodeWrapper::get_transcode_profiles();
-    }
-    catch (Exception $e) {
+    $xml = MediaMosaCkConnectorWrapper::get_transcode_profiles();
+    if ($xml == FALSE) {
       drupal_set_message(t('Unable to retrieve transcode profiles, check MediaMosa Connector.'), 'error');
-      return $form;
     }
 
     $options = array();
+
+    // Get the allowed profiles.
+    $allowed_profiles = MediaMosaCkConnectorWrapper::get_allowed_transcode_profiles();
+
+    // List of the profile IDs that are used.
+    $existing_transcodes = array();
+    $is_downloadable = array();
+
+    // Get the default profiles, these can not be deleted or recreated.
+    $default_profile = MediaMosaCkConnectorWrapper::get_default_transcode_profile();
+
+    try {
+      // Get existing mediafiles.
+      $asset = MediaMosaCkConnectorWrapper::get_asset($asset_id);
+
+      // Loop through the mediafiles.
+      foreach ($asset->xpath('items/item/mediafiles/mediafile') as $mediafile) {
+        // Skip original.
+        if (MediaMosaCkConnectorWrapper::string2bool($mediafile->is_original_file)) {
+          continue;
+        }
+
+        // Collect the transcodes.
+        if (!empty($mediafile->transcode_profile_id)) {
+          $existing_transcodes[$mediafile->transcode_profile_id] = $mediafile->transcode_profile_id;
+        }
+
+        // Collect the downloadables.
+        if (MediaMosaCkConnectorWrapper::string2bool($mediafile->is_downloadable)) {
+          $is_downloadable[$mediafile->transcode_profile_id] = $mediafile->transcode_profile_id;
+        }
+      }
+    }
+    catch (Exception $e) {
+      mediamosa_ck::watchdog_error('Unable to find existing mediafiles.');
+    }
 
     $transcode_profile_default = 0;
     if (!empty($xml->items->item)) {
       foreach ($xml->items->item as $profile) {
         $profile_id = (int) $profile->profile_id;
 
-        // Is default profile?
-        $options[$profile_id]['is_default'] = drupal_strtoupper((string) $profile->default) == 'TRUE';
+        // Is allowed as profile? If a mediafile exists, we ignore the allowed profile.
+        if (!isset($allowed_profiles[$profile_id]) && !isset($existing_transcodes[$profile_id])) {
+          continue;
+        }
 
-        $options[$profile_id]['active'] = FALSE;
+        // Exists as transcode?
+        $active = isset($existing_transcodes[$profile_id]);
+
+        // Is default profile?
+        $options[$profile_id]['is_default'] = $profile_id == $default_profile;
+        $options[$profile_id]['is_allowed'] = $profile_id != $default_profile;
+
+        $options[$profile_id]['active'] = $active;
         $options[$profile_id]['downloadable'] = FALSE;
         $options[$profile_id]['title'] = (string) $profile->profile;
         $options[$profile_id]['profile_id'] = (int) $profile->profile_id;
@@ -420,7 +465,7 @@ class mediamosa_sb_asset_forms {
 
     $form['transcode']['table'] = array(
       '#theme' => 'mediamosa_sb_profile_select',
-      '#options' => $options, //mediamosa_connector::variable_get('media_mediamosa_transcode_profile_default_options_value', $options),
+      '#options' => $options,
       '#default_value' => reset($options),
     );
 

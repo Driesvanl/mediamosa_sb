@@ -1,0 +1,25 @@
+
+/**********************************************************
+ * Main navigation
+ *********************************************************/
+
+#block-system-main-menu {
+  margin-top: 48px;
+  float: left;
+}
+
+#block-system-main-menu li {
+  border-right: 1px #e1e1e1 solid;
+  list-style: none;
+  margin:0;
+  padding: 0 14px 0 14px;
+  float: left;
+}
+
+#block-system-main-menu li.last {
+  border: none;
+}
+
+#block-system-main-menu a {
+  text-decoration: none;
+}

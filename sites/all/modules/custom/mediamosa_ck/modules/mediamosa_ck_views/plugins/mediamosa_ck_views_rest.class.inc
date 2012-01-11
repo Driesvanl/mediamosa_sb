@@ -287,6 +287,14 @@ abstract class mediamosa_ck_views_rest extends views_plugin_query {
           'handler' => 'mediamosa_ck_views_field_text',
         ),
       ),
+
+      'is_owner' => array(
+        'title' => t('Is owner'),
+        'help' => t('A boolean value to indicate ownership of the object. TRUE / Yes will allow the user to edit or delete the object.'),
+        'field' => array(
+          'handler' => 'mediamosa_ck_views_field_boolean',
+        ),
+      ),
     );
   }
 
@@ -300,10 +308,10 @@ abstract class mediamosa_ck_views_rest extends views_plugin_query {
           'handler' => 'mediamosa_ck_views_field_text',
           'click sortable' => TRUE,
         ),
-        'filter' => array(
-          'handler' => 'mediamosa_ck_views_filter_text',
-          'mediamosa_filter_keys' => array('filter_key' => 'granted'),
-        ),
+//        'filter' => array(
+//          'handler' => 'mediamosa_ck_views_filter_text',
+//          'mediamosa_filter_keys' => array('filter_key' => 'granted'),
+//        ),
         'sort' => array(
           'handler' => 'mediamosa_ck_views_sort',
         ),
@@ -451,7 +459,7 @@ abstract class mediamosa_ck_views_rest extends views_plugin_query {
         ),
         'filter' => array(
           'handler' => 'mediamosa_ck_views_filter_text',
-          'mediamosa_filter_keys' => array('filter_key' => 'granted'),
+  //        'mediamosa_filter_keys' => array('filter_key' => 'granted'),
         ),
         'sort' => array(
           'handler' => 'mediamosa_ck_views_sort',

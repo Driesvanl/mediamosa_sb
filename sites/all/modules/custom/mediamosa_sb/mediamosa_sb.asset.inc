@@ -451,7 +451,7 @@ function mediamosa_sb_asset_edit_access_form_submit($form, $form_state) {
 }
 
 function mediamosa_sb_asset_edit_media_form($form, $form_state, $asset_id) {
-  $values = array();
+  $values = array('asset_id' => $asset_id);
 
   // Get the asset.
   $asset = MediaMosaSbConnectorWrapper::get_asset($asset_id);
