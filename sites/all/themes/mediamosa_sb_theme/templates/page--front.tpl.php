@@ -32,7 +32,7 @@
   </div>
   <div id="footer">
     <div class="mm_logo">
-      <?php print theme('image', array('path' => path_to_theme() .'/images/mm_logo.png'))?>
+      <?php print theme('image', array('path' => $logo)); ?>
     </div>
     <?php print render($page['footer']); ?>
   </div>

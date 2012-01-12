@@ -50,7 +50,8 @@ function mediamosa_sb_asset_upload_form($form, &$form_state) {
   $form_state['has_file_element'] = TRUE;
 
   // FIXME: Hack to make it work with single array file upload to mediamosa.
-  // To make it work with MediaMosa single array upload result.
+  // To make it work with MediaMosa single array upload result. MediaMosa
+  // can not work with files[file].
   $form['file'] = array(
     '#markup' => '<input type="file" id="edit-file" name="file" size="60" class="form-file" />',
     '#title' => t('Upload your file'),
@@ -202,7 +203,10 @@ function mediamosa_sb_asset_upload_step_metadata_form($form, $form_state) {
     'values' => array(),
   );
 
-  return mediamosa_sb_asset_forms::metadata_form($form_state['values']);
+  // Set asset_id in case we need it.
+  $values = array_merge(array('asset_id' => $form_state['asset_id']), $form_state['values']);
+
+  return mediamosa_sb_asset_forms::info_form($values);
 }
 
 /**
@@ -223,7 +227,10 @@ function mediamosa_sb_asset_upload_step_access_form($form, $form_state) {
     'values' => array(),
   );
 
-  return mediamosa_sb_asset_forms::access_form($form_state['values']);
+  // Set asset_id in case we need it.
+  $values = array_merge(array('asset_id' => $form_state['asset_id']), $form_state['values']);
+
+  return mediamosa_sb_asset_forms::access_form($values);
 }
 
 /**
@@ -238,22 +245,22 @@ function mediamosa_sb_asset_upload_step_media_form($form, &$form_state) {
     'values' => array(),
   );
 
-  return mediamosa_sb_asset_forms::media_form($form_state['values']);
+  // Set asset_id in case we need it.
+  $values = array_merge(array('asset_id' => $form_state['asset_id']), $form_state['values']);
+
+  return mediamosa_sb_asset_forms::media_form($values, TRUE);
 }
 
 /**
  * Validation for metadata form.
  */
 function _mediamosa_sb_asset_upload_steps_finish_validation($form, &$form_state) {
+  // Run function for validation transcode jobs / stills to MediaMosa.
+  mediamosa_sb::validate_media($form_state['step_information'][3]['stored_values'], $form_state['asset_id']);
 }
 
 /**
- * Wizard form submit handler.
- * - Saves away $form_state['values']
- * - Process all the form values.
- *
- * This demonstration handler just do a drupal_set_message() with the information
- * collected on each different step of the steps.
+ * Step 4 submition function.
  *
  * @param $form
  * @param $form_state
@@ -265,13 +272,13 @@ function _mediamosa_sb_asset_upload_steps_finish_submit($form, &$form_state) {
   $form_state['step_information'][$form_state['step']]['stored_values'] = $form_state['input'];
 
   // Run function for posting metadata to MediaMosa.
-  mediamosa_sb::post_metadata($form_state['step_information'][1]['stored_values'], $form_state['asset_id']);
+  mediamosa_sb::submit_info($form_state['step_information'][1]['stored_values'], $form_state['asset_id']);
 
   // Run function for posting access rules to MediaMosa.
-  mediamosa_sb::post_access($form_state['step_information'][2]['stored_values'], $form_state['asset_id'], $form_state['mediafile_id']);
+  mediamosa_sb::submit_access($form_state['step_information'][2]['stored_values'], $form_state['asset_id']);
 
-  // Run function for posting transcode jobs to MediaMosa.
-  mediamosa_sb::post_media($form_state['step_information'][3]['stored_values'], $form_state['asset_id'], $form_state['mediafile_id']);
+  // Run function for posting transcode jobs / stills to MediaMosa.
+  mediamosa_sb::submit_media($form_state['step_information'][3]['stored_values'], $form_state['asset_id']);
 
   // Go to view page.
   drupal_goto('asset/' . rawurlencode( $form_state['asset_id']));
@@ -327,7 +334,8 @@ function mediamosa_sb_asset_edit_metadata_form($form, &$form_state, $asset_id) {
     $values['mycollections'][] = (string) $collection->attributes()->id;
   }
 
-  $form = mediamosa_sb_asset_forms::metadata_form($values);
+  // Get the form.
+  $form = mediamosa_sb_asset_forms::info_form($values);
 
   $form['asset_id'] = array(
     '#type' => 'value',
@@ -367,7 +375,7 @@ function mediamosa_sb_asset_edit_metadata_form_submit($form, $form_state) {
   switch ($op) {
     case t('Save'):
       // Run function for posting metadata to MediaMosa.
-      mediamosa_sb::post_metadata($form_state['input'], $asset_id);
+      mediamosa_sb::submit_info($form_state['input'], $asset_id);
       break;
 
     case t('Delete'):
@@ -378,6 +386,9 @@ function mediamosa_sb_asset_edit_metadata_form_submit($form, $form_state) {
   drupal_goto('asset/' . rawurlencode($asset_id));
 }
 
+/**
+ * Access form.
+ */
 function mediamosa_sb_asset_edit_access_form($form, $form_state, $asset_id) {
   $values = array();
 
@@ -442,7 +453,7 @@ function mediamosa_sb_asset_edit_access_form_submit($form, $form_state) {
   switch ($op) {
     case t('Save'):
       // Run function for posting access to MediaMosa.
-      mediamosa_sb::post_access($form_state['input'], $asset_id);
+      mediamosa_sb::submit_access($form_state['input'], $asset_id);
       break;
   }
 
@@ -450,6 +461,9 @@ function mediamosa_sb_asset_edit_access_form_submit($form, $form_state) {
   drupal_goto('asset/' . rawurlencode($asset_id));
 }
 
+/**
+ * The Media form.
+ */
 function mediamosa_sb_asset_edit_media_form($form, $form_state, $asset_id) {
   $values = array('asset_id' => $asset_id);
 
@@ -463,7 +477,7 @@ function mediamosa_sb_asset_edit_media_form($form, $form_state, $asset_id) {
   // Set the title.
   drupal_set_title(mediamosa_sb::get_asset_title($asset));
 
-  // Get the form.
+  // Get the media form.
   $form = mediamosa_sb_asset_forms::media_form($values);
 
   $form['asset_id'] = array(
@@ -483,7 +497,19 @@ function mediamosa_sb_asset_edit_media_form($form, $form_state, $asset_id) {
 /**
  * Validation for asset media page.
  */
-function mediamosa_sb_asset_edit_media_form_validation($form, &$form_state) {
+function mediamosa_sb_asset_edit_media_form_validate($form, &$form_state) {
+  // What was pressed.
+  $op = isset($form_state['values']['op']) ? $form_state['values']['op'] : '';
+
+  // The collection ID.
+  $asset_id = $form_state['values']['asset_id'];
+
+  switch ($op) {
+    case t('Save'):
+      // Run function for validating media form post.
+      mediamosa_sb::validate_media($form_state['input'], $asset_id);
+      break;
+  }
 }
 
 /**
@@ -498,15 +524,14 @@ function mediamosa_sb_asset_edit_media_form_submit($form, $form_state) {
 
   switch ($op) {
     case t('Save'):
-      // Run function for posting media to MediaMosa.
-      mediamosa_sb::post_media($form_state['input'], $asset_id);
+      // Submit the media form.
+      mediamosa_sb::submit_media($form_state['input'], $asset_id);
       break;
   }
 
   // Redirect.
   drupal_goto('asset/' . rawurlencode($asset_id));
 }
-
 
 /**
  * Deletion confirm.
@@ -522,7 +547,7 @@ function mediamosa_sb_delete_delete_confirm_form($form, &$form_state, $asset_id)
   $asset = MediaMosaSbConnectorWrapper::get_asset($asset_id);
 
   if (!$asset) {
-    drupal_set_message(t('Unable to find asset.'), 'warning');
+    drupal_set_message(t('Unable to find media, already deleted?'), 'warning');
 
     // Failed.
     drupal_goto('assets');
@@ -534,7 +559,7 @@ function mediamosa_sb_delete_delete_confirm_form($form, &$form_state, $asset_id)
   );
 
   return confirm_form($form,
-                      t('Are you sure you want to delete this asset?'),
+                      t('Are you sure you want to delete this media file?'),
                       url('asset/' . rawurlencode($asset_id), array('absolute' => TRUE)),
                       t('This action cannot be undone.'),
                       t('Delete'), t('Cancel')
@@ -556,11 +581,11 @@ function mediamosa_sb_collection_delete_confirm_form_submit($form, &$form_state)
 
   // No more assets in collection, now remove collection.
   if (!MediaMosaSbConnectorWrapper::delete_asset($asset_id, $user_id)) {
-    mediamosa_sb::watchdog_error('Unable to delete asset.');
+    mediamosa_sb::watchdog_error('Unable to delete media.');
     drupal_goto('asset/' . rawurlencode($asset_id));
   }
 
   // All ok.
-  drupal_set_message(t('Asset has been deleted.'));
+  drupal_set_message(t('Media has been deleted.'));
   drupal_goto('myassets');
 }

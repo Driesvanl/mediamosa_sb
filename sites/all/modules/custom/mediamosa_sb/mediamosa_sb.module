@@ -111,7 +111,7 @@ function mediamosa_sb_menu() {
     'title' => 'Edit collection',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('mediamosa_sb_collection_edit_form', 2),
-    'access callback' => '_mediamosa_sb_is_owner_asset',
+    'access callback' => '_mediamosa_sb_is_owner_collection',
     'access arguments' => array(2),
     'description' => 'Edit the properties of the collection.',
     'type' => MENU_NORMAL_ITEM,
@@ -122,7 +122,7 @@ function mediamosa_sb_menu() {
     'title' => 'Delete collection',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('mediamosa_sb_collection_delete_confirm_form', 2),
-    'access callback' => '_mediamosa_sb_is_owner_asset',
+    'access callback' => '_mediamosa_sb_is_owner_collection',
     'access arguments' => array(2),
     'description' => 'Delete the collection, but not the assets.',
     'type' => MENU_NORMAL_ITEM,
@@ -147,15 +147,24 @@ function mediamosa_sb_theme() {
  * Access function to asset.
  *
  * @param $asset_id
+ *   The asset ID.
+ *
+ * @return
+ *   Returns TRUE when current user is owner of asset, or FALSE.
  */
 function _mediamosa_sb_is_owner_asset($asset_id) {
-  // Get the asset cached.
-  $asset = MediaMosaSbConnectorWrapper::get_asset($asset_id, array('show_stills' => FALSE, 'show_collections' => FALSE));
+  return mediamosa_sb::is_owner_asset($asset_id);
+}
 
-  // Check if we are owner of the asset.
-  if (!empty($asset) && !empty($asset->items->item->owner_id)) {
-    return $asset->items->item->owner_id == mediamosa_ck::session_user_id();
-  }
-
-  return FALSE;
+/**
+ * Access function to collection.
+ *
+ * @param $collection_id
+ *   The collection ID.
+ *
+ * @return
+ *   Returns TRUE when current user is owner of asset, or FALSE.
+ */
+function _mediamosa_sb_is_owner_collection($collection_id) {
+  return mediamosa_sb::is_owner_collection($collection_id);
 }

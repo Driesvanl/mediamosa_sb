@@ -67,6 +67,35 @@ class MediaMosaSbConnectorWrapper extends MediaMosaCkConnectorWrapper {
   }
 
   /**
+   * Get the collections in which provided asset is present of current user.
+   *
+   * @todo:
+   *   Limit is 200.
+   */
+  static public function get_my_asset_collections($asset_id) {
+    // Get the user ID.
+    $user_id = mediamosa_ck::session_user_id();
+
+    $options = array(
+      'offset' => 0,
+      'limit' => 200, // Get max allowed per rest call.
+      'asset_id' => $asset_id,
+      'cql' => strtr('owner_id == "^!user_id^"', array('!user_id' => $user_id)),
+    );
+
+    // Get it.
+    $collections = array();
+    $xml = parent::search_collection($options);
+    if ($xml) {
+      foreach ($xml->xpath('items/item') as $collection) {
+        $collections[(string) $collection->coll_id] = (string) $collection->title;
+      }
+    }
+
+    return $collections;
+  }
+
+  /**
    * Get the access of a mediafile.
    *
    * @see MediaMosaCkConnectorWrapper::get_access_control()

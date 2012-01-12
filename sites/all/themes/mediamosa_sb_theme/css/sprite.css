@@ -9,6 +9,13 @@
 .asset-detail-information .asset-collections ul li,
 .asset-detail-information .asset-formats ul li,
 .asset-detail-information .asset-formats ul li a,
+.collection-detail-information .collection-view-count,
+.collection-detail-information .collection-uploaded-info,
+.collection-detail-information .collection-collections,
+.collection-detail-information .collection-formats,
+.collection-detail-information .collection-collections ul li,
+.collection-detail-information .collection-formats ul li,
+.collection-detail-information .collection-formats ul li a,
 .item-navigation li,
 .item-navigation li span,
 .item-navigation li span a,
@@ -20,11 +27,13 @@
   background-repeat: no-repeat;
 }
 
-.asset-detail-information .asset-view-count {
+.asset-detail-information .asset-view-count,
+.collection-detail-information .collection-view-count {
   background-position: -480px -554px;
 }
 
-.asset-detail-information .asset-uploaded-info {
+.asset-detail-information .asset-uploaded-info,
+.collection-detail-information .collection-uploaded-info {
   background-position: -454px -597px;
 }
 

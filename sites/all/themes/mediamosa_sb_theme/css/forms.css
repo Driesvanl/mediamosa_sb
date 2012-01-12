@@ -12,7 +12,7 @@
 .page-asset #content form,
 .page-collection #content form {
   padding: 10px;
-  border: 10px solid #eaeaf3;
+  border: 10px solid;
 }
 
 .page-asset #content form .form-wrapper,
@@ -111,17 +111,28 @@ html.js .page-collection #content form .form-wrapper fieldset.collapsible {
 
 html.js .page-asset #content form .form-wrapper fieldset.collapsible .fieldset-legend,
 html.js .page-collection #content form .form-wrapper fieldset.collapsible .fieldset-legend {
-  width: 685px;
+  width: 700px;
+  height: 36px;
   margin-left: -35px;
-  padding-top: 5px;
+  padding: 0;
   border-bottom: none;
   clear: both;
-  background-position: 90% 20%;
+  background-image: url('../images/sprite.png');
   background-color: #ccc;
+  background-position: 219px -1480px;
+}
+
+html.js .page-asset #content form .form-wrapper fieldset.collapsed .fieldset-legend,
+html.js .page-collection #content form .form-wrapper fieldset.collapsed .fieldset-legend {
+  background-position: 182px -1540px;
 }
 
 html.js .page-asset #content form .form-wrapper fieldset.collapsible .fieldset-legend a,
 html.js .page-collection #content form .form-wrapper fieldset.collapsible .fieldset-legend a {
+  margin: 0;
+  padding: 12px;
   color: #404040;
   font-size: 12px;
+  display: block;
 }
+

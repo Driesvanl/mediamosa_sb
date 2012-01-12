@@ -10,7 +10,7 @@
  * Theme override for theme_pager().
  * @see theme_pager()
  */
-function mediamosa_sb_theme_pager($variables) {
+function mm_sb_pager($variables) {
   $tags = $variables['tags'];
   $element = $variables['element'];
   $parameters = $variables['parameters'];
@@ -145,7 +145,7 @@ function mediamosa_sb_theme_pager($variables) {
  * Theme function for a pager placeholder.
  * @ingroup themeable.
  */
-function mediamosa_sb_theme_pager_placeholder($variables) {
+function mm_sb_pager_placeholder($variables) {
   if (!$variables['text']) return '';
   return '<a disabled="disabled">' . $variables['text'] . '</a>';
 }

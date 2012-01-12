@@ -25,10 +25,52 @@
 class mediamosa_sb {
 
   /**
+   * Checks if current user is owner of the asset.
+   *
+   * @param $asset_id
+   *   The asset ID.
+   *
+   * @return
+   *   Returns TRUE when current user is owner of asset, or FALSE.
+   */
+  static public function is_owner_asset($asset_id) {
+    // Get the asset cached.
+    $asset = MediaMosaSbConnectorWrapper::get_asset($asset_id, array('show_stills' => FALSE, 'show_collections' => FALSE));
+
+    // Check if we are owner of the asset.
+    if (!empty($asset) && !empty($asset->items->item->owner_id)) {
+      return $asset->items->item->owner_id == mediamosa_ck::session_user_id();
+    }
+
+    return FALSE;
+  }
+
+  /**
+   * Checks if current user is owner of the collection.
+   *
+   * @param $coll_id
+   *   The collection ID.
+   *
+   * @return
+   *   Returns TRUE when current user is owner of asset, or FALSE.
+   */
+  static public function is_owner_collection($coll_id) {
+    // Get the asset cached.
+    $collection = MediaMosaSbConnectorWrapper::get_collection($coll_id);
+
+    // Check if we are owner of the asset.
+    if (!empty($collection) && !empty($collection->items->item->owner_id)) {
+      return $collection->items->item->owner_id == mediamosa_ck::session_user_id();
+    }
+
+    return FALSE;
+  }
+
+  /**
    * Returns the title of the asset using the metadata.
    *
-   * @param simplexmlelement $asset
-   *   The asset in simplexmlelement.
+   * @param SimpleXMLElement $asset
+   *   The asset in SimpleXMLElement.
    *
    * @return
    *   The title or ''.
@@ -244,10 +286,18 @@ class mediamosa_sb {
      );
   }
 
+  static public function submit_info($values, $asset_id) {
+    // Submit the metadata.
+    self::submit_info_metadata($values, $asset_id);
+
+    // Submit the metadata.
+    self::submit_info_collections($values, $asset_id);
+  }
+
   /**
-   * Post the metadata from form submited fields.
+   * Submit the metadata from form submited fields.
    */
-  static public function post_metadata($values, $asset_id) {
+  static protected function submit_info_metadata($values, $asset_id) {
     // Options + metadata for write.
     $options = array('action' => 'replace');
 
@@ -278,15 +328,68 @@ class mediamosa_sb {
   }
 
   /**
+   * Submit the metadata from form submited fields.
+   */
+  static protected function submit_info_collections($values, $asset_id) {
+
+    // Create array for easy lookup.
+    $selected_collections = empty($values['mycollections']) ? array() : array_combine($values['mycollections'], $values['mycollections']);
+
+    // Get the collections in which now the asset is in.
+    $my_asset_collections = MediaMosaSbConnectorWrapper::get_my_asset_collections($asset_id);
+
+    // Get my collections.
+    $my_collections = MediaMosaSbConnectorWrapper::get_my_collections_for_options();
+
+    // Loop through my collections
+    foreach ($my_collections as $coll_id => $title) {
+      // Is asset selected in this collection?
+      if (isset($selected_collections[$coll_id])) {
+        // If not already in collection, then create relation.
+        if (!isset($my_asset_collections[$coll_id])) {
+          MediaMosaSbConnectorWrapper::create_collection_asset_relations($coll_id, mediamosa_ck::session_user_id(), array($asset_id));
+        }
+      }
+      else {
+        // Not selected, so has it got a collection relation?
+        if (isset($my_asset_collections[$coll_id])) {
+          // Remove from collection.
+          MediaMosaSbConnectorWrapper::delete_collection_asset_relations($coll_id, mediamosa_ck::session_user_id(), array($asset_id));
+        }
+      }
+    }
+  }
+
+  /**
    * Set access on mediafile.
    *
    * @param $values
+   *   The submited values.
    * @param $asset_id
-   * @param $mediafile_id
+   *   The asset ID.
    *
    * @return
    */
-  static public function post_access($values, $asset_id) {
+  static public function submit_access($values, $asset_id) {
+
+    // Submit visiblilty.
+    self::submit_access_visibility($values, $asset_id);
+
+    // Submit ACL.
+    self::submit_access_acl($values, $asset_id);
+  }
+
+  /**
+   * Set access on mediafile.
+   *
+   * @param $values
+   *   The submited values.
+   * @param $asset_id
+   *   The asset ID.
+   *
+   * @return
+   */
+  static protected function submit_access_visibility($values, $asset_id) {
 
     // Save state isprivate to asset.
     $options = array(
@@ -294,7 +397,19 @@ class mediamosa_sb {
     );
 
     MediaMosaSbConnectorWrapper::update_asset($asset_id, $options);
+  }
 
+  /**
+   * Set access on mediafile.
+   *
+   * @param $values
+   *   The submited values.
+   * @param $asset_id
+   *   The asset ID.
+   *
+   * @return
+   */
+  static protected function submit_access_acl($values, $asset_id) {
     // Get the mediafiles.
     $mediafile_ids = MediaMosaSbConnectorWrapper::get_asset_mediafile_ids($asset_id);
 
@@ -319,42 +434,158 @@ class mediamosa_sb {
     foreach ($mediafile_ids as $mediafile_id) {
       if (!MediaMosaSbConnectorWrapper::set_access_control($mediafile_id, mediamosa_ck::session_user_id(), $acl_domain_realm, $acl_user)) {
         mediamosa_sb::watchdog_error('Unable to save access for mediafile with ID @mediafile_id.', array('@mediafile_id' => $mediafile_id));
-        return FALSE;
       }
     }
-
-    return TRUE;
   }
 
   /**
-   * Post transcode & still.
+   * Validate form media.
    *
    * @param $values
+   *   The post values.
    * @param $asset_id
-   * @param $mediafile_id
+   *   The asset ID.
    */
-  static public function post_media($values, $asset_id) {
+  static public function validate_media($values, $asset_id) {
+    // Validate the still form.
+    self::validate_media_still($values, $asset_id);
+  }
+
+  /**
+   * Validate form still.
+   *
+   * @param $values
+   *   The post values.
+   * @param $asset_id
+   *   The asset ID.
+   */
+  static protected function validate_media_still($values, $asset_id) {
+    // Check if still time is correct format.
+    if (!preg_match("/[0-9]{1,2}:[0-9]{1,2}/", $values['still_start_time'])) {
+      form_set_error('still_start_time', t('Time for still generation must be in format MM:SS.'));
+    }
+  }
+
+
+  /**
+   * Submit the media form.
+   *
+   * @param $values
+   *   The post values.
+   * @param $asset_id
+   *   The asset ID.
+   */
+  static public function submit_media($values, $asset_id) {
+    // Submit still.
+    self::submit_media_still($values, $asset_id);
+
+    // Submit media.
+    self::submit_media_transcoding($values, $asset_id);
+  }
+
+  /**
+   * Submit still.
+   *
+   * @param $values
+   *   The post values.
+   * @param $asset_id
+   *   The asset ID.
+   */
+  static protected function submit_media_still($values, $asset_id) {
+    // Get the original mediafile_id.
+    $mediafile_id_original = reset(MediaMosaSbConnectorWrapper::get_asset_mediafile_ids_original($asset_id));
+
+    // Check if we need to generate still.
+    if ($values['still_start_time'] != mediamosa_sb_asset_forms::DEFAULT_START_TIME_STILL_FORM) {
+      // Remove all stills first.
+      MediaMosaSbConnectorWrapper::delete_asset_still($asset_id, mediamosa_ck::session_user_id());
+
+      // Calc number of seconds.
+      list($minutes, $seconds) = explode(':', $values['still_start_time'], 2);
+      $data = array(
+        'start_time' => ($minutes * 60) + $seconds,
+      );
+
+      // Create still.
+      MediaMosaSbConnectorWrapper::create_mediafile_still($mediafile_id_original, mediamosa_ck::session_user_id(), $data);
+    }
+  }
+
+  /**
+   * Submit transcodes.
+   *
+   * @param $values
+   *   The post values.
+   * @param $asset_id
+   *   The asset ID.
+   */
+  static protected function submit_media_transcoding($values, $asset_id) {
+    // Get the original mediafile_id.
+    $mediafile_id_original = reset(MediaMosaSbConnectorWrapper::get_asset_mediafile_ids_original($asset_id));
 
     // Get existing mediafiles transcodes.
     $current_used_transcode_profiles = MediaMosaSbConnectorWrapper::get_asset_current_used_transcode_profiles($asset_id);
 
-    // Get the original mediafile_id.
-    $mediafile_id_original = reset(MediaMosaSbConnectorWrapper::get_asset_mediafile_ids_original($asset_id));
-/*
-    if (!empty($mediafile_id_original)) {
-      foreach ($values as $name => $profile_id) {
-        if (drupal_substr($name, 0, strlen('active_')) == 'active_') {
-          // If not in $current_used_transcode_profiles, then we can start it.
-          if ($current_used_transcode_profiles[$profile_id]) {
-            continue;
-          }
+    // Get the allowed profiles.
+    $allowed_profiles = MediaMosaCkConnectorWrapper::get_allowed_transcode_profiles();
 
-          // Start transcode job.
-          MediaMosaSbConnectorWrapper::create_transcode($mediafile_id_original, array('profile_id' => $profile_id));
+    // Get the default profiles, these can not be deleted or re-created.
+    $default_profile = MediaMosaCkConnectorWrapper::get_default_transcode_profile();
+
+    // List of the profile IDs now used.
+    $active_profile_ids = array();
+
+    if (!empty($mediafile_id_original)) {
+      foreach ($values as $name => $on_status) {
+        if (empty($on_status)) {
+          continue;
+        }
+
+        if (drupal_substr($name, 0, strlen('active_')) == 'active_') {
+          $profile_id = (int) drupal_substr($name, strlen('active_'));
+
+          // Add as checked.
+          $active_profile_ids[$profile_id] = $profile_id;
+
+          // If not in $current_used_transcode_profiles, then we can start it.
+          if (empty($current_used_transcode_profiles[$profile_id])) {
+            // Hmmm how to get this value into a not yet create transcode...
+            $is_downloadable = !empty($values['downloadable_' . $profile_id]);
+
+            // Start transcode job.
+            $job_id = MediaMosaSbConnectorWrapper::create_transcode($mediafile_id_original, array('profile_id' => $profile_id));
+          }
         }
       }
+
+      // Remove transcodes that are not checked (if they are found).
+      foreach ($current_used_transcode_profiles as $profile_id => $profile) {
+        if (isset($active_profile_ids[$profile_id])) {
+          $is_downloadable = !empty($values['downloadable_' . $profile_id]);
+
+          $options = array(
+            'is_downloadable' => $is_downloadable,
+            'transcode_inherits_acl' => TRUE,
+          );
+
+          // Is checked, so set download status.
+          MediaMosaSbConnectorWrapper::update_mediafile($profile['mediafile_id'], $options);
+          continue;
+        }
+
+        // Not allowed, skip.
+        if (!isset($allowed_profiles[$profile_id])) {
+          continue;
+        }
+
+        // Can't delete the default profile.
+        if ($default_profile == $profile_id) {
+          continue;
+        }
+
+        // Remove transcode, for now we ignore the result.
+        MediaMosaSbConnectorWrapper::delete_mediafile($profile['mediafile_id'], mediamosa_ck::session_user_id());
+      }
     }
-*/
   }
 }
-

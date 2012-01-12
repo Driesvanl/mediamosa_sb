@@ -24,6 +24,9 @@
  * and this is autoloaded.
  */
 class mediamosa_sb_asset_forms {
+  // ------------------------------------------------------------------- Consts.
+  const DEFAULT_START_TIME_STILL_FORM = '00:00';
+
   // ---------------------------------------------------------------- Functions.
   /**
    * Return the default value.
@@ -33,19 +36,40 @@ class mediamosa_sb_asset_forms {
   }
 
   /**
-   * The metadata form.
+   * The info form.
    *
-   * @param $form_state
-   *   The form state array.
+   * @param $values
+   *   The values of the form.
    *
    * @return
    *   Returns the form array.
    */
-  static public function metadata_form($values) {
+  static public function info_form($values) {
     $form = array();
 
-    // Get the collections.
-    $options_collections = MediaMosaSbConnectorWrapper::get_my_collections_for_options();
+    // Add basic information form.
+    $form['bacicinfo'] = self::info_basicinfo_form($values);
+
+    // Add collections form.
+    $form['collections'] = self::info_collections_form($values);
+
+    // Add metadata form.
+    $form['metadata'] = self::info_metadata_form($values);
+
+    return $form;
+  }
+
+  /**
+   * The metadata form.
+   *
+   * @param $values
+   *   The values of the form.
+   *
+   * @return
+   *   Returns the form array.
+   */
+  static protected function info_basicinfo_form($values) {
+    $form = array();
 
     $form['basic'] = array(
       '#type' => 'fieldset',
@@ -68,6 +92,24 @@ class mediamosa_sb_asset_forms {
       '#default_value' => self::default_value($values, 'dc_description'),
     );
 
+    return $form;
+  }
+
+  /**
+   * The metadata form.
+   *
+   * @param $values
+   *   The values of the form.
+   *
+   * @return
+   *   Returns the form array.
+   */
+  static protected function info_collections_form($values) {
+    $form = array();
+
+    // Get the collections.
+    $options_collections = MediaMosaSbConnectorWrapper::get_my_collections_for_options();
+
     $form['collections'] = array(
       '#type' => 'fieldset',
       '#title' => t('Collections'),
@@ -77,10 +119,26 @@ class mediamosa_sb_asset_forms {
       '#type' => 'select',
       '#title' => t('My collections'),
       '#required' => FALSE,
+      '#multiple' => TRUE,
       '#size'=> 5,
       '#options' => $options_collections,
       '#default_value' => self::default_value($values, 'mycollections'),
     );
+
+    return $form;
+  }
+
+  /**
+   * The metadata form.
+   *
+   * @param $values
+   *   The values of the form.
+   *
+   * @return
+   *   Returns the form array.
+   */
+  static protected function info_metadata_form($values) {
+    $form = array();
 
     $form['additional'] = array(
       '#type' => 'fieldset',
@@ -321,13 +379,34 @@ class mediamosa_sb_asset_forms {
   /**
    * The access form.
    *
-   * @param $form_state
-   *   The form state array.
+   * @param $values
+   *   The values of the form.
    *
    * @return
    *   Returns the form array.
    */
   static public function access_form($values) {
+    $form = array();
+
+    // Add visibility form.
+    $form['visibility'] = self::access_visibility_form($values);
+
+    // Add acl form.
+    $form['acl'] = self::access_acl_form($values);
+
+    return $form;
+  }
+
+  /**
+   * The access form.
+   *
+   * @param $values
+   *   The values of the form.
+   *
+   * @return
+   *   Returns the form array.
+   */
+  static protected function access_visibility_form($values) {
     $form = array();
 
     $form['visibility'] = array(
@@ -343,6 +422,21 @@ class mediamosa_sb_asset_forms {
       '#required' => FALSE,
       '#default_value' => self::default_value($values, 'is_visible'),
     );
+
+    return $form;
+  }
+
+  /**
+   * The access form.
+   *
+   * @param $values
+   *   The values of the form.
+   *
+   * @return
+   *   Returns the form array.
+   */
+  static protected function access_acl_form($values) {
+    $form = array();
 
     $form['control'] = array(
       '#type' => 'fieldset',
@@ -377,15 +471,38 @@ class mediamosa_sb_asset_forms {
   }
 
   /**
-   * The transcode/still form.
+   * The access form.
    *
-   * @param $form_state
-   *   The form state array.
+   * @param $values
+   *   The values of the form.
+   * @param $is_upload
+   *   Form is used during upload.
    *
    * @return
    *   Returns the form array.
    */
-  static public function media_form($values) {
+  static public function media_form($values, $is_upload = FALSE) {
+    $form = array();
+
+    // Add transcoding form.
+    $form['transcoding'] = self::media_transcoding_form($values, $is_upload);
+
+    // Add still form.
+    $form['still'] = self::media_still_form($values);
+
+    return $form;
+  }
+
+  /**
+   * The transcode form.
+   *
+   * @param $values
+   *   The values of the form.
+   *
+   * @return
+   *   Returns the form array.
+   */
+  static protected function media_transcoding_form($values, $is_upload) {
     $form = array();
 
     // The asset ID.
@@ -393,7 +510,7 @@ class mediamosa_sb_asset_forms {
 
     $form['transcode'] = array(
       '#type' => 'fieldset',
-      '#title' => t('Visibility'),
+      '#title' => t('Currently active video profiles'),
     );
 
     $xml = MediaMosaCkConnectorWrapper::get_transcode_profiles();
@@ -410,7 +527,7 @@ class mediamosa_sb_asset_forms {
     $existing_transcodes = array();
     $is_downloadable = array();
 
-    // Get the default profiles, these can not be deleted or recreated.
+    // Get the default profiles, these can not be deleted or re-created.
     $default_profile = MediaMosaCkConnectorWrapper::get_default_transcode_profile();
 
     try {
@@ -426,12 +543,12 @@ class mediamosa_sb_asset_forms {
 
         // Collect the transcodes.
         if (!empty($mediafile->transcode_profile_id)) {
-          $existing_transcodes[$mediafile->transcode_profile_id] = $mediafile->transcode_profile_id;
+          $existing_transcodes[(int) $mediafile->transcode_profile_id] = (int) $mediafile->transcode_profile_id;
         }
 
         // Collect the downloadables.
         if (MediaMosaCkConnectorWrapper::string2bool($mediafile->is_downloadable)) {
-          $is_downloadable[$mediafile->transcode_profile_id] = $mediafile->transcode_profile_id;
+          $is_downloadable[(int) $mediafile->transcode_profile_id] = (int) $mediafile->transcode_profile_id;
         }
       }
     }
@@ -449,15 +566,26 @@ class mediamosa_sb_asset_forms {
           continue;
         }
 
-        // Exists as transcode?
-        $active = isset($existing_transcodes[$profile_id]);
+        // Is default profile?
+        $default = $profile_id == $default_profile;
+
+        // Exists as transcode? Put checked on.
+        // If we are during upload, then we expect the defaults to exist (job
+        // is running).
+        $checked_transcode = isset($existing_transcodes[$profile_id]) || ($is_upload && $default ? TRUE : FALSE);
+
+        // Disable the checkbox only when default and transcode is available.
+        $disabled = $default && $checked_transcode;
+
+        // Is downloadable?
+        $checked_downloadable = $checked_transcode && isset($is_downloadable[$profile_id]);
 
         // Is default profile?
-        $options[$profile_id]['is_default'] = $profile_id == $default_profile;
-        $options[$profile_id]['is_allowed'] = $profile_id != $default_profile;
+        $options[$profile_id]['default'] = $default;
+        $options[$profile_id]['disabled'] = $disabled;
+        $options[$profile_id]['checked_transcode'] = $checked_transcode;
+        $options[$profile_id]['checked_downloadable'] = $checked_downloadable;
 
-        $options[$profile_id]['active'] = $active;
-        $options[$profile_id]['downloadable'] = FALSE;
         $options[$profile_id]['title'] = (string) $profile->profile;
         $options[$profile_id]['profile_id'] = (int) $profile->profile_id;
       }
@@ -469,17 +597,32 @@ class mediamosa_sb_asset_forms {
       '#default_value' => reset($options),
     );
 
+    return $form;
+  }
+
+  /**
+   * The still form.
+   *
+   * @param $values
+   *   The values of the form.
+   *
+   * @return
+   *   Returns the form array.
+   */
+  static protected function media_still_form($values) {
+    $form = array();
+
     $form['still'] = array(
       '#type' => 'fieldset',
       '#title' => t('Still generation for this video'),
     );
 
-    $form['still']['title'] = array(
+    $form['still']['still_start_time'] = array(
       '#type' => 'textfield',
       '#title' => t('Time for still generation'),
       '#required' => FALSE,
       '#size' => 5,
-      '#value' => '00.00', // added default value.
+      '#value' => self::DEFAULT_START_TIME_STILL_FORM, // added default value.
       '#description' => t('Enter the time for the frame on which the still wil be generated'),
     );
 

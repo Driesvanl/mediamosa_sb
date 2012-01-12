@@ -100,7 +100,6 @@
 #breadcrumbs {
   height: 31px;
   border-bottom: 1px solid #d9d9d9;
-  background: #eaeaf3;
 }
 
 #breadcrumbs .breadcrumb {
@@ -123,4 +122,48 @@
 
 #breadcrumbs .breadcrumb a {
   font-size: 12px;
+}
+
+/**********************************************************
+ * Tabs primary
+ *********************************************************/
+
+ul.tabs.primary {
+  clear: both;
+  height: 38px;
+  overflow: visible;
+  padding-left: 10px;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #d9d9d9;
+}
+
+ul.tabs.primary li {
+  float: left;
+  padding: 0;
+  margin-right: 5px;
+  background: #eaeaf3;
+}
+
+ul.tabs.primary li.active {
+  padding: 0;
+  border-top: 1px solid #d9d9d9;
+  border-left: 1px solid #d9d9d9;
+  border-right: 1px solid #d9d9d9;
+  border-bottom: 1px solid #fff;
+  background: #fff;
+}
+
+ul.tabs.primary li a {
+  display: block;
+  color: #000;
+  border: none;
+  margin: 0;
+  font-size: 12px;
+  padding: 13px 15px;
+  background: none;
+}
+
+ul.tabs.primary li.active a {
+  padding: 12px 14px 12px 14px;
+  border-bottom: 1px solid #fff;
 }

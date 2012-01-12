@@ -42,6 +42,7 @@
 
 .not-front .view .views-field-mediafile-duration {
   top: 123px;
+  left: 174px;
 }
 
 .view .views-field-mediafile-duration .field-content {
@@ -89,7 +90,7 @@
 .views-exposed-form {
   margin-bottom: 11px;
   padding: 12px 10px;
-  border: 2px solid #eaeaf3;
+  border: 2px solid;
 }
 
 .views-exposed-form .form-item {
@@ -151,7 +152,7 @@
   content: url('../images/sprite.png');
   position: absolute;
   left: -205px;
-  top: -150px;
+  top: -188px;
 }
 
 #spotlight .views-field-mediafile-duration {
@@ -190,20 +191,23 @@
 
 
 /**********************************************************
- * Asset detail Page
+ * Asset / collection detail Page
  *********************************************************/
 
-.page-asset .view {
+.page-asset .view,
+.page-collection .view {
   position: relative;
 }
 
-.page-asset .view .views-row {
+.page-asset .view .views-row,
+.page-collection .view-mediamosa-collection-detail .views-row {
   padding: 0;
   border: none;
   position: relative;
 }
 
-.page-asset .view .asset-video-player {
+.page-asset .view .asset-video-player,
+.page-collection .view .collection-videos {
   width: 640px;
   margin-right: 20px;
   float: left;
@@ -246,7 +250,8 @@
   color: #000;
 }
 
-.page-asset .asset-detail-information {
+.page-asset .asset-detail-information,
+.page-collection .collection-detail-information {
   width: 274px;
   float: left;
   border-width: 7px 7px 1px 7px;
@@ -254,29 +259,34 @@
   border-style: solid;
 }
 
-.page-asset .asset-detail-information strong {
+.page-asset .asset-detail-information strong,
+.page-collection .collection-detail-information strong {
   color: #000;
 }
 
-.asset-detail-information .information-row {
+.asset-detail-information .information-row,
+.collection-detail-information .information-row {
   border-bottom: 6px solid #eaeaf3;
 }
 
-.asset-detail-information .asset-view-count {
+.asset-detail-information .asset-view-count,
+.collection-detail-information .collection-view-count {
   padding: 10px 0 10px 25px;
   font-size: 18px;
   border-bottom: 2px solid #eaeaf3;
   /* background declaration in sprite.css */
 }
 
-.asset-detail-information .asset-uploaded-info {
+.asset-detail-information .asset-uploaded-info,
+.collection-detail-information .collection-uploaded-info {
   margin: 10px 0;
   padding: 0 0 0 25px;
   font-size: 14px;
   /* background declaration in sprite.css */
 }
 
-.asset-detail-information .asset-view-count .count .field-content {
+.asset-detail-information .asset-view-count .count .field-content,
+.collection-detail-information .collection-view-count .count {
   font-size: 28px;
   color: #000;
 }
@@ -312,11 +322,13 @@
 .asset-detail-information .asset-formats ul li {
   padding-left: 12px;
   margin-bottom: 5px;
+  font-size: 12px;
   /* background declaration in sprite.css */
 }
 
 .asset-detail-information .asset-collections ul li a,
 .asset-detail-information .asset-formats ul li a {
+  margin-top: 2px;
   padding-right: 20px;
   font-size: 12px;
 }
@@ -345,7 +357,6 @@
 .asset-technical-information #asset-tabs li {
   float: left;
   margin-right: 5px;
-  background: #eaeaf3;
 }
 
 .asset-technical-information #asset-tabs li.active {
@@ -369,17 +380,17 @@
 }
 
 .asset-technical-information .tab {
-  border-top: 7px solid #ebecf4;
-  border-bottom: 7px solid #ebecf4;
-  border-left: 6px solid #ebecf4;
-  border-right: 6px solid #ebecf4;
+  border-top: 7px solid;
+  border-bottom: 7px solid;
+  border-left: 6px solid;
+  border-right: 6px solid;
 }
 
 .asset-technical-information .tab h2 {
   margin-bottom: 0;
   padding-left: 27px;
   color: #8e8e8e;
-  border-bottom: 6px solid #ebecf4;
+  border-bottom: 6px solid;
   font-size: 18px;
   font-weight: normal;
 }
@@ -393,8 +404,8 @@
   padding: 9px;
   font-size: 12px;
   border-collapse: collapse;
-  border-top: 1px solid #fcfcfe;
-  border-bottom: 1px solid #ebecf4;
+  border-top: 1px solid;
+  border-bottom: 1px solid;
   background: #fff;
 }
 
@@ -480,7 +491,7 @@
 
 
 /**********************************************************
- * Asset / video overview
+ * Collection overview
  *********************************************************/
 
 .page-collections .view .views-table {
@@ -512,4 +523,51 @@
 .page-collections .view .views-table tr td.views-field-numofvideos {
   color: #000;
   font-size: 14px;
+}
+
+
+/**********************************************************
+ * Collection detail
+ *********************************************************/
+
+.page-collection .view-mediamosa-assets-in-collection {
+  width: 620px;
+  margin-top: -160px;
+}
+
+.page-collection .view-mediamosa-assets-in-collection .views-row {
+  width: 298px;
+  margin-right: 19px;
+  padding: 0;
+  clear: none;
+  float: left;
+}
+
+.page-collection .view-mediamosa-assets-in-collection .views-row .asset-information {
+  min-height: 70px;
+  padding: 9px;
+  position: relative;
+}
+
+.page-collection .view-mediamosa-assets-in-collection .views-row:nth-child(2n+2) {
+  margin-right: 0;
+}
+
+.page-collection .view-mediamosa-assets-in-collection .asset-information,
+.page-collection .view-mediamosa-assets-in-collection .views-field-still-url {
+  float: none;
+}
+
+.page-collection .view-mediamosa-assets-in-collection .views-field-still-url:after {
+  left: -205px;
+  top: -188px;
+}
+
+.page-collection .view-mediamosa-assets-in-collection .views-field-mediafile-duration {
+  left: 251px;
+  top: -34px;
+}
+
+.page-collection .view-mediamosa-assets-in-collection .views-field-title .field-content a {
+  font-size: 18px;
 }
