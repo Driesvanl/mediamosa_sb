@@ -136,3 +136,26 @@ html.js .page-collection #content form .form-wrapper fieldset.collapsible .field
   display: block;
 }
 
+/**********************************************************
+ * Asset upload
+ *********************************************************/
+
+.page-asset form#mediamosa-sb-asset-upload-form {
+  overflow: hidden;
+}
+
+.page-asset form#mediamosa-sb-asset-upload-form div {
+  width: 350px;
+  margin: 0 auto;
+}
+
+.page-asset form#mediamosa-sb-asset-upload-form input[type="file"] {
+  width: 300px;
+  float: left;
+}
+
+.page-asset form#mediamosa-sb-asset-upload-form #edit-submit {
+  margin-top: 10px;
+  float: left;
+  clear: both;
+}

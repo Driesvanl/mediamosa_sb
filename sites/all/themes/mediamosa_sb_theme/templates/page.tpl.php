@@ -22,6 +22,10 @@
 
   <div id="content">
     <div id="page_content">
+      <?php if (!empty($title)): ?>
+        <h1><?php print $title; ?></h1>
+      <?php endif; ?>
+
       <?php print $messages; ?>
       <?php if ($tabs): ?><div class="tabs"><?php print render($tabs); ?></div><?php endif; ?>
       <?php print render($page['help']); ?>

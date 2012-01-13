@@ -15,6 +15,7 @@
       $('#' + defaultActiveContent).show();
 
       navigation.find('a').click(function(event){
+        event.preventDefault;
         tabs.hide();
         navigation.removeClass('active');
         var goto_tab = $(this).attr('name');
@@ -25,11 +26,12 @@
     }
   };
 
-  Drupal.behaviors.ie_nth_item = {
+  Drupal.behaviors.ie_nth_fix = {
       attach: function (context, settings) {
         if ($.browser.msie && $.browser.version <= 8) {
           $('.page-assets #page_content .views-row:nth-child(4n)').addClass('fourth-child');
         }
       }
   };
+
 }(jQuery));

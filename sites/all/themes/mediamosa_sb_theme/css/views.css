@@ -3,6 +3,15 @@
  * Views defaults
  *********************************************************/
 
+.page-assets h1,
+.page-collections h1,
+.page-mycollections h1,
+.page-myassets h1 {
+  margin-bottom: 15px;
+  font-size: 32px;
+  color: #000;
+}
+
 .view .views-field-title .field-content {
   font-size: 14px;
 }
@@ -417,15 +426,14 @@
  * Asset / video overview
  *********************************************************/
 
-.page-assets .view {
-}
-
-.page-assets .view .view-content {
+.page-assets .view .view-content,
+.page-myassets .view .view-content {
   margin-left: 9px;
   display: block;
 }
 
-.page-assets .view .item-list {
+.page-assets .view .item-list,
+.page-myassets .view .item-list {
   overflow: hidden;
   clear: both;
   position: relative;
@@ -434,9 +442,10 @@
   border-top: 2px solid #eaeaf3;
 }
 
-.page-assets .views-row {
+.page-assets .views-row,
+.page-myassets .views-row {
   width: 220px;
-  height: 240px;
+  height: 220px;
   padding: 0;
   margin-right: 18px;
   float: left;
@@ -444,7 +453,8 @@
   position: relative;
 }
 
-.page-assets .view .views-row:nth-child(4n+4) {
+.page-assets .view .views-row:nth-child(4n+4),
+.page-myassets .view .views-row:nth-child(4n+4) {
   margin-right: 8px;
 }
 
@@ -453,37 +463,44 @@
   /* IE fix through jquery */
 }
 
-.page-assets .view .views-field-still-url:after {
+.page-assets .view .views-field-still-url:after,
+.page-myassets .view .views-field-still-url:after {
   left: 188px;
 }
 
-.page-assets .views-row .asset-information {
+.page-assets .views-row .asset-information,
+.page-myassets .views-row .asset-information {
   width: 206px;
   padding: 8px 7px;
 }
 
-.page-assets .views-row .asset-information .views-field-title {
+.page-assets .views-row .asset-information .views-field-title,
+.page-myassets .views-row .asset-information .views-field-title {
   max-width: 170px;
 }
 
-.page-assets .views-row .asset-information .views-field-viewed {
+.page-assets .views-row .asset-information .views-field-viewed,
+.page-myassets .views-row .asset-information .views-field-viewed {
   float: right;
   text-align: right;
   display: block;
 }
 
-.page-assets .views-row .asset-information .views-field-viewed .field-content {
+.page-assets .views-row .asset-information .views-field-viewed .field-content,
+.page-myassets .views-row .asset-information .views-field-viewed .field-content {
   color: #000;
   font-size: 12px;
 }
 
-.page-assets .views-row .asset-information .views-field-viewed .field-content span {
+.page-assets .views-row .asset-information .views-field-viewed .field-content span,
+.page-myassets .views-row .asset-information .views-field-viewed .field-content span {
   margin-top: -3px;
   display: block;
   color: #9f9f9f;
 }
 
-.page-assets .views-row .asset-information .views-field-videotimestamp {
+.page-assets .views-row .asset-information .views-field-videotimestamp,
+.page-myassets .views-row .asset-information .views-field-videotimestamp {
   position: absolute;
   bottom: 4px;
   right: 7px;
@@ -494,37 +511,59 @@
  * Collection overview
  *********************************************************/
 
-.page-collections .view .views-table {
+.page-collections .view .views-table,
+.page-mycollections .view .views-table {
   width: 100%;
 }
 
-.page-collections .view .views-table tr th {
+.page-collections .view .views-table tr th,
+.page-mycollections .view .views-table tr th {
   padding: 11px 0 11px 11px;
   color: #000;
   font-size: 12px;
   background: #eaeaf3;
 }
 
-.page-collections .view .views-table tr td {
+.page-collections .view .views-table tr td,
+.page-mycollections .view .views-table tr td {
   padding: 11px 0 11px 11px;
   font-size: 12px;
   border-bottom: 2px solid #eaeaf3;
   background: #fff;
 }
 
-.page-collections .view .views-table tr td.views-field-title a {
+.page-collections .view .views-table tr td.views-field-title a,
+.page-mycollections .view .views-table tr td.views-field-title a {
   font-size: 18px;
 }
 
-.page-collections .view .views-table tr td.views-field-description {
+.page-collections .view .views-table tr td.views-field-description,
+.page-mycollections .view .views-table tr td.views-field-description {
   color: #000;
 }
 
-.page-collections .view .views-table tr td.views-field-numofvideos {
+.page-collections .view .views-table tr td.views-field-numofvideos,
+.page-mycollections .view .views-table tr td.views-field-numofvideos {
   color: #000;
   font-size: 14px;
 }
 
+/* my collections edit / delete buttons */
+
+.page-mycollections .view .views-table .views-field-actions ul {
+  float: right;
+}
+
+.page-mycollections .view .views-table .views-field-actions li {
+  float: left;
+  margin-right: 1px;
+}
+
+.page-mycollections .view .views-table .views-field-actions li a {
+  padding: 6px 14px;
+  color: #000;
+  background: #f3f3f3;
+}
 
 /**********************************************************
  * Collection detail

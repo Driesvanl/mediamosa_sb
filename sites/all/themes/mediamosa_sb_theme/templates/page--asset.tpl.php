@@ -21,7 +21,7 @@
   <?php endif; ?>
 
   <div id="content">
-    <div id="page_content">
+    <div id="page_content"><?php dsm($page); ?>
       <?php print $messages; ?>
       <?php if ($tabs): ?><div class="tabs"><?php print render($tabs); ?></div><?php endif; ?>
       <?php print render($page['help']); ?>
