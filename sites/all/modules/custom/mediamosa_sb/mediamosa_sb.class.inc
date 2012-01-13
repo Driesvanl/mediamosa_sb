@@ -475,12 +475,12 @@ class mediamosa_sb {
    * @param $asset_id
    *   The asset ID.
    */
-  static public function submit_media($values, $asset_id) {
+  static public function submit_media($values, $asset_id, $is_upload = FALSE) {
     // Submit still.
     self::submit_media_still($values, $asset_id);
 
     // Submit media.
-    self::submit_media_transcoding($values, $asset_id);
+    self::submit_media_transcoding($values, $asset_id, $is_upload);
   }
 
   /**
@@ -518,8 +518,11 @@ class mediamosa_sb {
    *   The post values.
    * @param $asset_id
    *   The asset ID.
+   * @param $is_upload
+   *   Is TRUE when called during the upload steps (need to ignore the default
+   *   profile(s)).
    */
-  static protected function submit_media_transcoding($values, $asset_id) {
+  static protected function submit_media_transcoding($values, $asset_id, $is_upload = FALSE) {
     // Get the original mediafile_id.
     $mediafile_id_original = reset(MediaMosaSbConnectorWrapper::get_asset_mediafile_ids_original($asset_id));
 
@@ -543,6 +546,12 @@ class mediamosa_sb {
 
         if (drupal_substr($name, 0, strlen('active_')) == 'active_') {
           $profile_id = (int) drupal_substr($name, strlen('active_'));
+
+          // When upload, do not create default profile transcodes. That is
+          // already started in step 1.
+          if ($is_upload && $default_profile == $profile_id) {
+            continue;
+          }
 
           // Add as checked.
           $active_profile_ids[$profile_id] = $profile_id;

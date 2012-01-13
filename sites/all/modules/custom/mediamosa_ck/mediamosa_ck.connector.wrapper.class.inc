@@ -102,6 +102,7 @@ class MediaMosaCkConnectorWrapper extends mediamosa_connector {
       'transcode_inherits_acl' => TRUE,
       'create_still' => mediamosa_ck::setting_mediafile_upload_create_still(),
       'is_downloadable' => mediamosa_ck::setting_mediafile_downloadable(),
+      'transcode' => array(),
     );
 
     try {
@@ -133,7 +134,7 @@ class MediaMosaCkConnectorWrapper extends mediamosa_connector {
       $action = (string) $response->xml->items->item->action;
 
       // Inherit ACL / Create still.
-      if ($options['transcode_inherits_acl'] || $options['create_still']) {
+      if ($options['transcode_inherits_acl'] || $options['create_still'] || !empty($options['transcode'])) {
         // Rebuild url.
         $parse_url = parse_url($action);
 
@@ -148,6 +149,11 @@ class MediaMosaCkConnectorWrapper extends mediamosa_connector {
         if ($options['create_still']) {
           // Set create still.
           $parse_url['query']['create_still'] = $options['create_still'] ? 'TRUE' : 'FALSE';
+        }
+
+        if (!empty($options['transcode'])) {
+          // Set create still.
+          $parse_url['query']['transcode'] = $options['transcode'];
         }
 
         // Rebuild.

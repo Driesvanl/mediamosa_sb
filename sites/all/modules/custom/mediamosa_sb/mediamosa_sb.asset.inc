@@ -25,8 +25,11 @@ function mediamosa_sb_asset_upload_form($form, &$form_state) {
   // Set title.
   drupal_set_title(t('Step 1/4: Upload'));
 
+  // Get the default profile.
+  $default_profile = MediaMosaCkConnectorWrapper::get_default_transcode_profile();
+
   // Try to create upload ticket.
-  $result = MediaMosaCkConnectorWrapper::create_upload_ticket(array('create_still' => TRUE));
+  $result = MediaMosaCkConnectorWrapper::create_upload_ticket(array('create_still' => TRUE, 'transcode' => $default_profile ? array($default_profile) : array()));
   if (!$result) {
     $form['upload'] = array(
       '#markup' => t('Unable to upload to MediaMosa; @reason', array('@reason' => mediamosa_ck::get_connector_last_error_text())),
@@ -278,7 +281,7 @@ function _mediamosa_sb_asset_upload_steps_finish_submit($form, &$form_state) {
   mediamosa_sb::submit_access($form_state['step_information'][2]['stored_values'], $form_state['asset_id']);
 
   // Run function for posting transcode jobs / stills to MediaMosa.
-  mediamosa_sb::submit_media($form_state['step_information'][3]['stored_values'], $form_state['asset_id']);
+  mediamosa_sb::submit_media($form_state['step_information'][3]['stored_values'], $form_state['asset_id'], TRUE);
 
   // Go to view page.
   drupal_goto('asset/' . rawurlencode( $form_state['asset_id']));
