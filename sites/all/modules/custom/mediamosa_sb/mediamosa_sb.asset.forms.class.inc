@@ -31,8 +31,8 @@ class mediamosa_sb_asset_forms {
   /**
    * Return the default value.
    */
-  static protected function default_value($values, $name) {
-    return empty($values[$name]) ? '' : $values[$name];
+  static protected function default_value($values, $name, $default = '') {
+    return !isset($values[$name]) ? $default : $values[$name];
   }
 
   /**
@@ -420,7 +420,7 @@ class mediamosa_sb_asset_forms {
       '#type' => 'checkbox',
       '#title' => t('Visible in lists'),
       '#required' => FALSE,
-      '#default_value' => self::default_value($values, 'is_visible'),
+      '#default_value' => self::default_value($values, 'is_visible', TRUE),
     );
 
     return $form;
@@ -553,10 +553,9 @@ class mediamosa_sb_asset_forms {
       }
     }
     catch (Exception $e) {
-      mediamosa_ck::watchdog_error('Unable to find existing mediafiles.');
+      mediamosa_ck::watchdog_error('Unable to find existing mediafiles, error message; @message', array('@message' => $e->getMessage()));
     }
 
-    $transcode_profile_default = 0;
     if (!empty($xml->items->item)) {
       foreach ($xml->items->item as $profile) {
         $profile_id = (int) $profile->profile_id;
@@ -622,8 +621,8 @@ class mediamosa_sb_asset_forms {
       '#title' => t('Time for still generation'),
       '#required' => FALSE,
       '#size' => 5,
-      '#value' => self::DEFAULT_START_TIME_STILL_FORM, // added default value.
-      '#description' => t('Enter the time for the frame on which the still wil be generated'),
+      '#default_value' => isset($values['still_start_time']) ? $values['still_start_time'] : self::DEFAULT_START_TIME_STILL_FORM,
+      '#description' => t('Enter the time in MM:SS (minutes:seconds) format for the frame on which the still wil be generated'),
     );
 
     return $form;

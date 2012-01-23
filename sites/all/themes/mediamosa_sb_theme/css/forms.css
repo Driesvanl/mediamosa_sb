@@ -5,12 +5,14 @@
 .page-asset-edit #content #page_content,
 .page-asset-upload #content #page_content,
 .page-collection-add #content #page_content,
-.page-collection-edit #content #page_content {
+.page-collection-edit #content #page_content,
+.page-user #content #page_content {
   width: 824px;
 }
 
 .page-asset #content form,
-.page-collection #content form {
+.page-collection #content form,
+.page-user #content form {
   padding: 10px;
   border: 10px solid;
 }

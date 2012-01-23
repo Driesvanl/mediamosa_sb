@@ -26,7 +26,6 @@ dfn,
 em,
 img,
 q,
-s,
 samp,
 small,
 strike,
@@ -167,6 +166,7 @@ textarea {
 }
 
 /* START STYLESHEET */
+/*
 body {
   font-family: Arial;
 }
@@ -185,4 +185,4 @@ h2 {
 
 td {
   color: #666;
-}
+}*/

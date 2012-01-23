@@ -82,19 +82,23 @@ function mediamosa_sb_kickstart_install() {
       'status' => 1,
       'weight' => 0,
       'region' => 'content',
+      'visibility' => 0,
       'pages' => '',
+      'title' => '',
       'cache' => -1,
     ),
-    array(
-      'module' => 'search',
-      'delta' => 'form',
-      'theme' => $default_theme,
-      'status' => 1,
-      'weight' => -1,
-      'region' => 'sidebar_first',
-      'pages' => '',
-      'cache' => -1,
-    ),
+//    array(
+//      'module' => 'search',
+//      'delta' => 'form',
+//      'theme' => $default_theme,
+//      'status' => 1,
+//      'weight' => -1,
+//      'region' => 'sidebar_first',
+//      'visibility' => 0,
+//      'pages' => '',
+//      'title' => '',
+//      'cache' => -1,
+//    ),
     array(
       'module' => 'node',
       'delta' => 'recent',
@@ -102,7 +106,9 @@ function mediamosa_sb_kickstart_install() {
       'status' => 1,
       'weight' => 10,
       'region' => 'dashboard_main',
+      'visibility' => 0,
       'pages' => '',
+      'title' => '',
       'cache' => -1,
     ),
     array(
@@ -112,7 +118,9 @@ function mediamosa_sb_kickstart_install() {
       'status' => 1,
       'weight' => 0,
       'region' => 'sidebar_first',
+      'visibility' => 0,
       'pages' => '',
+      'title' => '',
       'cache' => -1,
     ),
     array(
@@ -122,7 +130,9 @@ function mediamosa_sb_kickstart_install() {
       'status' => 1,
       'weight' => 0,
       'region' => 'sidebar_first',
+      'visibility' => 0,
       'pages' => '',
+      'title' => '',
       'cache' => -1,
     ),
     array(
@@ -132,7 +142,9 @@ function mediamosa_sb_kickstart_install() {
       'status' => 1,
       'weight' => 10,
       'region' => 'footer',
+      'visibility' => 0,
       'pages' => '',
+      'title' => '',
       'cache' => -1,
     ),
     array(
@@ -142,7 +154,9 @@ function mediamosa_sb_kickstart_install() {
       'status' => 1,
       'weight' => 0,
       'region' => 'help',
+      'visibility' => 0,
       'pages' => '',
+      'title' => '',
       'cache' => -1,
     ),
     array(
@@ -152,7 +166,9 @@ function mediamosa_sb_kickstart_install() {
       'status' => 1,
       'weight' => 0,
       'region' => 'content',
+      'visibility' => 0,
       'pages' => '',
+      'title' => '',
       'cache' => -1,
     ),
     array(
@@ -162,7 +178,9 @@ function mediamosa_sb_kickstart_install() {
       'status' => 1,
       'weight' => 0,
       'region' => 'help',
+      'visibility' => 0,
       'pages' => '',
+      'title' => '',
       'cache' => -1,
     ),
     array(
@@ -172,7 +190,9 @@ function mediamosa_sb_kickstart_install() {
       'status' => 1,
       'weight' => 10,
       'region' => 'content',
+      'visibility' => 0,
       'pages' => '',
+      'title' => '',
       'cache' => -1,
     ),
     array(
@@ -182,21 +202,106 @@ function mediamosa_sb_kickstart_install() {
       'status' => 1,
       'weight' => 0,
       'region' => 'dashboard_sidebar',
+      'visibility' => 0,
       'pages' => '',
+      'title' => '',
       'cache' => -1,
     ),
-    array(
+/*    array(
       'module' => 'search',
       'delta' => 'form',
       'theme' => $admin_theme,
       'status' => 1,
       'weight' => -10,
       'region' => 'dashboard_sidebar',
+      'visibility' => 0,
       'pages' => '',
+      'title' => '',
       'cache' => -1,
     ),
+*/
+    // Search bar in header.
+    array(
+      'module' => 'search',
+      'delta' => 'form',
+      'theme' => $default_theme,
+      'status' => 1,
+      'weight' => -14,
+      'region' => 'header',
+      'visibility' => 0,
+      'pages' => '',
+      'title' => '',
+      'cache' => -1,
+    ),
+    // Main-menu in header
+    array(
+      'module' => 'system',
+      'delta' => 'main-menu',
+      'theme' => $default_theme,
+      'status' => 1,
+      'weight' => -15,
+      'region' => 'header',
+      'visibility' => 0,
+      'pages' => '',
+      'title' => '<none>',
+      'cache' => -1,
+    ),
+    // Featured in highlighted.
+    array(
+      'module' => 'views',
+      'delta' => 'mediamosa_asset_featured-block',
+      'theme' => $default_theme,
+      'status' => 1,
+      'weight' => -1,
+      'region' => 'highlighted',
+      'visibility' => 1,
+      'pages' => '<front>',
+      'title' => '',
+      'cache' => -1,
+    ),
+    // New in content.
+    array(
+      'module' => 'views',
+      'delta' => 'mediamosa_asset_new-block',
+      'theme' => $default_theme,
+      'status' => 1,
+      'weight' => -15,
+      'region' => 'content',
+      'visibility' => 1,
+      'pages' => '<front>',
+      'title' => '',
+      'cache' => -1,
+    ),
+    // Popular in content.
+    array(
+      'module' => 'views',
+      'delta' => 'mediamosa_asset_popular-block',
+      'theme' => $default_theme,
+      'status' => 1,
+      'weight' => -14,
+      'region' => 'content',
+      'visibility' => 1,
+      'pages' => '<front>',
+      'title' => '',
+      'cache' => -1,
+    ),
+    // Assets in collections in content.
+    array(
+      'module' => 'views',
+      'delta' => '785fd9c6a0f79850d74723fb85cded34', // Has generated ID because its ID does not fit the 32 char limit.
+      'theme' => $default_theme,
+      'status' => 1,
+      'weight' => -12,
+      'region' => 'content',
+      'visibility' => 1,
+      'pages' => 'collection/detail/*',
+      'title' => '',
+      'cache' => -1,
+    ),
+
+
   );
-  $query = db_insert('block')->fields(array('module', 'delta', 'theme', 'status', 'weight', 'region', 'pages', 'cache'));
+  $query = db_insert('block')->fields(array('module', 'delta', 'theme', 'status', 'weight', 'region', 'visibility', 'pages', 'title', 'cache'));
   foreach ($values as $record) {
     $query->values($record);
   }
@@ -426,4 +531,8 @@ function mediamosa_sb_kickstart_install() {
 
   // Update the menu router information.
   menu_rebuild();
+
+  // Set the SB search engine as default. Turn off others.
+  variable_set('search_active_modules', array('node' => 'node', 'user' => 'user', 'mediamosa_sb' => 'mediamosa_sb'));
+  variable_set('search_default_module', 'mediamosa_sb');
 }

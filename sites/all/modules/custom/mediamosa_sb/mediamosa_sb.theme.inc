@@ -109,3 +109,61 @@ function theme_mediamosa_sb_profile_select($variables) {
 
   return implode('', $extra) . theme('table', array('header' => $header, 'rows' => $rows, 'empty' => $element['#empty'], 'attributes' => $element['#attributes']));
 }
+
+/**
+ * Returns HTML for a progress bar.
+ *
+ * @param $variables
+ *   An associative array containing:
+ *   - percent: The percentage of the quota.
+ *   - low: text like 30mb
+ *   -
+ *   - message: A string containing information to be displayed.
+ */
+function theme_mediamosa_sb_quota_bar($variables) {
+  $output = '<div id="quota" class="progress">';
+  $output .= '<div class="bar"><div class="filled" style="width: ' . $variables['percent'] . '%"></div></div>';
+  $output .= '<div class="quota-used">' . $variables['used'] . '</div>';
+  $output .= '<div class="quota-total">' . $variables['total'] . '</div>';
+  $output .= '<div class="message">' . $variables['message'] . '</div>';
+  $output .= '</div>';
+
+  return $output;
+}
+
+/**
+ * Custom theme for profile.
+ *
+ * @param $variables
+ *   Theme variables.
+ *
+ * @return
+ *   The rendered HTML.
+ */
+function theme_mediamosa_sb_upload_quota($variables) {
+
+  // Shortcut to element.
+  $element = $variables['element'];
+
+  $quota_bar_options = array(
+    'percent' => min(round($element['#options']['user_used'] / $element['#options']['user_total'] * 100), 100),
+    'message' => t('You have no more quota for upload'),
+    'used' => format_size($element['#options']['user_used'] * 1048576),
+    'total' => format_size($element['#options']['user_total'] * 1048576),
+  );
+
+  if (empty($element['#options']['user_over_quota'])) {
+    $quota_bar_options['message'] = '';
+  }
+
+  $quota_bar = theme('mediamosa_sb_quota_bar', $quota_bar_options);
+
+  $form = array();
+  $form['file'] = array(
+    '#type' => 'item',
+    '#markup' => $quota_bar,
+    '#title' => $element['#title'],
+    '#description' => empty($element['#description']) ? '' : $element['#description'],
+  );
+  return drupal_render_children($form);
+}

@@ -91,34 +91,16 @@ h2 {
 
 /* Footer */
 #footer {
-  border-top: 4px #e2e2e2 solid;
-  border-bottom: 1px #e2e2e2 solid;
-  border-left: 1px #e2e2e2 solid;
-  width: 958px;
-  height: 76px;
+  width: 950px;
   margin: 0 auto;
+  overflow: hidden;
+  border-color: #e2e2e2;
+  border-width: 4px 1px 1px 1px;
+  border-style: solid;
 }
 
 #footer .mm_logo {
+  padding: 5px 10px;
   border-right: 1px #e2e2e2 solid;
   float: left;
-}
-
-#footer .menu {
-  padding-top: 6px;
-  float: right;
-}
-
-#footer .menu li {
-  border-right: 1px #e1e1e1 solid;
-  list-style: none;
-  margin:0;
-  padding: 0 14px 0 14px;
-  float: left;
-}
-
-#footer .menu a {
-  text-decoration: none;
-  font-size: 12px;
-  color: #6f6f6f;
 }

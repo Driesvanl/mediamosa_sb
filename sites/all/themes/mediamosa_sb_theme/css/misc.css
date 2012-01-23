@@ -17,12 +17,11 @@
   color: #b6b6b6;
 }
 
-#header #block-search-form #edit-actions {
-  background: transparent url(../images/btn_bg.png);
-  background-repeat: repeat-x;
+#header #block-search-form .form-actions {
   height: 33px;
   width: 34px;
   float: left;
+  background: url('../images/btn_bg.png') repeat-x 0 100%;
 }
 
 #header #block-search-form .form-submit {

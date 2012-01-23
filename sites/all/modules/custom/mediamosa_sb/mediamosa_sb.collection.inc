@@ -88,7 +88,7 @@ function mediamosa_sb_collection_add_form_submit($form, $form_state) {
   // Add the collection.
   $coll_id = MediaMosaSbConnectorWrapper::create_collection($options);
   if ($coll_id) {
-    drupal_goto('collection/' . rawurlencode($coll_id));
+    drupal_goto(mediamosa_sb::get_collection_detail_url($coll_id));
   }
 
   // Log the error.
@@ -174,7 +174,7 @@ function mediamosa_sb_collection_edit_form_submit($form, $form_state) {
   }
 
   // Redirect.
-  drupal_goto('collection/' . rawurlencode($coll_id));
+  drupal_goto(mediamosa_sb::get_collection_detail_url($coll_id));
 }
 
 /**
@@ -225,7 +225,7 @@ function mediamosa_sb_collection_delete_confirm_form_submit($form, &$form_state)
     // Get the asset_ids.
     $xml = MediaMosaSbConnectorWrapper::get_collection_asset_ids($coll_id);
     if (!$xml) {
-      drupal_goto('collection/' . rawurlencode($coll_id));
+      drupal_goto(mediamosa_sb::get_collection_detail_url($coll_id));
     }
 
     // Collect the asset_ids;
@@ -240,7 +240,7 @@ function mediamosa_sb_collection_delete_confirm_form_submit($form, &$form_state)
       // Delete relations.
       if (!MediaMosaSbConnectorWrapper::delete_collection_asset_relations($coll_id, $user_id, $asset_ids)) {
         mediamosa_sb::watchdog_error('Unable to remove assets from collection.');
-        drupal_goto('collection/' . rawurlencode($coll_id));
+        drupal_goto(mediamosa_sb::get_collection_detail_url($coll_id));
       }
     }
   }
@@ -249,7 +249,7 @@ function mediamosa_sb_collection_delete_confirm_form_submit($form, &$form_state)
   // No more assets in collection, now remove collection.
   if (!MediaMosaSbConnectorWrapper::delete_collection($coll_id, $user_id)) {
     mediamosa_sb::watchdog_error('Unable to delete collection.');
-    drupal_goto('collection/' . rawurlencode($coll_id));
+    drupal_goto(mediamosa_sb::get_collection_detail_url($coll_id));
   }
 
   // All ok.

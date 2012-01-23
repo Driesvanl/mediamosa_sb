@@ -25,6 +25,26 @@
 class mediamosa_sb {
 
   /**
+   * Return the URL for detail page of asset.
+   *
+   * @param type $asset_id
+   * @return type
+   */
+  static public function get_asset_detail_url($asset_id) {
+    return 'asset/detail/' . $asset_id;
+  }
+
+  /**
+   * Return the URL for detail page of collection.
+   *
+   * @param type $asset_id
+   * @return type
+   */
+  static public function get_collection_detail_url($coll_id) {
+    return 'collection/detail/' . $coll_id;
+  }
+
+  /**
    * Checks if current user is owner of the asset.
    *
    * @param $asset_id
@@ -415,9 +435,6 @@ class mediamosa_sb {
 
     // Domains and realms.
     $acl_domain_realm = array();
-
-    // acl users.
-    $acl_user_id = array();
 
     $acl_domain = trim($values['acl_domain']);
     $acl_realm = trim($values['acl_realm']);

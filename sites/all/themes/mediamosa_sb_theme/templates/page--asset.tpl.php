@@ -6,6 +6,20 @@
     <div class="site_logo">
       <?php print l(theme('image', array('path' => $logo, 'title' => $site_name, 'alt' => $site_name)), '<front>', array('html' => TRUE)); ?>
     </div>
+
+    <?php if ($user->uid != 0): ?>
+      <?php print l(t('My account'), 'user', array('attributes' => array('class' => array('user-custom-navigation')))); ?>
+    <?php endif;?>
+
+    <?php if ($user->uid == 0): ?>
+      <?php print l(t('Sign in'), 'user', array('attributes' => array('class' => array('user-login-button')))); ?>
+    <?php endif;?>
+
+    <select id="language-picker">
+      <option>EN</option>
+      <option selected>NL</option>
+    </select>
+
     <?php print render($page['header']); ?>
   </div>
 </div>
@@ -21,7 +35,7 @@
   <?php endif; ?>
 
   <div id="content">
-    <div id="page_content"><?php dsm($page); ?>
+    <div id="page_content">
       <?php print $messages; ?>
       <?php if ($tabs): ?><div class="tabs"><?php print render($tabs); ?></div><?php endif; ?>
       <?php print render($page['help']); ?>

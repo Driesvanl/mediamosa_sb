@@ -13,6 +13,7 @@
   width: 960px;
   height: 88px;
   margin: auto;
+  position: relative;
 }
 
 #header .site_logo {

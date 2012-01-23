@@ -42,7 +42,7 @@
 .view .views-field-mediafile-duration {
   padding: 5px;
   position: absolute;
-  top: 134px;
+  top: 105px;
   left: 184px;
   font-size: 12px;
   font-weight: bold;
@@ -50,7 +50,7 @@
 }
 
 .not-front .view .views-field-mediafile-duration {
-  top: 123px;
+  top: 95px;
   left: 174px;
 }
 
@@ -161,7 +161,7 @@
   content: url('../images/sprite.png');
   position: absolute;
   left: -205px;
-  top: -188px;
+  top: -150px;
 }
 
 #spotlight .views-field-mediafile-duration {
@@ -405,6 +405,7 @@
 }
 
 .asset-technical-information .tab table {
+  width: 100%;
   border-collapse: separate;
 }
 
@@ -569,9 +570,18 @@
  * Collection detail
  *********************************************************/
 
+.page-collection #page_content .collection-holder {
+  width: 620px;
+  float: left;
+}
+
+.page-collection #page_content .collection-information {
+  width: 320px;
+  float: right;
+}
+
 .page-collection .view-mediamosa-assets-in-collection {
   width: 620px;
-  margin-top: -160px;
 }
 
 .page-collection .view-mediamosa-assets-in-collection .views-row {

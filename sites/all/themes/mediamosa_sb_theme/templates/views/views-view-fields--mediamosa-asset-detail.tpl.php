@@ -40,7 +40,7 @@
     <p class="asset-view-count"><span class="count"><?php print $fields['played']->content; ?></span> <?php print t('views'); ?></p>
 
     <p class="asset-uploaded-info">
-      <?php print t('Posted by');?>: <strong><?php print $fields['owner_id']->raw; ?></strong> <?php print t('on'); ?> <strong><?php print $fields['videotimestamp']->raw; ?></strong>
+      <?php print t('Posted by');?>: <strong><?php print $fields['owner_id']->content; ?></strong> <?php print t('on'); ?> <strong><?php print $fields['videotimestamp']->content; ?></strong>
     </p>
   </div>
 
@@ -68,13 +68,13 @@
 <div class="asset-technical-information">
   <ul id="asset-tabs">
     <li>
-      <?php print l('Description', 'asset/' . $fields['asset_id']->raw, array('fragment' => 'tab-metadata-dc', 'attributes' => array('name' => 'tab-metadata-dc'))); ?>
+      <?php print l('Description', 'asset/detail/' . $fields['asset_id']->raw, array('fragment' => 'tab-metadata-dc', 'attributes' => array('name' => 'tab-metadata-dc'))); ?>
     </li>
     <li>
-      <?php print l('More info', 'asset/' . $fields['asset_id']->raw, array('fragment' => 'tab-metadata-qdc', 'attributes' => array('name' => 'tab-metadata-qdc'))); ?>
+      <?php print l('More info', 'asset/detail/' . $fields['asset_id']->raw, array('fragment' => 'tab-metadata-qdc', 'attributes' => array('name' => 'tab-metadata-qdc'))); ?>
     </li>
     <li>
-      <?php print l('Technical info', 'asset/' . $fields['asset_id']->raw, array('fragment' => 'tab-technical-metadata', 'attributes' => array('name' => 'tab-technical-metadata'))); ?>
+      <?php print l('Technical info', 'asset/detail/' . $fields['asset_id']->raw, array('fragment' => 'tab-technical-metadata', 'attributes' => array('name' => 'tab-technical-metadata'))); ?>
     </li>
   </ul>
 
@@ -88,7 +88,7 @@
     <?php print $fields['metadata_qdc']->content; ?>
   </div>
 
-  <div class="tab" id="tab-technical-metadata"> 
+  <div class="tab" id="tab-technical-metadata">
     <h2>Technical metadata</h2>
     <?php print $fields['technical_metadata']->content; ?>
   </div>

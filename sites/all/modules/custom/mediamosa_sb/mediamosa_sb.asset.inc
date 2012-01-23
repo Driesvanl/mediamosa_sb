@@ -19,6 +19,11 @@
  */
 
 /**
+ * @file
+ * Asset related functions.
+ */
+
+/**
  * Step 1: Upload file to MediaMosa.
  */
 function mediamosa_sb_asset_upload_form($form, &$form_state) {
@@ -56,10 +61,32 @@ function mediamosa_sb_asset_upload_form($form, &$form_state) {
   // To make it work with MediaMosa single array upload result. MediaMosa
   // can not work with files[file].
   $form['file'] = array(
+    '#type' => 'item',
     '#markup' => '<input type="file" id="edit-file" name="file" size="60" class="form-file" />',
     '#title' => t('Upload your file'),
     // @todo: make setting.
     '#description' => t('Maximum size of 2,0 GB, MOV, AVI'),
+  );
+
+  // Get the current user.
+  $user = MediaMosaCkConnectorWrapper::get_user(mediamosa_ck::session_user_id());
+
+  $user_quota = array(
+    'user_over_quota' => TRUE,
+    'user_total' => 0,
+    'user_used' => 0,
+  );
+
+  if (!empty($user->header->item_count)) {
+    $user_quota['user_over_quota'] = MediaMosaCkConnectorWrapper::string2bool($user->items->item->user_over_quota);
+    $user_quota['user_total'] = (int) $user->items->item->app_quota_mb;
+    $user_quota['user_used'] = $user_quota['user_total'] - (int) $user->items->item->quota_available_mb;
+  }
+
+  $form['user_quota'] = array(
+    '#title' => t('Your Quota status'),
+    '#theme' => 'mediamosa_sb_upload_quota',
+    '#options' => $user_quota,
   );
 
   // Redirect value, we need to redirect back after upload so we can add it to
@@ -284,7 +311,7 @@ function _mediamosa_sb_asset_upload_steps_finish_submit($form, &$form_state) {
   mediamosa_sb::submit_media($form_state['step_information'][3]['stored_values'], $form_state['asset_id'], TRUE);
 
   // Go to view page.
-  drupal_goto('asset/' . rawurlencode( $form_state['asset_id']));
+  drupal_goto(mediamosa_sb::get_asset_detail_url($form_state['asset_id']));
 }
 
 /**
@@ -386,7 +413,7 @@ function mediamosa_sb_asset_edit_metadata_form_submit($form, $form_state) {
   }
 
   // Redirect.
-  drupal_goto('asset/' . rawurlencode($asset_id));
+  drupal_goto(mediamosa_sb::get_asset_detail_url($asset_id));
 }
 
 /**
@@ -461,7 +488,7 @@ function mediamosa_sb_asset_edit_access_form_submit($form, $form_state) {
   }
 
   // Redirect.
-  drupal_goto('asset/' . rawurlencode($asset_id));
+  drupal_goto(mediamosa_sb::get_asset_detail_url($asset_id));
 }
 
 /**
@@ -533,7 +560,7 @@ function mediamosa_sb_asset_edit_media_form_submit($form, $form_state) {
   }
 
   // Redirect.
-  drupal_goto('asset/' . rawurlencode($asset_id));
+  drupal_goto(mediamosa_sb::get_asset_detail_url($asset_id));
 }
 
 /**
@@ -585,7 +612,7 @@ function mediamosa_sb_collection_delete_confirm_form_submit($form, &$form_state)
   // No more assets in collection, now remove collection.
   if (!MediaMosaSbConnectorWrapper::delete_asset($asset_id, $user_id)) {
     mediamosa_sb::watchdog_error('Unable to delete media.');
-    drupal_goto('asset/' . rawurlencode($asset_id));
+    drupal_goto(mediamosa_sb::get_asset_detail_url($asset_id));
   }
 
   // All ok.

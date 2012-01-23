@@ -18,7 +18,7 @@ regions[header] = Header
 regions[highlighted] = Highlighted
 regions[help] = Help
 regions[content] = Content
-regions[sidebar_first] = Left sidebar
+regions[sidebar_first] = Right sidebar
 regions[footer] = Footer
 
 scripts[] = js/mediamosa_sb_theme.js
