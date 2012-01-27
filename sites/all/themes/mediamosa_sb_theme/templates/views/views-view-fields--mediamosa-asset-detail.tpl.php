@@ -24,8 +24,7 @@
  */
 ?>
 <ul class="item-navigation">
-  <li><span><?php print l(t('View'), 'view', array('attributes' => array('class' => 'view'))); ?></span></li>
-  <?php if ($fields['is_owner']->raw == TRUE): ?>
+  <?php if ($fields['access_edit']->raw == TRUE): ?>
     <li><span><?php print l(t('Edit'), 'asset/edit/' . $fields['asset_id']->raw, array('attributes' => array('class' => 'edit'))); ?></span></li>
   <?php endif; ?>
 </ul>
@@ -48,10 +47,10 @@
     <h3><?php print t('Collections'); ?></h3>
 
     <?php if ($fields['collections']->raw != NULL): ?>
-      <p><?php print t('This video is listed in the following Collection(s)'); ?>:</p>
+    <p><?php print t('This video is listed in the following collection(s)'); ?>:</p>
       <?php print $fields['collections']->content; ?>
     <?php else: ?>
-      <p><?php print t('This video is not listed in other Collections'); ?></p>
+      <p><?php print t('This video is not listed in any collection'); ?></p>
     <?php endif; ?>
   </div>
 

@@ -1,6 +1,4 @@
 <?php
-// $Id: template.php 1830 2011-10-13 16:16:01Z thijs $
-
 /**
  * @file
  * Template file containing alternative rendering for Drupal's default methods.
@@ -42,10 +40,6 @@ function mediamosa_sb_theme_preprocess_page(&$variables) {
   if (module_exists('color')) {
     _color_page_alter($variables);
   }
-  //$variables['container_class'] = 'container-fluid';
-
-  // Set the $has_tabs variable.
-  //$variables['has_tabs'] = ($variables['tabs'] && (!empty($variables['tabs']['#primary']) || !empty($variables['tabs']['#secondary'])));
 }
 
 /**

@@ -44,9 +44,12 @@
   top: 12px;
   right: 0;
   font-size: 12px;
-  text-decoration: underline;
 }
 
+a.user-custom-navigation {
+  font-size: 12px;
+  text-decoration: underline;
+}
 /**********************************************************
  * User login
  *********************************************************/

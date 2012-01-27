@@ -2,13 +2,13 @@
 
 /**
  * @file
- * the install file for the simplesamlphp_auth module
+ * the install file for the surf_conext module
  */
 
 /**
  * Implements hook_install().
  */
-function simplesamlphp_auth_install() {
+function surf_conext_install() {
 /*
   $abc = 'test';
 
@@ -24,7 +24,7 @@ function simplesamlphp_auth_install() {
   // Disable the open registration to the site and store the original setting.
   $original = variable_get('user_register', 1);
   variable_set('user_register', 0);
-  variable_set('simplesamlphp_auth_user_register_original', $original);
+  variable_set('surf_conext_user_register_original', $original);
 
   if ($query1) {
     drupal_set_message(st('The simpleSAMLphp authentication module was installed successfully.'));
@@ -37,14 +37,14 @@ function simplesamlphp_auth_install() {
 /**
  * Implements hook_uninstall().
  */
-function simplesamlphp_auth_uninstall() {
+function surf_conext_uninstall() {
   // Restore the original user registration directive.
-  //$original = variable_get('simplesamlphp_auth_user_register_original', 1);
+  //$original = variable_get('surf_conext_user_register_original', 1);
  /// variable_set('user_register', $original);
 
   // Clean up own variables
   db_delete('variable')
-    ->condition('name', 'simplesamlphp_auth_%', 'LIKE')
+    ->condition('name', 'surf_conext_%', 'LIKE')
     ->execute();
 
   // Clear the variable cache.

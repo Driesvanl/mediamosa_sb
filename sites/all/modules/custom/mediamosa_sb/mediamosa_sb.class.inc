@@ -24,6 +24,14 @@
  */
 class mediamosa_sb {
 
+  // ------------------------------------------------------------------- Consts
+  // Permissions.
+  const MEDIAMOSA_SB_PERMISSION_EDIT_ASSETS = 'mediamosa-sb edit assets';
+  const MEDIAMOSA_SB_PERMISSION_DELETE_ASSETS = 'mediamosa-sb delete assets';
+  const MEDIAMOSA_SB_PERMISSION_EDIT_COLLECTIONS = 'mediamosa-sb edit collections';
+  const MEDIAMOSA_SB_PERMISSION_DELETE_COLLECTIONS = 'mediamosa-sb delete collections';
+
+  // ---------------------------------------------------------------- Functions.
   /**
    * Return the URL for detail page of asset.
    *
@@ -47,19 +55,79 @@ class mediamosa_sb {
   /**
    * Checks if current user is owner of the asset.
    *
-   * @param $asset_id
-   *   The asset ID.
+   * @param $mixed
+   *   Object or asset ID.
    *
    * @return
    *   Returns TRUE when current user is owner of asset, or FALSE.
    */
-  static public function is_owner_asset($asset_id) {
-    // Get the asset cached.
-    $asset = MediaMosaSbConnectorWrapper::get_asset($asset_id, array('show_stills' => FALSE, 'show_collections' => FALSE));
+  static public function is_owner_asset($mixed) {
+    // Get the owner.
+    $user_id = self::get_owner_asset($mixed);
+
+    // Is owner?
+    return (!empty($user_id) && $user_id == mediamosa_ck::session_user_id());
+  }
+
+  /**
+   * Gets the owner of the asset.
+   *
+   * @param $mixed
+   *   Object or asset ID.
+   *
+   * @return
+   *   Returns user_id, or FALSE.
+   */
+  static public function get_owner_asset($mixed) {
+
+    if (is_object($mixed)) {
+      $asset = $mixed;
+    }
+    else {
+      // Get the asset cached.
+      $asset = MediaMosaSbConnectorWrapper::get_asset((string) $mixed, array('show_stills' => FALSE, 'show_collections' => FALSE));
+    }
 
     // Check if we are owner of the asset.
-    if (!empty($asset) && !empty($asset->items->item->owner_id)) {
-      return $asset->items->item->owner_id == mediamosa_ck::session_user_id();
+    if (!empty($asset)) {
+      if (!empty($asset->items->item->owner_id)) {
+        return (string) $asset->items->item->owner_id;
+      }
+      if (!empty($asset->owner_id)) {
+        return (string) $asset->owner_id;
+      }
+    }
+
+    return FALSE;
+  }
+
+  /**
+   * Gets the owner of the asset.
+   *
+   * @param $mixed
+   *   Object or mediafile ID.
+   *
+   * @return
+   *   Returns user_id, or FALSE.
+   */
+  static public function get_owner_mediafile($mixed) {
+
+    if (is_object($mixed)) {
+      $mediafile = $mixed;
+    }
+    else {
+      // Get the asset cached.
+      $mediafile = MediaMosaSbConnectorWrapper::get_mediafile((string) $mixed, array('show_stills' => FALSE));
+    }
+
+    // Check if we are owner of the asset.
+    if (!empty($mediafile)) {
+      if (!empty($mediafile->items->item->owner_id)) {
+        return (string) $mediafile->items->item->owner_id;
+      }
+      if (!empty($mediafile->owner_id)) {
+        return (string) $mediafile->owner_id;
+      }
     }
 
     return FALSE;
@@ -68,22 +136,124 @@ class mediamosa_sb {
   /**
    * Checks if current user is owner of the collection.
    *
-   * @param $coll_id
-   *   The collection ID.
+   * @param $mixed
+   *   Object or collection ID.
    *
    * @return
-   *   Returns TRUE when current user is owner of asset, or FALSE.
+   *   Returns TRUE when current user is owner of collection, or FALSE.
    */
-  static public function is_owner_collection($coll_id) {
-    // Get the asset cached.
-    $collection = MediaMosaSbConnectorWrapper::get_collection($coll_id);
+  static public function is_owner_collection($mixed) {
+    // Get the owner.
+    $user_id = self::get_owner_collection($mixed);
 
-    // Check if we are owner of the asset.
-    if (!empty($collection) && !empty($collection->items->item->owner_id)) {
-      return $collection->items->item->owner_id == mediamosa_ck::session_user_id();
+    // Is owner?
+    return (!empty($user_id) && $user_id == mediamosa_ck::session_user_id());
+  }
+
+  /**
+   * Get the owner of the collection.
+   *
+   * @param $mixed
+   *   Object or collection ID.
+   *
+   * @return
+   *   Returns the owner of collection, or FALSE.
+   */
+  static public function get_owner_collection($mixed) {
+
+    if (is_object($mixed)) {
+      $collection = $mixed;
+    }
+    else {
+     // Get the collection cached.
+      $collection = MediaMosaSbConnectorWrapper::get_collection((string) $mixed);
+    }
+
+    // Check if we are owner of the collection.
+    if (!empty($collection)) {
+      if (!empty($collection->items->item->owner_id)) {
+        return (string) $collection->items->item->owner_id;
+      }
+      if (!empty($collection->owner_id)) {
+        return (string) $collection->owner_id;
+      }
     }
 
     return FALSE;
+  }
+
+  /**
+   * Access function for editing asset.
+   *
+   * @param $mixed
+   *   Object or asset ID.
+   *
+   * @return
+   *   Returns TRUE when current user can edit asset, or FALSE.
+   */
+  static public function access_asset_edit($mixed) {
+
+    // Check Drupal access.
+    if (user_access(mediamosa_sb::MEDIAMOSA_SB_PERMISSION_EDIT_ASSETS)) {
+      return TRUE;
+    }
+
+    return mediamosa_sb::is_owner_asset($mixed);
+  }
+
+  /**
+   * Access function for deleting asset.
+   *
+   * @param $mixed
+   *   Object or asset ID.
+   *
+   * @return
+   *   Returns TRUE when current user can delete asset, or FALSE.
+   */
+  static public function access_asset_delete($mixed) {
+
+    // Check Drupal access.
+    if (user_access(mediamosa_sb::MEDIAMOSA_SB_PERMISSION_DELETE_ASSETS)) {
+      return TRUE;
+    }
+
+    return mediamosa_sb::is_owner_asset($mixed);
+  }
+
+  /**
+   * Access function for editing collection.
+   *
+   * @param $mixed
+   *   Object or collection ID.
+   *
+   * @return
+   *   Returns TRUE when current user can edit collection, or FALSE.
+   */
+  static public function access_collection_edit($mixed) {
+    // Check Drupal access.
+    if (user_access(mediamosa_sb::MEDIAMOSA_SB_PERMISSION_EDIT_COLLECTIONS)) {
+      return TRUE;
+    }
+
+    return mediamosa_sb::is_owner_collection($mixed);
+  }
+
+  /**
+   * Access function for deleting collection.
+   *
+   * @param $mixed
+   *   Object or collection ID.
+   *
+   * @return
+   *   Returns TRUE when current user is owner of collection, or FALSE.
+   */
+  static public function access_collection_delete($mixed) {
+    // Check Drupal access.
+    if (user_access(mediamosa_sb::MEDIAMOSA_SB_PERMISSION_DELETE_COLLECTIONS)) {
+      return TRUE;
+    }
+
+    return mediamosa_sb::is_owner_collection($mixed);
   }
 
   /**
@@ -93,13 +263,12 @@ class mediamosa_sb {
    *   The asset in SimpleXMLElement.
    *
    * @return
-   *   The title or ''.
+   *   The title or default.
    *
    * @see mediamosa_ck::get_asset_title()
    */
   static public function get_asset_title($asset) {
-    $title = mediamosa_ck::get_asset_title($asset);
-    return $title === '' ? t('[no title]') : t($title);
+    return mediamosa_ck::get_asset_title($asset);
   }
 
   /**
@@ -355,11 +524,22 @@ class mediamosa_sb {
     // Create array for easy lookup.
     $selected_collections = empty($values['mycollections']) ? array() : array_combine($values['mycollections'], $values['mycollections']);
 
+    // Get the session user ID.
+    $user_id = mediamosa_ck::session_user_id();
+
+    // Need edit right.
+    if (mediamosa_sb::access_asset_edit($asset_id)) {
+
+      // Although the owner of the asset might be the user that is in the
+      // session, having the edit right here grants you to be the owner for now.
+      $user_id = mediamosa_sb::get_owner_asset($asset_id);
+    }
+
     // Get the collections in which now the asset is in.
-    $my_asset_collections = MediaMosaSbConnectorWrapper::get_my_asset_collections($asset_id);
+    $my_asset_collections = MediaMosaSbConnectorWrapper::get_my_asset_collections($asset_id, $user_id);
 
     // Get my collections.
-    $my_collections = MediaMosaSbConnectorWrapper::get_my_collections_for_options();
+    $my_collections = MediaMosaSbConnectorWrapper::get_my_collections_for_options($user_id);
 
     // Loop through my collections
     foreach ($my_collections as $coll_id => $title) {
@@ -367,14 +547,14 @@ class mediamosa_sb {
       if (isset($selected_collections[$coll_id])) {
         // If not already in collection, then create relation.
         if (!isset($my_asset_collections[$coll_id])) {
-          MediaMosaSbConnectorWrapper::create_collection_asset_relations($coll_id, mediamosa_ck::session_user_id(), array($asset_id));
+          MediaMosaSbConnectorWrapper::create_collection_asset_relations($coll_id, $user_id, array($asset_id));
         }
       }
       else {
         // Not selected, so has it got a collection relation?
         if (isset($my_asset_collections[$coll_id])) {
           // Remove from collection.
-          MediaMosaSbConnectorWrapper::delete_collection_asset_relations($coll_id, mediamosa_ck::session_user_id(), array($asset_id));
+          MediaMosaSbConnectorWrapper::delete_collection_asset_relations($coll_id, $user_id, array($asset_id));
         }
       }
     }
@@ -449,7 +629,7 @@ class mediamosa_sb {
     $acl_domain_realm = implode(',', $acl_domain_realm);
 
     foreach ($mediafile_ids as $mediafile_id) {
-      if (!MediaMosaSbConnectorWrapper::set_access_control($mediafile_id, mediamosa_ck::session_user_id(), $acl_domain_realm, $acl_user)) {
+      if (!MediaMosaSbConnectorWrapper::set_access_control($asset_id, $mediafile_id, mediamosa_ck::session_user_id(), $acl_domain_realm, $acl_user)) {
         mediamosa_sb::watchdog_error('Unable to save access for mediafile with ID @mediafile_id.', array('@mediafile_id' => $mediafile_id));
       }
     }
@@ -524,7 +704,7 @@ class mediamosa_sb {
       );
 
       // Create still.
-      MediaMosaSbConnectorWrapper::create_mediafile_still($mediafile_id_original, mediamosa_ck::session_user_id(), $data);
+      MediaMosaSbConnectorWrapper::create_mediafile_still($asset_id, $mediafile_id_original, $data);
     }
   }
 
@@ -547,10 +727,10 @@ class mediamosa_sb {
     $current_used_transcode_profiles = MediaMosaSbConnectorWrapper::get_asset_current_used_transcode_profiles($asset_id);
 
     // Get the allowed profiles.
-    $allowed_profiles = MediaMosaCkConnectorWrapper::get_allowed_transcode_profiles();
+    $allowed_profiles = MediaMosaSbConnectorWrapper::get_allowed_transcode_profiles();
 
     // Get the default profiles, these can not be deleted or re-created.
-    $default_profile = MediaMosaCkConnectorWrapper::get_default_transcode_profile();
+    $default_profile = MediaMosaSbConnectorWrapper::get_default_transcode_profile();
 
     // List of the profile IDs now used.
     $active_profile_ids = array();
@@ -575,11 +755,11 @@ class mediamosa_sb {
 
           // If not in $current_used_transcode_profiles, then we can start it.
           if (empty($current_used_transcode_profiles[$profile_id])) {
-            // Hmmm how to get this value into a not yet create transcode...
+            // Hmmm how to get this value into a not yet created transcode...
             $is_downloadable = !empty($values['downloadable_' . $profile_id]);
 
             // Start transcode job.
-            $job_id = MediaMosaSbConnectorWrapper::create_transcode($mediafile_id_original, array('profile_id' => $profile_id));
+            $job_id = MediaMosaSbConnectorWrapper::create_transcode($asset_id, $mediafile_id_original, array('profile_id' => $profile_id));
           }
         }
       }
@@ -595,7 +775,7 @@ class mediamosa_sb {
           );
 
           // Is checked, so set download status.
-          MediaMosaSbConnectorWrapper::update_mediafile($profile['mediafile_id'], $options);
+          MediaMosaSbConnectorWrapper::update_mediafile($asset_id, $profile['mediafile_id'], $options);
           continue;
         }
 
@@ -610,7 +790,7 @@ class mediamosa_sb {
         }
 
         // Remove transcode, for now we ignore the result.
-        MediaMosaSbConnectorWrapper::delete_mediafile($profile['mediafile_id'], mediamosa_ck::session_user_id());
+        MediaMosaSbConnectorWrapper::delete_mediafile($asset_id, $profile['mediafile_id'], mediamosa_ck::session_user_id());
       }
     }
   }

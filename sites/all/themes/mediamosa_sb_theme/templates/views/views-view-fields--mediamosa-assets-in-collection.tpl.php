@@ -29,16 +29,17 @@
 <?php endif; ?>
 
 <div class="asset-information">
-  <?php foreach ($fields as $id => $field): ?>
-     <?php if ($field->handler->field_alias != 'still_url'): ?>
-      <?php if (!empty($field->separator)): ?>
-        <?php print $field->separator; ?>
-      <?php endif; ?>
+  <?php if ($fields['granted']->raw == 'TRUE'): ?>
+    <?php print $fields['mediafile_duration']->wrapper_prefix; ?>
+    <?php print $fields['mediafile_duration']->content; ?>
+    <?php print $fields['mediafile_duration']->wrapper_suffix; ?>
+  <?php endif; ?>
 
-      <?php print $field->wrapper_prefix; ?>
-        <?php print $field->label_html; ?>
-        <?php print $field->content; ?>
-      <?php print $field->wrapper_suffix; ?>
-    <?php endif; ?>
-  <?php endforeach; ?>
+  <?php print $fields['title']->wrapper_prefix; ?>
+  <?php print $fields['title']->content; ?>
+  <?php print $fields['title']->wrapper_suffix; ?>
+
+  <?php print $fields['videotimestamp']->wrapper_prefix; ?>
+  <?php print $fields['videotimestamp']->content; ?>
+  <?php print $fields['videotimestamp']->wrapper_suffix; ?>
 </div>

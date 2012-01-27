@@ -166,3 +166,33 @@ ul.tabs.primary li.active a {
   padding: 12px 14px 12px 14px;
   border-bottom: 1px solid #fff;
 }
+
+/**********************************************************
+ * Search results
+ *********************************************************/
+
+.page-search #search-form .form-wrapper {
+  padding: 15px 11px;
+  background: #eaeaf3;
+}
+
+.page-search #search-form .form-wrapper label {
+  display: none;
+}
+
+.page-search #search-form .form-wrapper input[type="text"] {
+  width: 390px;
+  padding: 3px 7px;
+  color: #b0b0b0;
+  font-size: 24px;
+}
+
+.page-search .view-mediamosa-asset-search-page .views-row .asset-still {
+  margin-right: 20px;
+  float: left;
+}
+
+.page-search .view-mediamosa-asset-search-page .views-row .asset-information .views-field-title a {
+  font-size: 18px;
+}
+

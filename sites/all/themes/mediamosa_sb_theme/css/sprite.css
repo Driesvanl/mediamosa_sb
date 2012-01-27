@@ -27,9 +27,12 @@
   background-repeat: no-repeat;
 }
 
-.asset-detail-information .asset-view-count,
-.collection-detail-information .collection-view-count {
+.asset-detail-information .asset-view-count {
   background-position: -480px -554px;
+}
+
+.collection-detail-information .collection-view-count {
+  background-position: -405px -652px;
 }
 
 .asset-detail-information .asset-uploaded-info,

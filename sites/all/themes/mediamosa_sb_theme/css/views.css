@@ -16,10 +16,14 @@
   font-size: 14px;
 }
 
+.view .views-field-description .field-content {
+  font-size: 12px;
+}
+
 .view .views-row {
   margin-bottom: 11px;
   padding: 10px;
-  border: 1px solid #eee;
+  border: 1px solid #d9d9d9;
   overflow: hidden;
   clear: both;
   position: relative;
@@ -47,6 +51,7 @@
   font-size: 12px;
   font-weight: bold;
   background: #000;
+    border: black solid 1px;
 }
 
 .not-front .view .views-field-mediafile-duration {
@@ -107,9 +112,11 @@
 }
 
 .views-exposed-form label {
-  margin-right: 19px;
-  line-height: 35px;
+  margin-right: 10px;
   float: left;
+  color: #404040;
+  font-size: 14px;
+  line-height: 35px;
 }
 
 .views-exposed-form input[type="text"] {
@@ -119,8 +126,35 @@
   box-shadow: inset -1px 1px 3px 0 #c3c3c3;
 }
 
+.views-exposed-form .views-exposed-widget {
+  overflow: hidden;
+  float: left;
+  margin-right: 10px;
+}
+
+.views-exposed-form .views-exposed-widget select {
+  margin-top: 5px;
+}
+
+.views-exposed-form .views-exposed-widget .form-autocomplete {
+  margin-top: 3px;
+  padding: 4px;
+}
+
+html.js .views-exposed-form .views-exposed-widget .form-autocomplete {
+  background-position: 98% 8px;
+}
+
+html.js .views-exposed-form .views-exposed-widget .form-autocomplete.throbbing {
+  background-position: 98% -12px;
+}
+
+.views-exposed-form .views-exposed-widget .views-widget {
+  float: left;
+}
+
 .views-exposed-form .views-submit-button {
-  margin-top: -30px;
+  margin-top: 8px;
   float: right;
 }
 
@@ -174,6 +208,10 @@
   background: #000;
 }
 
+#spotlight .view .asset-information {
+  width: 280px;
+}
+
 #spotlight .views-field-mediafile-duration .field-content {
   color: #fff;
 }
@@ -190,8 +228,6 @@
 
 #spotlight .view .asset-information .views-field-videotimestamp {
   font-size: 12px;
-  position: absolute;
-  bottom: 7px;
 }
 
 #spotlight .view .asset-information .views-field-videotimestamp .field-content {
@@ -292,6 +328,16 @@
   padding: 0 0 0 25px;
   font-size: 14px;
   /* background declaration in sprite.css */
+}
+
+.collection-detail-information .collection-description h3 {
+  color: #8e8e8e;
+  font-size: 18px;
+}
+
+.collection-detail-information .collection-description p .field-content {
+  color: #000;
+  font-size: 12px;
 }
 
 .asset-detail-information .asset-view-count .count .field-content,
@@ -446,7 +492,7 @@
 .page-assets .views-row,
 .page-myassets .views-row {
   width: 220px;
-  height: 220px;
+  height: 200px;
   padding: 0;
   margin-right: 18px;
   float: left;
@@ -480,21 +526,21 @@
   max-width: 170px;
 }
 
-.page-assets .views-row .asset-information .views-field-viewed,
-.page-myassets .views-row .asset-information .views-field-viewed {
+.page-assets .views-row .asset-information .views-field-played,
+.page-myassets .views-row .asset-information .views-field-played {
   float: right;
   text-align: right;
   display: block;
 }
 
-.page-assets .views-row .asset-information .views-field-viewed .field-content,
-.page-myassets .views-row .asset-information .views-field-viewed .field-content {
+.page-assets .views-row .asset-information .views-field-played .field-content,
+.page-myassets .views-row .asset-information .views-field-played .field-content {
   color: #000;
   font-size: 12px;
 }
 
-.page-assets .views-row .asset-information .views-field-viewed .field-content span,
-.page-myassets .views-row .asset-information .views-field-viewed .field-content span {
+.page-assets .views-row .asset-information .views-field-played .field-content span,
+.page-myassets .views-row .asset-information .views-field-played .field-content span {
   margin-top: -3px;
   display: block;
   color: #9f9f9f;
@@ -507,6 +553,12 @@
   right: 7px;
 }
 
+/**********************************************************
+ * Asset search overview
+ *********************************************************/
+.views-row #asset-search .asset-information {
+  width:690px;
+}
 
 /**********************************************************
  * Collection overview
@@ -570,21 +622,23 @@
  * Collection detail
  *********************************************************/
 
-.page-collection #page_content .collection-holder {
-  width: 620px;
-  float: left;
-}
-
-.page-collection #page_content .collection-information {
+.page-collection-detail #page_content .collection-detail-information {
   width: 320px;
   float: right;
 }
 
-.page-collection .view-mediamosa-assets-in-collection {
+.page-collection-detail .view .collection-videos {
   width: 620px;
+  margin-right: 0;
+  float: left;
 }
 
-.page-collection .view-mediamosa-assets-in-collection .views-row {
+
+.page-collection-detail .view-mediamosa-collection-detail .collection-videos .views-row {
+  border: 1px solid #eee;
+}
+
+.page-collection-detail .view-mediamosa-assets-in-collection .views-row {
   width: 298px;
   margin-right: 19px;
   padding: 0;
@@ -592,31 +646,41 @@
   float: left;
 }
 
-.page-collection .view-mediamosa-assets-in-collection .views-row .asset-information {
+.page-collection-detail .view-mediamosa-assets-in-collection .views-row .asset-information {
   min-height: 70px;
   padding: 9px;
   position: relative;
 }
 
-.page-collection .view-mediamosa-assets-in-collection .views-row:nth-child(2n+2) {
+.page-collection-detail .view-mediamosa-assets-in-collection .views-row:nth-child(2n+2) {
   margin-right: 0;
 }
 
-.page-collection .view-mediamosa-assets-in-collection .asset-information,
-.page-collection .view-mediamosa-assets-in-collection .views-field-still-url {
+.page-collection-detail .view-mediamosa-assets-in-collection .asset-information,
+.page-collection-detail .view-mediamosa-assets-in-collection .views-field-still-url {
   float: none;
+  position: relative;
 }
 
-.page-collection .view-mediamosa-assets-in-collection .views-field-still-url:after {
+.page-collection-detail .view-mediamosa-assets-in-collection .views-row .views-field-still-url:after {
   left: -205px;
-  top: -188px;
+  top: -150px;
 }
 
-.page-collection .view-mediamosa-assets-in-collection .views-field-mediafile-duration {
+.page-collection-detail .asset-information {
+  width: 280px;
+}
+
+.page-collection-detail .view-mediamosa-assets-in-collection .views-field-mediafile-duration {
   left: 251px;
   top: -34px;
 }
 
-.page-collection .view-mediamosa-assets-in-collection .views-field-title .field-content a {
+.page-collection-detail .view-mediamosa-assets-in-collection .views-field-title .field-content a {
   font-size: 18px;
+}
+
+
+.collection-detail-information .collection-description {
+  padding: 10px 10px 10px 7px;
 }

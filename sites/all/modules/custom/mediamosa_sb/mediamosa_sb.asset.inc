@@ -31,10 +31,10 @@ function mediamosa_sb_asset_upload_form($form, &$form_state) {
   drupal_set_title(t('Step 1/4: Upload'));
 
   // Get the default profile.
-  $default_profile = MediaMosaCkConnectorWrapper::get_default_transcode_profile();
+  $default_profile = MediaMosaSbConnectorWrapper::get_default_transcode_profile();
 
   // Try to create upload ticket.
-  $result = MediaMosaCkConnectorWrapper::create_upload_ticket(array('create_still' => TRUE, 'transcode' => $default_profile ? array($default_profile) : array()));
+  $result = MediaMosaSbConnectorWrapper::create_upload_ticket(array('create_still' => TRUE, 'transcode' => $default_profile ? array($default_profile) : array()));
   if (!$result) {
     $form['upload'] = array(
       '#markup' => t('Unable to upload to MediaMosa; @reason', array('@reason' => mediamosa_ck::get_connector_last_error_text())),
@@ -62,14 +62,14 @@ function mediamosa_sb_asset_upload_form($form, &$form_state) {
   // can not work with files[file].
   $form['file'] = array(
     '#type' => 'item',
-    '#markup' => '<input type="file" id="edit-file" name="file" size="60" class="form-file" />',
+    '#markup' => '<input type="file" id="edit-file-upload" name="file" size="60" class="form-file" />',
     '#title' => t('Upload your file'),
     // @todo: make setting.
     '#description' => t('Maximum size of 2,0 GB, MOV, AVI'),
   );
 
   // Get the current user.
-  $user = MediaMosaCkConnectorWrapper::get_user(mediamosa_ck::session_user_id());
+  $user = MediaMosaSbConnectorWrapper::get_user(mediamosa_ck::session_user_id());
 
   $user_quota = array(
     'user_over_quota' => TRUE,
@@ -78,7 +78,7 @@ function mediamosa_sb_asset_upload_form($form, &$form_state) {
   );
 
   if (!empty($user->header->item_count)) {
-    $user_quota['user_over_quota'] = MediaMosaCkConnectorWrapper::string2bool($user->items->item->user_over_quota);
+    $user_quota['user_over_quota'] = MediaMosaSbConnectorWrapper::string2bool($user->items->item->user_over_quota);
     $user_quota['user_total'] = (int) $user->items->item->app_quota_mb;
     $user_quota['user_used'] = $user_quota['user_total'] - (int) $user->items->item->quota_available_mb;
   }
@@ -338,7 +338,7 @@ function mediamosa_sb_asset_edit_metadata_form($form, &$form_state, $asset_id) {
   $title = mediamosa_ck::get_asset_title($asset);
 
   // Set the title.
-  drupal_set_title(mediamosa_sb::get_asset_title($asset));
+  drupal_set_title($title);
 
   // Get the metadata setup.
   $metadata_fields = mediamosa_ck::get_metadata_fields();
@@ -365,7 +365,7 @@ function mediamosa_sb_asset_edit_metadata_form($form, &$form_state, $asset_id) {
   }
 
   // Get the form.
-  $form = mediamosa_sb_asset_forms::info_form($values);
+  $form = mediamosa_sb_asset_forms::info_form($values, $asset_id);
 
   $form['asset_id'] = array(
     '#type' => 'value',
@@ -378,10 +378,13 @@ function mediamosa_sb_asset_edit_metadata_form($form, &$form_state, $asset_id) {
     '#value' => t('Save'),
   );
 
-  $form['delete'] = array(
-    '#type' => 'submit',
-    '#value' => t('Delete'),
-  );
+  // Has delete rights?
+  if (_mediamosa_sb_access_collection_delete($asset_id)) {
+    $form['delete'] = array(
+      '#type' => 'submit',
+      '#value' => t('Delete'),
+    );
+  }
 
   return $form;
 }
@@ -437,7 +440,16 @@ function mediamosa_sb_asset_edit_access_form($form, $form_state, $asset_id) {
   $mediafile_id = reset($mediafile_ids);
 
   if (!empty($mediafile_id)) {
-    $access = MediaMosaSbConnectorWrapper::get_access_control($mediafile_id, mediamosa_ck::session_user_id());
+    $user_id = mediamosa_ck::session_user_id();
+
+    // Need edit right.
+    if (mediamosa_sb::access_asset_edit($asset_id)) {
+      // Although the owner of the asset might be the user that is in the
+      // session, having the edit right here grants you to be the owner for now.
+      $user_id = mediamosa_sb::get_owner_asset($asset_id);
+    }
+
+    $access = MediaMosaSbConnectorWrapper::get_access_control($mediafile_id, $user_id);
 
     $values['acl_domain'] = implode(', ', $access['acl_domain']);
     $values['acl_realm'] = implode(', ', $access['acl_realm']);
@@ -515,7 +527,7 @@ function mediamosa_sb_asset_edit_media_form($form, $form_state, $asset_id) {
     '#value' => $asset_id,
   );
 
-    // Submit button.
+  // Submit button.
   $form['save'] = array(
     '#type' => 'submit',
     '#value' => t('Save'),
@@ -569,9 +581,9 @@ function mediamosa_sb_asset_edit_media_form_submit($form, $form_state) {
  * @param $asset_id
  *   ID of the asset to delete.
  *
- * @see mediamosa_sb_collection_delete_confirm_form_submit()
+ * @see mediamosa_sb_asset_delete_confirm_form_submit()
  */
-function mediamosa_sb_delete_delete_confirm_form($form, &$form_state, $asset_id) {
+function mediamosa_sb_asset_delete_confirm_form($form, &$form_state, $asset_id) {
 
   // Get the collection.
   $asset = MediaMosaSbConnectorWrapper::get_asset($asset_id);
@@ -599,9 +611,9 @@ function mediamosa_sb_delete_delete_confirm_form($form, &$form_state, $asset_id)
 /**
  * Submit handler for deletion collection.
  *
- * @see mediamosa_sb_delete_delete_confirm_form()
+ * @see mediamosa_sb_asset_delete_confirm_form()
  */
-function mediamosa_sb_collection_delete_confirm_form_submit($form, &$form_state) {
+function mediamosa_sb_asset_delete_confirm_form_submit($form, &$form_state) {
 
   // Remove all links
   $asset_id = $form_state['values']['asset_id'];

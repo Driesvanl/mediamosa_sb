@@ -23,20 +23,29 @@
  * The main module file for MediaMosa Site Builder.
  */
 
-// Configuration administrator permission.
-define('MEDIAMOSA_SB_PERMISSION_ADMIN_CONFIGURATION', 'mediamosa-sb admin configuration');
-
 /**
  * Implements hook_permission().
  */
-//function mediamosa_sb_permission() {
-//  return array(
-//    MEDIAMOSA_SB_PERMISSION_ADMIN_CONFIGURATION =>  array(
-//      'title' => t('Change MediaMosa site builder configuration.'),
-//      'description' => t('Users with this permission can change the MediaMosa site builder configuration.'),
-//    ),
-//  );
-//}
+function mediamosa_sb_permission() {
+  return array(
+    mediamosa_sb::MEDIAMOSA_SB_PERMISSION_EDIT_ASSETS =>  array(
+      'title' => t('Allow user to edit any asset.'),
+      'description' => t('Users with this permission may edit any asset, even when they are not owner.'),
+    ),
+    mediamosa_sb::MEDIAMOSA_SB_PERMISSION_DELETE_ASSETS =>  array(
+      'title' => t('Allow user to delete any asset.'),
+      'description' => t('Users with this permission may delete any asset, even when they are not owner.'),
+    ),
+    mediamosa_sb::MEDIAMOSA_SB_PERMISSION_EDIT_COLLECTIONS =>  array(
+      'title' => t('Allow user to edit any collection.'),
+      'description' => t('Users with this permission may edit any collection, even when they are not owner.'),
+    ),
+    mediamosa_sb::MEDIAMOSA_SB_PERMISSION_DELETE_COLLECTIONS =>  array(
+      'title' => t('Allow user to admin the collections.'),
+      'description' => t('Users with this permission may delete any collection, even when they are not owner.'),
+    ),
+  );
+}
 
 /**
  * Implements hook_menu().
@@ -67,7 +76,7 @@ function mediamosa_sb_menu() {
     'title' => 'Edit asset',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('mediamosa_sb_asset_upload_steps_form', 3, 4),
-    'access callback' => '_mediamosa_sb_is_owner_asset',
+    'access callback' => '_mediamosa_sb_access_asset_edit',
     'access arguments' => array(3),
     'description' => 'Edit the properties of the video',
     'type' => MENU_CALLBACK,
@@ -79,7 +88,7 @@ function mediamosa_sb_menu() {
     'title' => 'Info',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('mediamosa_sb_asset_edit_metadata_form', 2),
-    'access callback' => '_mediamosa_sb_is_owner_asset',
+    'access callback' => '_mediamosa_sb_access_asset_edit',
     'access arguments' => array(2),
     'description' => 'Edit metadata of the asset.',
     'type' => MENU_CALLBACK,
@@ -96,7 +105,7 @@ function mediamosa_sb_menu() {
     'title' => 'Access',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('mediamosa_sb_asset_edit_access_form', 2),
-    'access callback' => '_mediamosa_sb_is_owner_asset',
+    'access callback' => '_mediamosa_sb_access_asset_edit',
     'access arguments' => array(2),
     'description' => 'Edit metadata of the asset.',
     'type' => MENU_LOCAL_TASK,
@@ -108,7 +117,7 @@ function mediamosa_sb_menu() {
     'title' => 'Video',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('mediamosa_sb_asset_edit_media_form', 2),
-    'access callback' => '_mediamosa_sb_is_owner_asset',
+    'access callback' => '_mediamosa_sb_access_asset_edit',
     'access arguments' => array(2),
     'description' => 'Control the transcode and stills of the asset.',
     'type' => MENU_LOCAL_TASK,
@@ -116,12 +125,23 @@ function mediamosa_sb_menu() {
     'weight' => -4,
   );
 
+  $items['asset/delete/%'] = array(
+    'title' => 'Delete asset',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('mediamosa_sb_asset_delete_confirm_form', 2),
+    'access callback' => '_mediamosa_sb_access_asset_edit',
+    'access arguments' => array(2),
+    'description' => 'Delete the asset.',
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'mediamosa_sb.asset.inc',
+  );
+
   $items['collection/add'] = array(
     'title' => 'Add collection',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('mediamosa_sb_collection_add_form'),
     'access callback' => TRUE,
-    'description' => 'Edit the properties of the collection.',
+    'description' => 'Add a new collection.',
     'type' => MENU_NORMAL_ITEM,
     'file' => 'mediamosa_sb.collection.inc',
   );
@@ -130,7 +150,7 @@ function mediamosa_sb_menu() {
     'title' => 'Edit collection',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('mediamosa_sb_collection_edit_form', 2),
-    'access callback' => '_mediamosa_sb_is_owner_collection',
+    'access callback' => '_mediamosa_sb_access_collection_edit',
     'access arguments' => array(2),
     'description' => 'Edit the properties of the collection.',
     'type' => MENU_NORMAL_ITEM,
@@ -141,12 +161,13 @@ function mediamosa_sb_menu() {
     'title' => 'Delete collection',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('mediamosa_sb_collection_delete_confirm_form', 2),
-    'access callback' => '_mediamosa_sb_is_owner_collection',
+    'access callback' => '_mediamosa_sb_access_collection_edit',
     'access arguments' => array(2),
     'description' => 'Delete the collection, but not the assets.',
     'type' => MENU_NORMAL_ITEM,
     'file' => 'mediamosa_sb.collection.inc',
   );
+
   return $items;
 }
 
@@ -170,37 +191,76 @@ function mediamosa_sb_theme() {
 }
 
 /**
- * Access function to asset.
- *
- * @param $asset_id
- *   The asset ID.
- *
- * @return
- *   Returns TRUE when current user is owner of asset, or FALSE.
- */
-function _mediamosa_sb_is_owner_asset($asset_id) {
-  return mediamosa_sb::is_owner_asset($asset_id);
-}
-
-/**
  * Check if user is allowed to upload. Must be logged in.
  */
 function _mediamosa_sb_may_upload() {
   return user_is_logged_in();
 }
 
-
 /**
- * Access function to collection.
+ * Access function for editing asset.
  *
- * @param $collection_id
- *   The collection ID.
+ * @param $mixed
+ *   Object or asset ID.
  *
  * @return
- *   Returns TRUE when current user is owner of asset, or FALSE.
+ *   Returns TRUE when current user can edit asset, or FALSE.
  */
-function _mediamosa_sb_is_owner_collection($collection_id) {
-  return mediamosa_sb::is_owner_collection($collection_id);
+function _mediamosa_sb_access_asset_edit($mixed) {
+  return mediamosa_sb::access_asset_edit($mixed);
+}
+
+/**
+ * Access function for deleting asset.
+ *
+ * @param $mixed
+ *   Object or asset ID.
+ *
+ * @return
+ *   Returns TRUE when current user can delete asset, or FALSE.
+ */
+function _mediamosa_sb_access_asset_delete($mixed) {
+  return mediamosa_sb::access_asset_delete($mixed);
+}
+
+/**
+ * Implements hook_mediamosa_asset_view_object_alter().
+ */
+function mediamosa_sb_mediamosa_asset_view_object_alter($object) {
+  $object->access_edit = _mediamosa_sb_access_asset_edit($object);
+}
+
+/**
+ * Access function for editing collection.
+ *
+ * @param $mixed
+ *   Object or collection ID.
+ *
+ * @return
+ *   Returns TRUE when current user can edit collection, or FALSE.
+ */
+function _mediamosa_sb_access_collection_edit($mixed) {
+  return mediamosa_sb::access_collection_edit($mixed);
+}
+
+/**
+ * Access function for deleting collection.
+ *
+ * @param $mixed
+ *   Object or collection ID.
+ *
+ * @return
+ *   Returns TRUE when current user is owner of collection, or FALSE.
+ */
+function _mediamosa_sb_access_collection_delete($mixed) {
+  return mediamosa_sb::access_collection_delete($mixed);
+}
+
+/**
+ * Implements hook_mediamosa_collection_view_object_alter().
+ */
+function mediamosa_sb_mediamosa_collection_view_object_alter($object) {
+  $object->access_edit = _mediamosa_sb_access_collection_edit($object);
 }
 
 /**
@@ -210,30 +270,9 @@ function _mediamosa_sb_is_owner_collection($collection_id) {
  */
 function mediamosa_sb_search_info() {
   return array(
-    'title' => 'Media',
+    'title' => 'Videos',
   );
 }
-//
-///**
-// * Implements hook_search_admin().
-// *
-// * Add elements to the search settings form.
-// */
-//function mediamosa_sb_search_admin() {
-//  $form = array();
-//
-//  return $form;
-//}
-//
-/**
- * Implements hook_search_access().
- *
- * Define access to a custom search routine.
- */
-//function mediamosa_sb_search_access() {
-//  return TRUE;
-//  //user_access('some role');
-//}
 
 /**
  * Implements hook_search_page().

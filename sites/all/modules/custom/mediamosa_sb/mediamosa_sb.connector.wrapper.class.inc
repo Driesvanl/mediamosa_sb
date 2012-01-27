@@ -27,7 +27,7 @@ class MediaMosaSbConnectorWrapper extends MediaMosaCkConnectorWrapper {
   /**
    * Get the asset.
    *
-   * @see MediaMosaCkConnectorWrapper::get_asset()
+   * @see parent::get_asset()
    */
   static public function get_asset($asset_id, array $options = array(), $cached = TRUE, $reset = FALSE) {
     try {
@@ -41,12 +41,19 @@ class MediaMosaSbConnectorWrapper extends MediaMosaCkConnectorWrapper {
   /**
    * Return with array of the users collection.
    *
+   * @param $user_id
+   *   The ID of the user from which to get the collections.
+   *
    * @todo:
    *   Limit is 200.
    */
-  static public function get_my_collections_for_options() {
-    // Get the user ID.
-    $user_id = mediamosa_ck::session_user_id();
+  static public function get_my_collections_for_options($user_id = '') {
+
+    // No user_id provided, use session.
+    if (empty($user_id)) {
+      // Get the user ID.
+      $user_id = mediamosa_ck::session_user_id();
+    }
 
     $options = array(
       'offset' => 0,
@@ -72,9 +79,12 @@ class MediaMosaSbConnectorWrapper extends MediaMosaCkConnectorWrapper {
    * @todo:
    *   Limit is 200.
    */
-  static public function get_my_asset_collections($asset_id) {
-    // Get the user ID.
-    $user_id = mediamosa_ck::session_user_id();
+  static public function get_my_asset_collections($asset_id, $user_id = '') {
+    // No user_id provided, use session.
+    if (empty($user_id)) {
+      // Get the user ID.
+      $user_id = mediamosa_ck::session_user_id();
+    }
 
     $options = array(
       'offset' => 0,
@@ -98,9 +108,21 @@ class MediaMosaSbConnectorWrapper extends MediaMosaCkConnectorWrapper {
   /**
    * Get the access of a mediafile.
    *
-   * @see MediaMosaCkConnectorWrapper::get_access_control()
+   * @param $mediafile_id
+   *   The ID of the mediafile.
+   * @param $user_id
+   *   The ID of the user / owner of the mediafile.
+   *
+   * @see parent::get_access_control()
    */
-  static public function get_access_control($mediafile_id, $user_id) {
+  static public function get_access_control($mediafile_id, $user_id = '') {
+
+    // No user_id provided, use session.
+    if (empty($user_id)) {
+      // Get the user ID.
+      $user_id = mediamosa_ck::session_user_id();
+    }
+
     // Access array.
     $access = array(
       'acl_domain' => array(),
@@ -124,5 +146,231 @@ class MediaMosaSbConnectorWrapper extends MediaMosaCkConnectorWrapper {
     }
 
     return $access;
+  }
+
+  // ---------------------------------------------- Overrides for Drupal rights.
+  /**
+   * Update the metadata for given asset ID.
+   *
+   * @param $asset_id
+   *   The ID of the asset.
+   * @param $options
+   *   The options for the REST call.
+   */
+  static public function update_metadata($asset_id, array $options = array()) {
+    // Need edit right.
+    if (mediamosa_sb::access_asset_edit($asset_id)) {
+      $options += array('user_id' => mediamosa_sb::get_owner_asset($asset_id));
+    }
+
+    return parent::update_metadata($asset_id, $options);
+  }
+
+  /**
+   * Update a asset.
+   *
+   * @param $options
+   *   The options for the asset.
+   *
+   * @return type
+   */
+  static public function update_asset($asset_id, array $options = array()) {
+    // Need edit right.
+    if (mediamosa_sb::access_asset_edit($asset_id)) {
+      $options += array('user_id' => mediamosa_sb::get_owner_asset($asset_id));
+    }
+
+    return parent::update_asset($asset_id, $options);
+  }
+
+  /**
+   * Update a mediafile.
+   *
+   * @param $options
+   *   The options for the mediafile.
+   *
+   * @return type
+   */
+  static public function update_mediafile($asset_id, $mediafile_id, array $options = array()) {
+    // Need edit right.
+    if (mediamosa_sb::access_asset_edit($asset_id)) {
+      $options += array('user_id' => mediamosa_sb::get_owner_mediafile($mediafile_id));
+    }
+
+    return parent::update_mediafile($mediafile_id, $options);
+  }
+
+  /**
+   * Update a collection.
+   *
+   * @param $options
+   *   The options for the collection.
+   *   - title
+   *     The title of the collection.
+   *   - description
+   *     The description of the collection.
+   *
+   * @return type
+   */
+  static public function update_collection($coll_id, array $options = array()) {
+    // Need edit right.
+    if (mediamosa_sb::access_collection_edit($coll_id)) {
+      $options += array('user_id' => mediamosa_sb::get_owner_collection($coll_id));
+    }
+
+    return parent::update_collection($coll_id, $options);
+  }
+
+  /**
+   * Apply access limitations to mediafile.
+   *
+   * @param $asset_id
+   *   The asset ID.
+   * @param $mediafile_id
+   *   The ID of the mediafile.
+   * @param $user_id
+   *   The owner of the mediafile.
+   * @param $acl_domain_realm
+   *   A string with domains and realms. Function is responsible to determine
+   *   correct type for each element.
+   * @param $acl_user_id
+   *   A string with users. This can be anything as MediaMosa does not care
+   *   about the content of a user_id.
+   */
+  static public function set_access_control($asset_id, $mediafile_id, $user_id, $acl_domain_realm, $acl_user_id = '') {
+    // Need edit right.
+    if (mediamosa_sb::access_asset_edit($asset_id)) {
+      $user_id = mediamosa_sb::get_owner_mediafile($mediafile_id);
+    }
+
+    return parent::set_access_control($mediafile_id, $user_id, $acl_domain_realm, $acl_user_id);
+  }
+
+  /**
+   * Delete still(s) from a asset.
+   *
+   * @param $asset_id
+   *   The asset ID.
+   * @param $user_id
+   *   The user ID.
+   * @param $options
+   *   The REST call options.
+   */
+  static public function delete_asset_still($asset_id, $user_id, array $options = array()) {
+    // Need edit right.
+    if (mediamosa_sb::access_asset_edit($asset_id)) {
+      $user_id = mediamosa_sb::get_owner_asset($asset_id);
+    }
+
+    return parent::delete_asset_still($asset_id, $user_id, $options);
+  }
+
+  /**
+   * Mediafile delete.
+   *
+    * @param $asset_id
+   *   The asset ID.
+   * @param $mediafile_id
+   *   The ID of the mediafile.
+   * @param $user_id
+   *   The ID of the user, must be owner.
+   *
+   * @return
+   *   Returns TRUE when delete was successful.
+   */
+  static public function delete_mediafile($asset_id, $mediafile_id, $user_id) {
+    // Need edit right.
+    if (mediamosa_sb::access_asset_edit($asset_id)) {
+      $user_id = mediamosa_sb::get_owner_asset($asset_id);
+    }
+
+    return parent::delete_mediafile($mediafile_id, $user_id);
+  }
+
+  /**
+   * Delete a collection.
+   *
+   * @param $coll_id
+   *   The ID of the collection.
+   * @param $user_id
+   *   The ID of the user, must be owner.
+   * @param $options
+   *   Array of options.
+   *
+   * @return
+   *   Returns TRUE when delete was successful.
+   */
+  static public function delete_collection($coll_id, $user_id, $options = array()) {
+    // Need edit right.
+    if (mediamosa_sb::access_asset_edit($coll_id)) {
+      $user_id = mediamosa_sb::get_owner_collection($coll_id);
+    }
+
+    return parent::delete_collection($coll_id, $user_id, $options);
+  }
+
+  /**
+   * Remove the relation between collection and assets.
+   *
+   * @param $coll_id
+   *   The collection ID.
+   * @param $user_id
+   *   The user ID.
+   * @param $asset_ids
+   *   Array with asset_ids to remove from collection.
+   */
+  static public function delete_collection_asset_relations($coll_id, $user_id, array $asset_ids, array $options = array()) {
+    // Need edit right.
+    if (mediamosa_sb::access_asset_edit($coll_id)) {
+      $user_id = mediamosa_sb::get_owner_collection($coll_id);
+    }
+
+    return parent::delete_collection_asset_relations($coll_id, $user_id, $asset_ids, $options);
+  }
+
+  /**
+   * Create a still for specific mediafile.
+   *
+   * @param $asset_id
+   *   The asset ID.
+   * @param $mediafile_id
+   *   The mediafile ID.
+   * @param $user_id
+   *   The owner of the mediafile.
+   * @param $data
+   *   Array with all the still parameters.
+   *
+   * @return mediamosa_connector_response
+   *   Returns FALSE when failure or mediamosa_connector_response.
+   */
+  static public function create_mediafile_still($asset_id, $mediafile_id, $user_id, $data = array()) {
+    // Need edit right.
+    if (mediamosa_sb::access_asset_edit($asset_id)) {
+      $user_id = mediamosa_sb::get_owner_mediafile($mediafile_id);
+    }
+
+    return parent::create_mediafile_still($mediafile_id, $user_id, $data);
+  }
+
+  /**
+   * Create transcoded mediafile.
+   *
+   * @param $mediafile_id
+   *   The mediafile ID of the original.
+   * @param $user_id
+   *   The owner of the asset.
+   * @param $options
+   *   The options for the REST call.
+   *
+   * @return
+   *   Returns FALSE for failure.
+   */
+  static public function create_transcode($asset_id, $mediafile_id, $options = array()) {
+    // Need edit right.
+    if (mediamosa_sb::access_asset_edit($asset_id)) {
+      $options['user_id'] = mediamosa_sb::get_owner_mediafile($mediafile_id);
+    }
+
+    return parent::create_transcode($mediafile_id, $options);
   }
 }

@@ -116,16 +116,24 @@ function theme_mediamosa_sb_profile_select($variables) {
  * @param $variables
  *   An associative array containing:
  *   - percent: The percentage of the quota.
- *   - low: text like 30mb
- *   -
+ *   - used: The used quota in format like 30mb
+ *   - total: The total available quota in format like 70gb
  *   - message: A string containing information to be displayed.
  */
 function theme_mediamosa_sb_quota_bar($variables) {
+  $quota_used = '';
+
+  if ($variables['percent'] < 14) {
+    $quota_used = 'almost_nothing';
+  }
+  elseif ($variables['percent'] > 89) {
+    $quota_used = 'almost_everything';
+  }
+
   $output = '<div id="quota" class="progress">';
-  $output .= '<div class="bar"><div class="filled" style="width: ' . $variables['percent'] . '%"></div></div>';
-  $output .= '<div class="quota-used">' . $variables['used'] . '</div>';
-  $output .= '<div class="quota-total">' . $variables['total'] . '</div>';
-  $output .= '<div class="message">' . $variables['message'] . '</div>';
+  $output .= '<div class="bar"><div class="filled ' . $quota_used . '" style="width: ' . $variables['percent'] . '%"><span class="quota-used">' . $variables['used'] . '</span></div></div>';
+  $output .= '<span class="quota-total">' . $variables['total'] . '</span>';
+  $output .= '<span class="message">' . $variables['message'] . '</span>';
   $output .= '</div>';
 
   return $output;
@@ -146,12 +154,13 @@ function theme_mediamosa_sb_upload_quota($variables) {
   $element = $variables['element'];
 
   $quota_bar_options = array(
-    'percent' => min(round($element['#options']['user_used'] / $element['#options']['user_total'] * 100), 100),
+    'percent' => min(round($element['#options']['user_used'] / $element['#options']['user_total'] * 1000), 100),
     'message' => t('You have no more quota for upload'),
     'used' => format_size($element['#options']['user_used'] * 1048576),
     'total' => format_size($element['#options']['user_total'] * 1048576),
   );
 
+  // Clear the message when user still has quota.
   if (empty($element['#options']['user_over_quota'])) {
     $quota_bar_options['message'] = '';
   }
@@ -164,6 +173,7 @@ function theme_mediamosa_sb_upload_quota($variables) {
     '#markup' => $quota_bar,
     '#title' => $element['#title'],
     '#description' => empty($element['#description']) ? '' : $element['#description'],
+    '#attributes' => array('class' => array('file-quota'))
   );
   return drupal_render_children($form);
 }

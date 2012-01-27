@@ -25,24 +25,26 @@
 ?>
 <h1><?php print $fields['title']->content; ?></h1>
 <ul class="item-navigation">
-  <li><span><?php print l(t('View'), 'view', array('attributes' => array('class' => 'view'))); ?></span></li>
-  <li><span><?php print l(t('Edit'), 'collection/edit/' . $fields['coll_id']->raw, array('attributes' => array('class' => 'edit'))); ?></span></li>
+  <?php if ($fields['access_edit']->raw == TRUE): ?>
+    <li><span><?php print l(t('Edit'), 'collection/edit/' . $fields['coll_id']->raw, array('attributes' => array('class' => 'edit'))); ?></span></li>
+  <?php endif; ?>
 </ul>
-<div class="collection-videos">
-&nbsp;
-</div>
 
 <div class="collection-detail-information">
   <div class="information-row">
     <p class="collection-view-count"><span class="count"><?php print $fields['numofvideos']->raw; ?></span> <?php print t('videos'); ?></p>
 
     <p class="collection-uploaded-info">
-      <?php print t('Posted by');?>: <strong>[hardcoded]</strong> <?php print t('on'); ?> <strong><?php print $fields['created']->content; ?></strong>
+      <?php print t('Posted by');?>: <strong><?php print $fields['owner_id']->content; ?></strong> <?php print t('on'); ?> <strong><?php print $fields['created']->content; ?></strong>
     </p>
   </div>
 
-  <div class="information-row">
+  <div class="information-row collection-description">
     <h3><?php print t('About this collection'); ?></h3>
     <p><?php print $fields['description']->content; ?></p>
   </div>
+</div>
+
+<div class="collection-videos">
+<?php print views_embed_view('mediamosa_assets_in_collection', 'block'); ?>
 </div>

@@ -111,30 +111,30 @@ function mediamosa_sb_kickstart_install() {
       'title' => '',
       'cache' => -1,
     ),
-    array(
-      'module' => 'user',
-      'delta' => 'login',
-      'theme' => $default_theme,
-      'status' => 1,
-      'weight' => 0,
-      'region' => 'sidebar_first',
-      'visibility' => 0,
-      'pages' => '',
-      'title' => '',
-      'cache' => -1,
-    ),
-    array(
-      'module' => 'system',
-      'delta' => 'navigation',
-      'theme' => $default_theme,
-      'status' => 1,
-      'weight' => 0,
-      'region' => 'sidebar_first',
-      'visibility' => 0,
-      'pages' => '',
-      'title' => '',
-      'cache' => -1,
-    ),
+//    array(
+//      'module' => 'user',
+//      'delta' => 'login',
+//      'theme' => $default_theme,
+//      'status' => 1,
+//      'weight' => 0,
+//      'region' => 'sidebar_first',
+//      'visibility' => 0,
+//      'pages' => '',
+//      'title' => '',
+//      'cache' => -1,
+//    ),
+//    array(
+//      'module' => 'system',
+//      'delta' => 'navigation',
+//      'theme' => $default_theme,
+//      'status' => 1,
+//      'weight' => 0,
+//      'region' => 'sidebar_first',
+//      'visibility' => 0,
+//      'pages' => '',
+//      'title' => '',
+//      'cache' => -1,
+//    ),
     array(
       'module' => 'system',
       'delta' => 'powered-by',
@@ -285,21 +285,6 @@ function mediamosa_sb_kickstart_install() {
       'title' => '',
       'cache' => -1,
     ),
-    // Assets in collections in content.
-    array(
-      'module' => 'views',
-      'delta' => '785fd9c6a0f79850d74723fb85cded34', // Has generated ID because its ID does not fit the 32 char limit.
-      'theme' => $default_theme,
-      'status' => 1,
-      'weight' => -12,
-      'region' => 'content',
-      'visibility' => 1,
-      'pages' => 'collection/detail/*',
-      'title' => '',
-      'cache' => -1,
-    ),
-
-
   );
   $query = db_insert('block')->fields(array('module', 'delta', 'theme', 'status', 'weight', 'region', 'visibility', 'pages', 'title', 'cache'));
   foreach ($values as $record) {

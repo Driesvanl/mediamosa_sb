@@ -44,17 +44,17 @@ class mediamosa_sb_asset_forms {
    * @return
    *   Returns the form array.
    */
-  static public function info_form($values) {
+  static public function info_form($values, $asset_id = '') {
     $form = array();
 
     // Add basic information form.
-    $form['bacicinfo'] = self::info_basicinfo_form($values);
+    $form['bacicinfo'] = self::info_basicinfo_form($values, $asset_id);
 
     // Add collections form.
-    $form['collections'] = self::info_collections_form($values);
+    $form['collections'] = self::info_collections_form($values, $asset_id);
 
     // Add metadata form.
-    $form['metadata'] = self::info_metadata_form($values);
+    $form['metadata'] = self::info_metadata_form($values, $asset_id);
 
     return $form;
   }
@@ -86,7 +86,7 @@ class mediamosa_sb_asset_forms {
     );
 
     $form['basic']['dc_description'] = array(
-      '#type' => 'textfield',
+      '#type' => 'textarea',
       '#title' => t('Description'),
       '#required' => FALSE,
       '#default_value' => self::default_value($values, 'dc_description'),
@@ -104,11 +104,16 @@ class mediamosa_sb_asset_forms {
    * @return
    *   Returns the form array.
    */
-  static protected function info_collections_form($values) {
+  static protected function info_collections_form($values, $asset_id) {
     $form = array();
 
+    $user_id = '';
+    if (!empty($asset_id)) {
+      $user_id = MediaMosaSbConnectorWrapper::get_asset_owner($asset_id);
+    }
+
     // Get the collections.
-    $options_collections = MediaMosaSbConnectorWrapper::get_my_collections_for_options();
+    $options_collections = MediaMosaSbConnectorWrapper::get_my_collections_for_options($user_id);
 
     $form['collections'] = array(
       '#type' => 'fieldset',
@@ -513,7 +518,7 @@ class mediamosa_sb_asset_forms {
       '#title' => t('Currently active video profiles'),
     );
 
-    $xml = MediaMosaCkConnectorWrapper::get_transcode_profiles();
+    $xml = MediaMosaSbConnectorWrapper::get_transcode_profiles();
     if ($xml == FALSE) {
       drupal_set_message(t('Unable to retrieve transcode profiles, check MediaMosa Connector.'), 'error');
     }
@@ -521,23 +526,23 @@ class mediamosa_sb_asset_forms {
     $options = array();
 
     // Get the allowed profiles.
-    $allowed_profiles = MediaMosaCkConnectorWrapper::get_allowed_transcode_profiles();
+    $allowed_profiles = MediaMosaSbConnectorWrapper::get_allowed_transcode_profiles();
 
     // List of the profile IDs that are used.
     $existing_transcodes = array();
     $is_downloadable = array();
 
     // Get the default profiles, these can not be deleted or re-created.
-    $default_profile = MediaMosaCkConnectorWrapper::get_default_transcode_profile();
+    $default_profile = MediaMosaSbConnectorWrapper::get_default_transcode_profile();
 
     try {
       // Get existing mediafiles.
-      $asset = MediaMosaCkConnectorWrapper::get_asset($asset_id);
+      $asset = MediaMosaSbConnectorWrapper::get_asset($asset_id);
 
       // Loop through the mediafiles.
       foreach ($asset->xpath('items/item/mediafiles/mediafile') as $mediafile) {
         // Skip original.
-        if (MediaMosaCkConnectorWrapper::string2bool($mediafile->is_original_file)) {
+        if (MediaMosaSbConnectorWrapper::string2bool($mediafile->is_original_file)) {
           continue;
         }
 
@@ -547,7 +552,7 @@ class mediamosa_sb_asset_forms {
         }
 
         // Collect the downloadables.
-        if (MediaMosaCkConnectorWrapper::string2bool($mediafile->is_downloadable)) {
+        if (MediaMosaSbConnectorWrapper::string2bool($mediafile->is_downloadable)) {
           $is_downloadable[(int) $mediafile->transcode_profile_id] = (int) $mediafile->transcode_profile_id;
         }
       }

@@ -5,7 +5,7 @@
 }
 
 body, span {
-  color: #888888;
+  color: #888;
 }
 
 a {
@@ -21,7 +21,7 @@ a {
 }
 
 .slogan h1 {
-  color: #999999
+  color: #555;
 }
 
 #spotlight,
@@ -31,10 +31,10 @@ a {
 }
 
 .views-exposed-form,
-.page-asset #content form, 
-.page-collection #content form, 
-.asset-technical-information .tab, 
-.asset-technical-information .tab h2, 
+.page-asset #content form,
+.page-collection #content form,
+.asset-technical-information .tab,
+.asset-technical-information .tab h2,
 .asset-technical-information .tab table tr td {
   border-color: #eaeaf3;
 }

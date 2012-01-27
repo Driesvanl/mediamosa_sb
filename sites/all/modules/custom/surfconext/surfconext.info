@@ -1,0 +1,7 @@
+name = "SURFconext authentication"
+description = "Enables users of SURFconext to login onto Drupal."
+package = "MediaMosa Site Builder"
+version = "7.x-1.0-dev"
+core = 7.x
+
+configure = admin/config/people/surfconext

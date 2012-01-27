@@ -1,6 +1,4 @@
 <?php
-// $Id: pager.inc 1817 2011-10-12 11:11:44Z thijs $
-
 /**
  * @file
  * Theme function for the pager.
@@ -10,7 +8,7 @@
  * Theme override for theme_pager().
  * @see theme_pager()
  */
-function mm_sb_pager($variables) {
+function mediamosa_sb_pager($variables) {
   $tags = $variables['tags'];
   $element = $variables['element'];
   $parameters = $variables['parameters'];
@@ -145,7 +143,7 @@ function mm_sb_pager($variables) {
  * Theme function for a pager placeholder.
  * @ingroup themeable.
  */
-function mm_sb_pager_placeholder($variables) {
+function mediamosa_sb_pager_placeholder($variables) {
   if (!$variables['text']) return '';
   return '<a disabled="disabled">' . $variables['text'] . '</a>';
 }

@@ -1,5 +1,4 @@
 <?php
-// $Id: page.tpl.php 1817 2011-10-12 11:11:44Z thijs $
 ?>
 <div id="header">
   <div class="header_content">
@@ -7,11 +6,12 @@
       <?php print l(theme('image', array('path' => $logo, 'title' => $site_name, 'alt' => $site_name)), '<front>', array('html' => TRUE)); ?>
     </div>
 
-    <?php if ($user->uid != 0): ?>
-      <?php print l(t('My account'), 'user', array('attributes' => array('class' => array('user-custom-navigation')))); ?>
-    <?php endif;?>
-
-    <?php if ($user->uid == 0): ?>
+    <?php if (user_is_logged_in()): ?>
+    <div class="user-custom-navigation">
+      <?php print l(t('My Videos'), 'myassets'); ?>&nbsp;|&nbsp;<?php print l(t('My Collections'), 'mycollections'); ?>&nbsp;|&nbsp;<?php print l(t('My account'), 'user'); ?>
+    </div>
+    <?php print l(t('Upload'), 'asset/upload', array('attributes' => array('class' => array('user-login-button')))); ?>
+    <?php else:?>
       <?php print l(t('Sign in'), 'user', array('attributes' => array('class' => array('user-login-button')))); ?>
     <?php endif;?>
 

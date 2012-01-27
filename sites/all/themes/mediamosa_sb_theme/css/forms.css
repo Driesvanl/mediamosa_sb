@@ -8,6 +8,7 @@
 .page-collection-edit #content #page_content,
 .page-user #content #page_content {
   width: 824px;
+  position: relative;
 }
 
 .page-asset #content form,
@@ -20,6 +21,12 @@
 .page-asset #content form .form-wrapper,
 .page-collection #content form .form-wrapper {
   padding: 0 50px;
+}
+
+.page-asset #content form .form-item,
+.page-collection #content form .form-item {
+  margin: 0 inherit;
+  padding: 1em inherit;
 }
 
 .page-asset #content form .form-wrapper .description,
@@ -104,7 +111,7 @@ fieldset.collapsible {
 html.js .page-asset #content form .form-wrapper fieldset.collapsible,
 html.js .page-collection #content form .form-wrapper fieldset.collapsible {
   width: 629px;
-  padding: 0 35px;
+  padding: 14px 35px 0 35px;
   float: left;
   clear: both;
   border: 1px solid #eaeaf3;
@@ -113,9 +120,11 @@ html.js .page-collection #content form .form-wrapper fieldset.collapsible {
 
 html.js .page-asset #content form .form-wrapper fieldset.collapsible .fieldset-legend,
 html.js .page-collection #content form .form-wrapper fieldset.collapsible .fieldset-legend {
-  width: 700px;
+  width: 701px;
   height: 36px;
-  margin-left: -35px;
+  margin-right: -37px;
+  margin-bottom: -15px;
+  margin-left: -36px;
   padding: 0;
   border-bottom: none;
   clear: both;
@@ -146,9 +155,29 @@ html.js .page-collection #content form .form-wrapper fieldset.collapsible .field
   overflow: hidden;
 }
 
+.page-asset form#mediamosa-sb-asset-upload-form label {
+  color: #000;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.page-asset form#mediamosa-sb-asset-upload-form #edit-file {
+  margin-bottom: 20px;
+}
+
+.page-asset form#mediamosa-sb-asset-upload-form label[for="edit-file"] {
+  margin-bottom: 15px;
+  font-size: 18px;
+}
+
 .page-asset form#mediamosa-sb-asset-upload-form div {
   width: 350px;
   margin: 0 auto;
+}
+
+.page-asset form#mediamosa-sb-asset-upload-form div div {
+  width: auto;
+  margin: 0;
 }
 
 .page-asset form#mediamosa-sb-asset-upload-form input[type="file"] {
@@ -160,4 +189,61 @@ html.js .page-collection #content form .form-wrapper fieldset.collapsible .field
   margin-top: 10px;
   float: left;
   clear: both;
+}
+
+/**********************************************************
+ * Asset upload - quota
+ *********************************************************/
+
+.page-asset form #quota {
+  width: 337px;
+  padding-bottom: 20px;
+  padding-top: 7px;
+  display: block;
+}
+
+.page-asset form #quota .quota-used,
+.page-asset form #quota .quota-total {
+  color: #000;
+  font-size: 10px;
+}
+
+.page-asset form #quota .quota-used {
+  position: absolute;
+  bottom: 0;
+  right: 7px;
+}
+
+.page-asset form #quota .almost_everything .quota-used {
+  right: 47px;
+}
+
+.page-asset form #quota .almost_nothing .quota-used {
+  right: -42px;
+}
+
+.page-asset form #quota .quota-total {
+  margin-top: -10px;
+  margin-right: 9px;
+  float: right;
+}
+
+.page-asset form #quota .bar {
+  height: 33px;
+  border: none;
+  border-radius: 0;
+  border-left: 1px solid #c6c6c6;
+  border-right: 1px solid #c6c6c6;
+  background: url('../images/quota_bg.png') repeat-x 0 0;
+}
+
+.page-asset form #quota .bar .filled {
+  height: 33px;
+  border-right: 1px solid #c6c6c6;
+  position: relative;
+  background: url('../images/quota_filler.png') repeat-x 0 0;
+}
+
+.page-asset form #quota .bar .filled.almost-everything {
+  border-right: none;
 }
