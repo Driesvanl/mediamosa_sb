@@ -27,8 +27,24 @@
  * Step 1: Upload file to MediaMosa.
  */
 function mediamosa_sb_asset_upload_form($form, &$form_state) {
+
   // Set title.
-  drupal_set_title(t('Step 1/4: Upload'));
+  drupal_set_title('Upload');
+
+  // Empty.
+  $form = array();
+
+  // Set the title.
+  $form['title'] = array(
+    '#title' => t('Upload a new video'),
+    '#theme' => 'mediamosa_sb_title_header',
+    '#options' => array(
+      'current' => 1,
+      'total' => 4,
+      'subtitle' => t('Upload'),
+      'subtitle_next' => t('Enter metadata'),
+    ),
+  );
 
   // Get the default profile.
   $default_profile = MediaMosaSbConnectorWrapper::get_default_transcode_profile();
@@ -62,7 +78,7 @@ function mediamosa_sb_asset_upload_form($form, &$form_state) {
   // can not work with files[file].
   $form['file'] = array(
     '#type' => 'item',
-    '#markup' => '<input type="file" id="edit-file-upload" name="file" size="60" class="form-file" />',
+    '#markup' => '<input type="file" id="edit-file-upload" name="file" size="40" class="form-file" />',
     '#title' => t('Upload your file'),
     // @todo: make setting.
     '#description' => t('Maximum size of 2,0 GB, MOV, AVI'),
@@ -128,28 +144,43 @@ function mediamosa_sb_asset_upload_steps_form($form, &$form_state, $asset_id, $m
     $form_state['step_information'] = array(
       1 => array(
         'form' => 'mediamosa_sb_asset_upload_step_metadata_form',
-        'name' => 'Metadata',
+        'subtitle' => t('Metadata'),
+        'subtitle_next' => t('Define Access & Visibility'),
       ),
       2 => array(
         'form' => 'mediamosa_sb_asset_upload_step_access_form',
-        'name' => 'Access & Visibility',
+        'subtitle' => t('Access & Visibility'),
+        'subtitle_next' => t('Define transcoding formats'),
       ),
       3 => array(
         'form' => 'mediamosa_sb_asset_upload_step_media_form',
-        'name' => 'Define formats',
+        'subtitle' => t('Transcoding formats'),
+        'subtitle_next' => '',
       ),
     );
   }
 
   $step = $form_state['step'];
-  $name = $form_state['step_information'][$step]['name'];
+  $step_information = $form_state['step_information'][$step];
 
   // Set title.
-  drupal_set_title(t('Step @step/4: @name', array('@step' => $step + 1, '@name' => $name)));
+  drupal_set_title('Upload');
+
+  // Set the title.
+  $form['title'] = array(
+    '#title' => t('Upload a new video'),
+    '#theme' => 'mediamosa_sb_title_header',
+    '#options' => array(
+      'current' => $step + 1,
+      'total' => 4,
+      'subtitle' => $step_information['subtitle'],
+      'subtitle_next' => $step_information['subtitle_next'],
+    ),
+  );
 
   // Call the function named in $form_state['step_information'] to get the
   // form elements to display for this step.
-  $form = $form_state['step_information'][$step]['form']($form, $form_state);
+  $form['data'] = $form_state['step_information'][$step]['form']($form, $form_state);
 
   // Show the Next button only if there are more steps defined.
   if ($step < count($form_state['step_information'])) {
@@ -236,7 +267,7 @@ function mediamosa_sb_asset_upload_step_metadata_form($form, $form_state) {
   // Set asset_id in case we need it.
   $values = array_merge(array('asset_id' => $form_state['asset_id']), $form_state['values']);
 
-  return mediamosa_sb_asset_forms::info_form($values);
+  return mediamosa_sb_asset_forms::info_form($values, $form_state['asset_id']);
 }
 
 /**

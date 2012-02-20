@@ -2,13 +2,13 @@
 
 /**
  * @file
- * the install file for the surf_conext module
+ * the install file for the surfconext module
  */
 
 /**
  * Implements hook_install().
  */
-function surf_conext_install() {
+function surfconext_install() {
 /*
   $abc = 'test';
 
@@ -24,7 +24,7 @@ function surf_conext_install() {
   // Disable the open registration to the site and store the original setting.
   $original = variable_get('user_register', 1);
   variable_set('user_register', 0);
-  variable_set('surf_conext_user_register_original', $original);
+  variable_set('surfconext_user_register_original', $original);
 
   if ($query1) {
     drupal_set_message(st('The simpleSAMLphp authentication module was installed successfully.'));
@@ -37,16 +37,77 @@ function surf_conext_install() {
 /**
  * Implements hook_uninstall().
  */
-function surf_conext_uninstall() {
-  // Restore the original user registration directive.
-  //$original = variable_get('surf_conext_user_register_original', 1);
- /// variable_set('user_register', $original);
+function surfconext_uninstall() {
 
-  // Clean up own variables
-  db_delete('variable')
-    ->condition('name', 'surf_conext_%', 'LIKE')
+  // Get all variables that we use.
+  $result = db_select('variable', 'v')
+    ->fields('v', array('name'))
+    ->condition('name', db_like('surfconext_') . '%', 'LIKE')
     ->execute();
 
-  // Clear the variable cache.
-  cache_clear_all('variables', 'cache_bootstrap');
+  // Now delete them.
+  foreach ($result as $row) {
+    variable_del($row->name);
+  }
+}
+
+/**
+ * Implements hook_requirements().
+ *
+ * Use requirements to ensure that all conditions for SURFconext are met.
+ */
+function surfconext_requirements($phase) {
+  $requirements = array();
+
+  if ($phase == 'runtime') {
+    // Is SURFconext enabled?
+    $enabled = surfconext::is_enabled();
+
+    $requirements['surfconext_enabled'] = array(
+      'title' => t('SURFconext'),
+      'severity' => $enabled ? REQUIREMENT_OK : REQUIREMENT_ERROR,
+      'value' => $enabled ? t('Enabled') : t('Disabled'),
+      'description' => $enabled ? '' : t('You need to review the !link and enable SURFconext authentication. You can also disable the SURFconext module.', array('!link' => l('SURFconext settings', 'admin/config/people/surfconext'))),
+    );
+
+    // Auto load simpleSAML.
+    surfconext::autoload();
+
+    // Make sure SimpleSAML is not set on PHPSESSION.
+    $config = SimpleSAML_Configuration::getInstance();
+
+    $requirements['surfconext_session'] = array(
+      'title' => t('SURFconext session'),
+      'severity' => $config->getValue('store.type') == 'phpsession' ? REQUIREMENT_ERROR : REQUIREMENT_OK,
+      'value' => t('Is not using PHPSession (using %type)', array('%type' => $config->getValue('store.type'))),
+      'description' => $config->getValue('store.type') != 'phpsession' ? '' : t('The SimpleSAML library can not use PHP cookie sessions, as these will conflict with the Drupal session. Use either SQL or memcache sessions')
+    );
+
+    // Check if we can find the simplesaml library.
+    $simplesaml_found = file_exists(surfconext::get_simplesaml_basedir() . '/lib/_autoload.php');
+
+    $requirements['surfconext_simplesaml_found'] = array(
+      'title' => t('SURFconext SimpleSAML library'),
+      'severity' => $simplesaml_found ? REQUIREMENT_OK : REQUIREMENT_ERROR,
+      'value' => 'Found simpleSAML library',
+      'description' => $simplesaml_found ? '' : t('The SimpleSAML library can not be located or loaded, please check the !link.', array('!link' => l('SURFconext settings', 'admin/config/people/surfconext'))),
+    );
+
+    if ($simplesaml_found) {
+      // Get the location of the metadata file.
+      $idp_filename = surfconext::get_surfconext_metadata_idp_filename();
+
+      // Check if we filename is set and writable. The requirements hook will
+      // tell problems if the filename is not working.
+      $writable = !empty($idp_filename) || is_writable(dirname(drupal_realpath($idp_filename)));
+      $requirements['surfconext_setup'] = array(
+        'title' => t('SURFconext metadata IdP file'),
+        'severity' => $writable ? REQUIREMENT_OK : REQUIREMENT_ERROR,
+        'value' => 'Location writable',
+        'description' => $writable ? '' : t('The location for the IdP metadata is not writable or not setup correctly, please visit the SURFconext settings page !link.', array('!link' => l('here', 'admin/config/people/surfconext'))),
+      );
+    }
+  }
+
+  return $requirements;
 }

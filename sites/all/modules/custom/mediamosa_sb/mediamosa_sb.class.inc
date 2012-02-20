@@ -30,6 +30,7 @@ class mediamosa_sb {
   const MEDIAMOSA_SB_PERMISSION_DELETE_ASSETS = 'mediamosa-sb delete assets';
   const MEDIAMOSA_SB_PERMISSION_EDIT_COLLECTIONS = 'mediamosa-sb edit collections';
   const MEDIAMOSA_SB_PERMISSION_DELETE_COLLECTIONS = 'mediamosa-sb delete collections';
+  const MEDIAMOSA_SB_PERMISSION_ALTER_FEATURED = 'mediamosa-sb alter featured';
 
   // ---------------------------------------------------------------- Functions.
   /**
@@ -481,6 +482,16 @@ class mediamosa_sb {
 
     // Submit the metadata.
     self::submit_info_collections($values, $asset_id);
+
+    if (user_access('mediamosa_sb::MEDIAMOSA_SB_PERMISSION_ALTER_FEATURED')) {
+      // Featured status.
+      if (empty($values['asset_featured'])) {
+        mediamosa_ck_views_rest_asset_featured::unset_featured_id($asset_id);
+      }
+      else {
+        mediamosa_ck_views_rest_asset_featured::set_featured_id($asset_id);
+      }
+    }
   }
 
   /**

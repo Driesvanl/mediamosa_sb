@@ -51,12 +51,17 @@
   font-size: 12px;
   font-weight: bold;
   background: #000;
-    border: black solid 1px;
+  border: 1px solid #000;
 }
 
 .not-front .view .views-field-mediafile-duration {
   top: 95px;
   left: 174px;
+}
+
+.page-search .view .views-field-mediafile-duration {
+  top: 103px;
+  left: 182px;
 }
 
 .view .views-field-mediafile-duration .field-content {
@@ -489,8 +494,7 @@ html.js .views-exposed-form .views-exposed-widget .form-autocomplete.throbbing {
   border-top: 2px solid #eaeaf3;
 }
 
-.page-assets .views-row,
-.page-myassets .views-row {
+.page-assets .views-row {
   width: 220px;
   height: 200px;
   padding: 0;
@@ -553,11 +557,44 @@ html.js .views-exposed-form .views-exposed-widget .form-autocomplete.throbbing {
   right: 7px;
 }
 
+/* my assets options */
+
+.page-myassets .views-row {
+  width: 220px;
+  height: 200px;
+  margin-bottom: 50px;
+  overflow: visible;
+  padding: 0;
+  margin-right: 18px;
+  float: left;
+  clear: none;
+  position: relative;
+}
+
+.page-myassets .views-row .asset-options {
+  width: 100%;
+  position: absolute;
+  left: -1px;
+  bottom: -22px;
+}
+
+.page-myassets .views-row .asset-options li {
+  float: left;
+  margin-right: 1px;
+}
+
+.page-myassets .views-row .asset-options li a {
+  padding: 7px 12px;
+  color: #000;
+  font-size: 12px;
+  background: #f3f3f3;
+}
+
 /**********************************************************
  * Asset search overview
  *********************************************************/
 .views-row #asset-search .asset-information {
-  width:690px;
+  width: 690px;
 }
 
 /**********************************************************
@@ -575,6 +612,26 @@ html.js .views-exposed-form .views-exposed-widget .form-autocomplete.throbbing {
   color: #000;
   font-size: 12px;
   background: #eaeaf3;
+}
+
+/* my collections custom widths for table columns */
+.page-mycollections .view .views-table tr th.views-field-title,
+.page-collections .view .views-table tr th.views-field-title {
+  width: 300px;
+}
+
+.page-mycollections .view .views-table tr th.views-field-description,
+.page-collections .view .views-table tr th.views-field-description {
+  width: 240px;
+}
+
+.page-mycollections .view .views-table tr th.views-field-actions {
+  width: 112px;
+}
+
+.page-collections .view .views-table tr td,
+.page-mycollections .view .views-table tr td {
+  vertical-align: top;
 }
 
 .page-collections .view .views-table tr td,
@@ -599,6 +656,83 @@ html.js .views-exposed-form .views-exposed-widget .form-autocomplete.throbbing {
 .page-mycollections .view .views-table tr td.views-field-numofvideos {
   color: #000;
   font-size: 14px;
+}
+
+/* my collections / my assets add buttons + navigational tab */
+
+#page_content .navigation-tab {
+  clear: both;
+  height: 38px;
+  overflow: visible;
+  padding-left: 10px;
+  margin-top: -3px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid #d9d9d9;
+}
+
+#page_content .navigation-tab ul {
+  float: right;
+}
+
+#page_content .navigation-tab li {
+  float: left;
+  margin-right: 5px;
+}
+
+#page_content .navigation-tab li.active {
+  border-top: 1px solid #d9d9d9;
+  border-left: 1px solid #d9d9d9;
+  border-right: 1px solid #d9d9d9;
+  border-bottom: 1px solid #fff;
+  background: #fff;
+}
+
+#page_content .navigation-tab li a {
+  display: block;
+  color: #000;
+  font-size: 12px;
+  padding: 13px 15px;
+  background-color: #eaeaf3;
+}
+
+#page_content .navigation-tab li.active a {
+  padding: 12px 14px 12px 14px;
+  border-bottom: 1px solid #fff;
+  background-color: #fff;
+}
+
+#page_content .add-collection {
+  margin-bottom: 20px;
+  background: url('../images/sprite.png') no-repeat 0 -200px;
+}
+
+/* add button */
+
+#page_content .add-collection a {
+  padding: 9px;
+  margin-top: -1px;
+  margin-left: 4px;
+  display: inline-block;
+  background: url('../images/sprite.png') no-repeat 100% -300px;
+}
+
+#page_content .add-collection a span {
+  padding-left: 20px;
+  font-size: 14px;
+  color: #000;
+  background: url('../images/sprite.png') no-repeat 0 -800px;
+}
+
+#page_content .add-collection:hover {
+  background-position: 0 -251px;
+}
+
+#page_content .add-collection:hover a {
+  background-position: 100% -350px;
+}
+
+#page_content .add-collection a:hover {
+  text-decoration: none;
 }
 
 /* my collections edit / delete buttons */

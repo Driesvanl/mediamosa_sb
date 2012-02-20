@@ -10,7 +10,11 @@
     </div>
       <?php print l(t('Upload'), 'asset/upload', array('attributes' => array('class' => array('user-login-button')))); ?>
     <?php else:?>
-      <?php print l(t('Sign in'), 'user', array('attributes' => array('class' => array('user-login-button')))); ?>
+      <?php
+      $user_url = 'user';
+      drupal_alter('mediamosa_sb_theme_user_url', $user_url);
+      print l(t('Sign in'), $user_url, array('attributes' => array('class' => array('user-login-button'))));
+      ?>
     <?php endif;?>
 
     <select id="language-picker">
@@ -39,6 +43,7 @@
       <?php endif; ?>
 
       <?php print $messages; ?>
+
       <?php if ($tabs): ?><div class="tabs"><?php print render($tabs); ?></div><?php endif; ?>
       <?php print render($page['help']); ?>
       <?php if ($action_links): ?><ul class="action-links"><?php print render($action_links); ?></ul><?php endif; ?>

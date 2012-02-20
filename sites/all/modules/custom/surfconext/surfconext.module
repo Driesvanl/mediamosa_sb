@@ -11,22 +11,22 @@
 /**
  * Implements hook_menu().
  */
-function surf_conext_menu() {
+function surfconext_menu() {
   $items = array();
 
   $items['admin/config/people/surfconext'] = array(
-    'title' => 'simpleSAMLphp authentication module settings',
-    'description' => 'Control the various settings of the simpleSAMLphp authentication module',
+    'title' => 'SURFconext settings',
+    'description' => 'Control the various settings of SURFconext federated login.',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('surf_conext_settings'),
-    'access arguments' => array('administer simpleSAMLphp authentication'),
+    'page arguments' => array('surfconext_settings_form'),
+    'access arguments' => array('administer surfconext'),
     'type' => MENU_LOCAL_TASK | MENU_NORMAL_ITEM,
   );
-  $items['saml_login'] = array(
-    'title' => 'Logon to the site',
-    'description' => 'Provides a site login page',
-    'page callback' => 'surf_conext_loginpage',
-    'access callback' => TRUE,
+
+  $items['user/login/surfconext'] = array(
+    'title' => 'Log in',
+    'access callback' => 'user_is_anonymous',
+    'page callback' => '_surfconext_login',
     'type' => MENU_CALLBACK,
   );
 
@@ -34,420 +34,240 @@ function surf_conext_menu() {
 }
 
 /**
+ * Implements hook_theme().
+ */
+function surfconext_theme() {
+  return array(
+    'surfconext_login_link' => array(
+      'file' => 'surfconext.theme.inc',
+      'variables' => array(),
+    ),
+    'surfconext_info' => array(
+      'file' => 'surfconext.theme.inc',
+      'variables' => array(),
+    ),
+  );
+}
+
+/**
+ * Implements hook_mediamosa_acl_alter.
+ *
+ * @param $acl
+ *   Array contains the basic ACL settings for viewer;
+ *  - acl_domain
+ *    The domain of the user.
+ *  - acl_realm
+ *    Realm information of the user.
+ *  - acl_user_id
+ *    The current user.
+ *  - acl_group_id[]
+ *    Array of group ids.
+ *
+ */
+function surfconext_mediamosa_acl_alter(&$acl, $type) {
+
+  $hostname = &drupal_static('surfconext_hostname');
+  if (empty($hostname)) {
+    $hostname = gethostbyaddr($_SERVER['REMOTE_ADDR']);
+  }
+
+  // Set the host name as our domain.
+  $acl['acl_domain'] = $hostname;
+
+  // Set realm.
+
+  // Get the SURFconext instance.
+  $surfconext = surfconext::get();
+  if ($surfconext) {
+    // Get unique ID which we can use as realm.
+    $realm = $surfconext->getAttibute_used_for_realm();
+    if (!empty($realm)) {
+      $acl['acl_realm'] = $realm;
+    }
+  }
+}
+
+/**
+ * Implements hook_mediamosa_acl_alter.
+ *
+ * @param $user_link
+ *   The user_link to change.
+ */
+function surfconext_mediamosa_sb_theme_user_url_alter(&$user_link) {
+  $user_link = 'user/login/surfconext';
+}
+
+/**
  * Implements hook_admin_paths().
  */
-function surf_conext_admin_paths() {
-  return array('admin/config/people/surf_conext' => TRUE);
+function surfconext_admin_paths() {
+  return array('admin/config/people/surfconext' => TRUE);
 }
 
 /**
  * Implements hook_help().
  */
-function surf_conext_help($path, $arg) {
+function surfconext_help($path, $arg) {
   switch ($path) {
-    case 'admin/config/people/surf_conext':
-      $output = t('<p>This module integrates Drupal with a SimpleSAMLphp Service Point (SP), effectively federating Drupal.</p>');
-      $output .= t('<p></p>');
-      return $output;
+    case 'admin/config/people/surfconext':
+      return t('<p>This module allows users to login using SURFconext.</p>');
   }
 }
 
 /**
  * Implements hook_permission().
  */
-function surf_conext_permission() {
+function surfconext_permission() {
   return array(
-    'administer simpleSAMLphp authentication' => array(
-      'title' => t('Administer simpleSAMLphp authentication'),
+    'administer surfconext' => array(
+      'title' => t('Administer SURFconext'),
       'description' => t('Warning: Give to trusted roles only; this permission has security implications.'),
     ),
   );
 }
 
 /**
- * Represents the Drupal page (saml_login), which triggers user authentication against the SimpleSAMLphp service provider.
+ * Implements hook_cron().
  */
-function surf_conext_loginpage() {
-  global $user;
-  global $_surf_conext_as;
-  global $_surf_conext_saml_attributes;
-
-  $fail = NULL;
-  $output = NULL;
-
-  if (!_surf_conext_isEnabled()) {
-    // Exit without initializing.
-    drupal_set_message(t('We\'re sorry this feature is not yet enabled.'));
-    drupal_goto('user');
-    return;
-  }
-
-  // Do some sanity checking before attempting anything.
-  $config = SimpleSAML_Configuration::getInstance();
-  $configStoreType = $config->getValue('store.type');
-
-  // Make sure phpsession is NOT being used.
-  if ($configStoreType == 'phpsession') {
-    watchdog('surf_conext', 'A user attempted to login using simplesamlphp but the store.type is phpsession, use memcache or sql for simplesamlphp session storage. See: simplesamlphp/config/config.php.', NULL, WATCHDOG_WARNING);
- //   $fail = TRUE;
-  }
-
-  // Make sure there is an instance of SimpleSAML_Auth_Simple.
-  if (!$_surf_conext_as) {
-    watchdog('surf_conext', 'A user attempted to login using this module but there was a problem.', NULL, WATCHDOG_WARNING);
-    $fail = TRUE;
-  }
-
-  // There was a problem, we can't go on, but we don't want to tell the user any specifics either.
-  if ($fail) {
-    drupal_set_message(t('We\'re sorry. There was a problem. The issue has been logged for the administrator.'));
-    drupal_goto();
-  }
-
-  if ($user->uid == 0 ) {
-    // Require the user to be authenticated.
-    $_surf_conext_as->requireAuth();
-
-  }
-  else {
-    drupal_goto('user/' . $user->uid);
-  }
-
-  return $output;
+function surfconext_cron() {
+  // Call our cron for surfconext.
+  surfconext::cron_surfconext();
 }
 
 /**
  * Implements hook_init().
  */
-function surf_conext_init() {
-  global $user;
-  global $_surf_conext_as;
-  global $_surf_conext_saml_attributes;
-  global $_surf_conext_saml_config;
-  global $_surf_conext_saml_version;
+function surfconext_init() {
 
-  if (!_surf_conext_isEnabled(TRUE)) {
-    // Exit without initializing.
-    return;
-  }
-
-  // Get the simplesamlphp session.
-  $basedir = variable_get('surf_conext_installdir', '/var/simplesamlphp');
-
-  require_once($basedir . '/lib/_autoload.php');
-
-  $_surf_conext_saml_config = SimpleSAML_Configuration::getInstance();
-  $_surf_conext_saml_version = $_surf_conext_saml_config->getVersion();
-
-  // Load simpleSAMLphp, configuration and metadata.
-  $_surf_conext_as = new SimpleSAML_Auth_Simple(variable_get('surf_conext_authsource', 'default-sp'));
-  $_surf_conext_saml_attributes = $_surf_conext_as->getAttributes();
-
-  if ($user->uid == 0) {
-    // User is not logged in to Drupal.
-    if ($_surf_conext_as->isAuthenticated()) {
-      // User is logged in - SimpleSAMLphp (but not Drupal).
-      // Get unique identifier from saml attributes.
-      $authname = _surf_conext_get_authname();
-
-      _simplesaml_auth_debug(t('Authname is [%authname] userid is [%uid]', array('%authname' => $authname, '%uid' => $user->uid)));
-
-      if (!empty($authname)) {
-        // User is logged in with SAML authentication and we got the unique identifier.
-        // Try to log into Drupal.
-        _simplesaml_auth_debug(t('Load user [%authname]', array('%authname' => $authname)));
-
-        // Retrieve user mapping and attempt to log the user in.
-        $ext_user = user_external_load($authname);
-
-        if (!$ext_user) {
-          // First we check the admin settings for simpleSAMLphp and find out if we are allowed to register users.
-          if (variable_get('surf_conext_registerusers', TRUE)) {
-
-            // We are allowed to register new users.
-            _simplesaml_auth_debug(t('Register [%authname]', array('%authname' => $authname)));
-
-            user_external_login_register($authname, 'surf_conext');
-
-            if ($user) {
-              // Populate roles based on configuration setting.
-              $roles = _surf_conext_rolepopulation(variable_get('surf_conext_rolepopulation', ''));
-              $userinfo = array('roles' => $roles);
-              $user = user_save($user, $userinfo); // @todo - Fjernet rolle-delen her da den gav en bra feilmelding når roller ikke finnes ;)
-            }
-
-            drupal_set_message(t("Welcome. Since this is your first time logging in, we've automatically provisioned an account for you."), 'status');
-
-            }
-            else {
-              // We are not allowed to register new users on the site through simpleSAML.
-              // We let the user know about this and redirect to the user/login page.
-              $msg = t("We are sorry. While you have successfully authenticated, you are not yet entitled to access this site. Please ask the site administrator to provision access for you.");
-              drupal_set_message($msg);
-              $_surf_conext_as->logout('/?msg=' . $msg);
-            }
-        }
-        else {
-          // If successfully logged into Drupal.
-          // See if we're supposed to re-evaluate role assignments.
-
-          if (variable_get('surf_conext_roleevaleverytime', 0)) {
-            // If the user is already registered...
-            // Update the roles.
-            // Populate roles based on configuration setting.
-            _simplesaml_auth_debug(t('User already registered [%authname] updating roles.', array('%authname' => $authname)));
-            $roles = _surf_conext_rolepopulation(variable_get('surf_conext_rolepopulation', ''));
-            $userinfo = array('roles' => $roles);
-
-            // Save the updated roles and populate the user object.
-            $user = user_save($ext_user, $userinfo);
-          }
-          else {
-            // No need to evaluate roles, populate the user object.
-            $user = $ext_user;
-          }
-
-          $msg = t("Welcome back.");
-          drupal_set_message($msg, 'status');
-        }
-          // Finalizing the login, calls hook_user op login.
-          $edit = array();
-          user_login_finalize($edit);
-      } // End if !empty authname.
-    } // End if isset saml_session.
-  }
-  else {
-    // The user is already logged into Drupal.
-    // If we forbid users from logging in using local accounts.
-    if (FALSE == variable_get('surf_conext_allowdefaultlogin', TRUE)) {
-      // If the user has NOT been authenticated via simpleSAML...
-      if (!$_surf_conext_as->isAuthenticated()) {
-        // :FYI: Until Drupal issue #754560 is corrected this message will never be seen by the user.
-        drupal_set_message(t("We are sorry, users are not permitted to log in using local accounts."));
-        // Destroy the user's session (log them out).
-        _surf_conext_destroy_drupal_session();
-      }
-    }
-    else {
-      // If we are allowing users to log in with local accounts.
-      // If the user has NOT been authenticated via simpleSAML.
-      if (!$_surf_conext_as->isAuthenticated()) {
-        // See if we limit this privilege to specified users
-        $strAllwDefLogUsers = variable_get('surf_conext_allowdefaultloginusers', '');
-        $arrAllwDefLogUsers = array();
-
-        // If user IDs are specified, we let them in, but everyone else gets logged out.
-        if (drupal_strlen($strAllwDefLogUsers)) {
-          // @todo Perform a test to make sure that only numbers, spaces, or commas are in the string.
-          // Convert the string into an array.
-          $arrAllwDefLogUsers = explode(',', $strAllwDefLogUsers);
-
-          // If we still have something to work with...
-          if (0 < count($arrAllwDefLogUsers)) {
-            // Log the user out of Drupal if the current user's uid is NOT in the list of allowed uids.
-            if (!in_array($user->uid, $arrAllwDefLogUsers)) {
-              // User is logged into Drupal, but may not be logged into simpleSAML.
-              // If this is the case we're supposed to log the user out of Drupal.
-
-              // :FYI: Until Drupal issue #754560 is corrected this message will never be seen by the user.
-              drupal_set_message(t("We are sorry, you are not permitted to log in using a local account."));
-
-              _surf_conext_destroy_drupal_session();
-            }
-          }
-        } // Test for specified users.
-      } // End if $_surf_conext_as->isAuthenticated().
-    } // End test to see if we allow default logins.
-  } // End if user->uid.
-}
-
-/**
- * Implements hook_user_insert().
- */
-function surf_conext_user_insert(&$edit, $account, $category = NULL) {
-  global $_surf_conext_as;
-  global $_surf_conext_saml_attributes;
-
-  if ($category = 'account') {
-    // If user registration has a valid session...
-    if ($_surf_conext_as->isAuthenticated()) {
-      // Get name from default attributes.
-      try {
-        _simplesaml_auth_debug(t('Registering user [%acctname]', array('%acctname' => $account->name)));
-        $account->name = _surf_conext_get_default_name($account->uid);
-      }
-      catch (Exception $e) {
-        $message = t('Username is missing.' . $e->getMessage());
-        drupal_set_message($message, "error");
-        watchdog('simplesamlphp', $message, WATCHDOG_CRITICAL);
-      }
-
-      db_update('users')
-        ->fields(array('name' => $account->name))
-        ->condition('uid', $account->uid)
-        ->execute();
-
-      _simplesaml_auth_debug(t('Updating username [%acctname]', array('%acctname' => $account->name)));
-
-      // Get mail from default attribute.
-      try {
-        $mail_address = _surf_conext_get_mail();
-      }
-      catch (Exception $e)  {
-        $message = t('Email is missing.' . $e->getMessage());
-        drupal_set_message($message, "error");
-        watchdog('simplesamlphp', $message, WATCHDOG_CRITICAL);
-      }
-
-      if (!empty($mail_address)) {
-        db_update('users')
-          ->fields(array('mail' => $mail_address))
-          ->condition('uid', $account->uid)
-          ->execute();
-      }
-
-      _simplesaml_auth_debug(t('Updating mail [%mailaddr]', array('%mailaddr' => $mail_address)));
-    }
+  // Get the SURFconext instance.
+  $surfconext = surfconext::get();
+  if ($surfconext) {
+    // Init SURFconext.
+    $surfconext->init();
   }
 }
 
 /**
  * Implements hook_user_logout().
  */
-function surf_conext_user_logout($account) {
-  global $user;
-  global $_surf_conext_as;
-  global $_surf_conext_saml_attributes;
+function surfconext_user_logout($account) {
 
-  if (!empty($_surf_conext_saml_attributes)) {
-
-    $config = SimpleSAML_Configuration::getInstance();
-    $msg = 'with_slo';
-
-    try {
-      $slo = $config->getString('SingleLogoutService');
-    }
-    catch (Exception $e) {
-      $msg = "no_slo";
-    }
-
-    // :KLUDGE: for some reason Drupal is not killing the session, even if I were to call drupal_session_destroy_uid() here.
-    session_destroy();
-
-    $_surf_conext_as->logout('/?msg=' . $msg);
+  // Get the SURFconext instance.
+  $surfconext = surfconext::get();
+  if ($surfconext) {
+    // Init SURFconext.
+    $surfconext->drupal_logoff($account);
   }
-}
-
-/**
- * Implements hook_user_delete().
- */
-function surf_conext_user_delete($account) {
-  db_delete('authmap')
-    ->condition('uid', $account->uid)
-    ->condition('authname', $account->name)
-    ->execute();
 }
 
 /**
  * Implements settings for the module.
+ *
+ * @see surfconext_settings_form_validate()
  */
-function surf_conext_settings() {
-  global $_surf_conext_saml_version;
+function surfconext_settings_form() {
 
-  if (!empty($_surf_conext_saml_version )) {
-    $ver = explode('.', $_surf_conext_saml_version);
+  // @todo: move to requirements hook.
+  global $_surfconext_saml_version;
+
+  if (!empty($_surfconext_saml_version )) {
+    $ver = explode('.', $_surfconext_saml_version);
     if ( !($ver[0] >= 1 && $ver[1] >= 5) ) {
-      drupal_set_message(t("Please upgrade SimpleSAMLphp. You are using %ssp_version", array('%ssp_version' => $_surf_conext_saml_version)), 'warning');
+      drupal_set_message(t("Please upgrade SimpleSAMLphp. You are using %ssp_version", array('%ssp_version' => $_surfconext_saml_version)), 'warning');
     }
   }
 
-  $form = array(
-    'surf_conext_activate' => array(
-      '#type' => 'checkbox',
-      '#title' => t('Activate authentication via SimpleSAMLphp'),
-      '#default_value' => variable_get('surf_conext_activate', FALSE),
-      '#description' => t('Checking this box before configuring the module could lock you out of Drupal.'),
-    ),
-    'surf_conext_installdir' => array(
-      '#type' => 'textfield',
-      '#title' => t('Installation directory (default: /var/simplesamlphp)'),
-      '#default_value' => variable_get('surf_conext_installdir', '/var/simplesamlphp'),
-      '#description' => t('The base directory of simpleSAMLphp. Absolute path with no trailing slash.'),
-    ),
-    'surf_conext_authsource' => array(
-      '#type' => 'textfield',
-      '#title' => t('Autenticaton source for this SP (default: default-sp)'),
-      '#default_value' => variable_get('surf_conext_authsource', 'default-sp'),
-      '#description' => t('The name of the source to use from /var/simplesamlphp/config/authsources.php'),
-    ),
-    'surf_conext_user_name' => array(
-      '#type' => 'textfield',
-      '#title' => t('Which attribute from simpleSAMLphp should be used as user\'s name'),
-      '#default_value' => variable_get('surf_conext_user_name', 'eduPersonPrincipalName'),
-      '#description' => t('Example: <i>eduPersonPrincipalName</i> or <i>displayName</i><br />If the attribute is multivalued, the first value will be used.'),
-      '#required' => TRUE,
-    ),
-    'surf_conext_unique_id' => array(
-      '#type' => 'textfield',
-      '#title' => t('Which attribute from simpleSAMLphp should be used as unique identifier for the user'),
-      '#default_value' => variable_get('surf_conext_unique_id', 'eduPersonPrincipalName'),
-      '#description' => t('Example: <i>eduPersonPrincipalName</i> or <i>eduPersonTargetedID</i><br />If the attribute is multivalued, the first value will be used.'),
-      '#required' => TRUE,
-    ),
-    'surf_conext_mailattr' => array(
-      '#type' => 'textfield',
-      '#title' => t('Which attribute from simpleSAMLphp should be used as user mail address'),
-      '#default_value' => variable_get('surf_conext_mailattr', 'mail'),
-      '#description' => t('Example: <i>mail</i><br />If the user attribute is multivalued, the first value will be used.'),
-    ),
-    'surf_conext_rolepopulation' => array(
-      '#type' => 'textarea',
-      '#title' => t('Automatic role population from simpleSAMLphp attributes'),
-      '#default_value' => variable_get('surf_conext_rolepopulation', ''),
-      '#description' => t('A pipe separated list of rules.<br />Example: <i>roleid1:condition1|roleid2:contition2...</i> <br />For instance: <i>1:eduPersonPrincipalName,@=,uninett.no;affiliation,=,employee|2:mail,=,andreas@uninett.no</i>'),
-    ),
-    'surf_conext_roleevaleverytime' => array(
-      '#type' => 'checkbox',
-      '#title' => t('Reevaluate roles every time the user logs in.'),
-      '#default_value' => variable_get('surf_conext_roleevaleverytime', 0),
-      '#description' => t('NOTE: This means users could loose any roles that have been assigned manually in Drupal.'),
-    ),
-    'surf_conext_forcehttps' => array(
-      '#type' => 'checkbox',
-      '#title' => t('Force https for login links'),
-      '#default_value' => variable_get('surf_conext_forcehttps', TRUE),
-      '#description' => t('Should be enabled on production sites.'),
-    ),
-    'surf_conext_registerusers' => array(
-      '#type' => 'checkbox',
-      '#title' => t('Register users'),
-      '#default_value' => variable_get('surf_conext_registerusers', TRUE),
-      '#description' => t('Decides wether or not the module should create/register new users upon authentication.<br />NOTE: If unchecked each user must already have been provisioned a Drupal account before logging in. Otherwise they will receive a notice and be denied access.'),
-    ),
-    'surf_conext_allowdefaultlogin' => array(
-      '#type' => 'checkbox',
-      '#title' => t('Allow authentication with local Drupal accounts'),
-      '#default_value' => variable_get('surf_conext_allowdefaultlogin', TRUE),
-      '#description' => t('Check this box if you want to let people log in with local Drupal accounts (without using simpleSAMLphp). If you want to restrict this privilege to certain users you can enter the Drupal user IDs in the next field.'),
-    ),
-    'surf_conext_allowdefaultloginusers' => array(
-      '#type' => 'textfield',
-      '#title' => t('Which users should be allowed to login with local accounts?'),
-      '#default_value' => variable_get('surf_conext_allowdefaultloginusers', ''),
-      '#description' => t('Example: <i>1,2,3</i><br />A comma-separated list of user IDs that should be allowed to login without simpleSAMLphp.'),
-    ),
+  $form['simplesaml'] = array(
+    '#type' => 'fieldset',
+    '#title' => 'SimpleSAML settings',
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
   );
+
+  $form['simplesaml']['surfconext_simplesaml_basedir'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Installation directory'),
+    '#default_value' => surfconext::get_simplesaml_basedir(),
+    '#description' => t("The base directory of simpleSAMLphp library. Absolute path with no trailing slash. Default: '/var/simplesamlphp'."),
+    '#required' => TRUE,
+  );
+
+  $form['simplesaml']['surfconext_authsource'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Autenticaton source for this SP'),
+    '#default_value' => variable_get('surfconext_authsource', 'default-sp'),
+    '#description' => t("The name of the source to use from /var/simplesamlphp/config/authsources.php. Default: 'default-sp'."),
+    '#required' => TRUE,
+  );
+
+  $form['surfconext'] = array(
+    '#type' => 'fieldset',
+    '#title' => 'SURFconext settings',
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+
+  $form['surfconext']['surfconext_metadata_idp_url'] = array(
+    '#type' => 'textfield',
+    '#title' => t('SURFconext IdP metadata URL'),
+    '#default_value' => surfconext::get_surfconext_metadata_idp_url(),
+    '#description' => t("Enter the URL of the IdP metadata provider. Default: 'https://engine.surfconext.nl/authentication/idp/metadata'."),
+    '#required' => TRUE,
+  );
+
+  $form['surfconext']['surfconext_metadata_idp_filename'] = array(
+    '#type' => 'textfield',
+    '#title' => t('SURFconext IdP metadata file location'),
+    '#default_value' => surfconext::get_surfconext_metadata_idp_filename(),
+    '#description' => t("This is the location where the file of the SURFconext IdP metadata is saved. Current real path location: '@realpath'. Default: 'private://saml20-idp-remote.php'.", array('@realpath' => drupal_realpath(surfconext::get_surfconext_metadata_idp_filename()))),
+    '#required' => TRUE,
+  );
+
+  $form['enable'] = array(
+    '#type' => 'fieldset',
+    '#title' => 'Master switch',
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+
+  $form['enable']['surfconext_enabled'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable authentication via SURFconext'),
+    '#default_value' => surfconext::is_enabled(),
+    '#description' => t('When enabling locks you out of Drupal, the Adminstrator (user 1) can always bypass the lock and disable SURFconext again.'),
+  );
+
+  $form['#validate'][] = 'surfconext_settings_form_validate';
 
   return system_settings_form($form);
 }
 
 /**
+ * Validate settings form.
+ *
+ * @see surfconext_settings_form()
+ */
+function surfconext_settings_form_validate($form, &$form_state) {
+  // Check if the IdP file is writable.
+  $surfconext_metadata_idp_filename = $form_state['values']['surfconext_metadata_idp_filename'];
+
+  // Is the location of the IdP file writeable?
+  if (!empty($surfconext_metadata_idp_filename) && !is_writable(dirname(drupal_realpath($surfconext_metadata_idp_filename)))) {
+    drupal_set_message(t("Warning: the location of the IdP metadata file '@file' is not writable. If the file is located under private://, then check the file settings for the 'Private file system path' !here.", array('@file' => drupal_realpath($surfconext_metadata_idp_filename), '!here' => l(t('here'), 'admin/config/media/file-system'))), 'error');
+  }
+  else {
+    // Remove the last update time so file is pulled again.
+    variable_del('surfconext_metadata_ipd_last_update');
+  }
+}
+
+/**
  * Implements hook_form_alter().
  */
-function surf_conext_form_alter(&$form, $form_state, $form_id) {
+function surfconext_form_alter(&$form, $form_state, $form_id) {
 
-  if (!_surf_conext_isEnabled()) {
-    // Exit without executing.
+  // Must be enabled.
+  if (!surfconext::is_enabled()) {
     return;
   }
 
@@ -467,307 +287,64 @@ function surf_conext_form_alter(&$form, $form_state, $form_id) {
 }
 
 /**
- * Implements hook_block_view().
- */
-function surf_conext_block_view($delta = '') {
-
-  if (!_surf_conext_isEnabled()) {
-    // Exit without executing.
-    return;
-  }
-
-  switch ($delta) {
-    case 0:
-      $block = array('subject' => t('simpleSAMLphp login'),
-      'content' => _surf_conext_generate_block_text());
-      break;
-  }
-  return $block;
-}
-
-/**
  * Implements hook_block_info().
  */
-function surf_conext_block_info() {
-  $block = array(
-    array(
-      'info' => t('simpleSAMLphp authentication'),
+function surfconext_block_info() {
+  return array(
+    'surfconext_login_link' => array(
+      'info' => t('SURFconext login'),
       'cache' => DRUPAL_NO_CACHE,
-    )
+    ),
+    'surfconext_info' => array(
+      'info' => t('SURFconext info'),
+      'cache' => DRUPAL_NO_CACHE,
+    ),
   );
-  return $block;
-}
-
-// Helper functions --------------------------------------
-
-/**
- * Checks to see if authentication via SimpleSAMLphp should be activated
- *
- * @param bShowInactiveMsg
- *   Whether to display the "module not activated" message
- *
- * @return
- *   TRUE/FALSE
- */
-function _surf_conext_isEnabled($bShowInactiveMsg=FALSE) {
-  global $user;
-
-  $failure = NULL;
-  $isActivated = variable_get('surf_conext_activate');
-  $basedir     = variable_get('surf_conext_installdir', '/var/simplesamlphp');
-
-  if (!$isActivated) {
-    $adminPath = array_keys(surf_conext_admin_paths());
-    $failure = t('SimpleSAMLphp authentication is NOT yet activated. It can be activated on the ' . l('configuration page', $adminPath[0]) . '.');
-
-    watchdog('surf_conext', $failure, NULL, WATCHDOG_WARNING);
-
-  }
-  else {
-
-    // Make sure we know where SimpleSAMLphp is.
-    if (!file_exists($basedir)) {
-      $failure = t('SimpleSAMLphp could not be found at %basedir . The surf_conext module cannot function until the path to the local SimpleSAMLphp instance is configured.', array('%basedir' => $basedir));
-
-      watchdog('surf_conext', $failure, NULL, WATCHDOG_WARNING);
-
-    }
-
-  }
-
-  // If there were no failures, then it should be activated
-  if (!$failure) {
-    return TRUE;
-  }
-  else {
-
-    // communicate but don't be too annoying
-    if ( $bShowInactiveMsg && (1 == $user->uid || user_access('access administration pages')) && ( preg_match('/admin\/people/', request_uri()) || preg_match('/admin\/modules/', request_uri()) || preg_match('/admin\/config/', request_uri()) ) ) {
-        drupal_set_message($failure);
-    }
-  }
-
-  return FALSE;
-
 }
 
 /**
- * Gets the authname attribute from the SAML assertion.
- *
- * @return
- *   The authname attribute.
+ * Implements hook_block_view().
  */
-function _surf_conext_get_authname() {
-  global $_surf_conext_saml_attributes;
+function surfconext_block_view($delta = '') {
 
-  $authname = '';
-
-  // Check if valid local session exists..
-  if (isset($_surf_conext_saml_attributes)) {
-    _simplesaml_auth_debug(t('_surf_conext_get_authname: Valid local session exist'));
-    if (isset($_surf_conext_saml_attributes[variable_get('surf_conext_unique_id', 'eduPersonPrincipalName')])) {
-      $authname = $_surf_conext_saml_attributes[variable_get('surf_conext_unique_id', 'eduPersonPrincipalName')][0];
-    }
-    else {
-      throw new Exception(t('error in surf_conext.module: no valid unique id attribute set'));
-    }
-  }
-  return $authname;
-}
-
-/**
- * Gets the default name attribute from the SAML assertion.
- *
- * @return
- *   The name attribute.
- */
-function _surf_conext_get_default_name($account) {
-  global $_surf_conext_as;
-  global $_surf_conext_saml_attributes;
-
-  $default_name = '';
-
-  // Check if valid local session exists..
-  if ($_surf_conext_as->isAuthenticated() ) {
-    $auth_user_name_attr = variable_get('surf_conext_user_name', 'eduPersonPrincipalName');
-    if (!isset($_surf_conext_saml_attributes[$auth_user_name_attr]) || !isset($_surf_conext_saml_attributes[$auth_user_name_attr][0])) {
-      throw new Exception(t('There was no attribute named %auth_user_name_attr set for your user.', array('%auth_user_name_attr' => $auth_user_name_attr)));
-    }
-    $default_name = $_surf_conext_saml_attributes[$auth_user_name_attr][0];
-  }
-  return $default_name;
-}
-
-/**
- * Gets the mail attribute.
- *
- * @return
- *   The mail attribute.
- */
-function _surf_conext_get_mail() {
-  global $_surf_conext_as;
-  global $_surf_conext_saml_attributes;
-  $mail_address = '';
-  // Check if valid local session exists..
-  if ($_surf_conext_as->isAuthenticated()) {
-    if (isset($_surf_conext_saml_attributes[variable_get('surf_conext_mailattr', 'mail')])) {
-      $mail_address = $_surf_conext_saml_attributes[variable_get('surf_conext_mailattr', 'mail')][0];
-    }
-    else {
-      throw new Exception(t('error in surf_conext.module: no valid mail attribute set'));
-    }
-  }
-
-  return $mail_address;
-}
-
-/**
- * Forces HTTPS connections.
- */
-function _surf_conext_forcehttps_rewrite($url) {
-  if (variable_get('surf_conext_forcehttps', TRUE)) {
-    $url = str_replace('http://', 'https://', $url);
-    _simplesaml_auth_debug('forcehttps rewrite: ' . $url);
-  }
-
-  return $url;
-}
-
-/**
- * Generates the text for the log in block.
- */
-function _surf_conext_generate_block_text() {
-  global $_surf_conext_as;
-  $block_content = '';
-  global $user;
-
-  if (!_surf_conext_isEnabled()) {
+  if (!surfconext::is_enabled()) {
     // Exit without executing.
     return;
   }
 
-  // Check if valid local session exists..
-  if ($_surf_conext_as->isAuthenticated()) {
-    $block_content .= '<p>Logged in as: ' . $user->name . '<br />' . l('Log Out', 'user/logout') . '</a></p>';
-  }
-  else {
-    $block_content .= '<p>' . l('Federated Log In', 'saml_login') . '</p>';
+  $block = array();
+
+  switch ($delta) {
+    case 'surfconext_login_link':
+      $block = array(
+        'subject' => t('SURFconext login'),
+        'content' => array(
+          '#theme' => 'surfconext_login_link'
+        ),
+      );
+      break;
+
+    case 'surfconext_info':
+      $block = array(
+        'subject' => t('SURFconext authentication info'),
+        'content' => array(
+          '#theme' => 'surfconext_info'
+        ),
+      );
+      break;
   }
 
-  return $block_content;
+  return $block;
 }
 
 /**
- * Evaluates a role rule.
- *
- * @param $roleruleevaluation
- *   An array containing the role rule to evaluate.
- * @param $attributes
- *   An array containing the identity attributes.
- *
- * @return
- *   An array containing role value and the attribute, or FALSE.
+ * Show the SURFconext page.
  */
-function _surf_conext_evaulaterolerule($roleruleevaluation, $attributes) {
-  _simplesaml_auth_debug(t('Evaluate rule (key=%key,operator=%op,value=%val)', array('%key' => $roleruleevaluation[0], '%op' => $roleruleevaluation[1], '%val' => $roleruleevaluation[2])));
-
-  if (!array_key_exists($roleruleevaluation[0], $attributes)) {
-    return FALSE;
+function _surfconext_login() {
+  // Get the SURFconext instance.
+  $surfconext = surfconext::get();
+  if ($surfconext) {
+    // Show login page SURFconext.
+    $surfconext->login();
   }
-  $attribute = $attributes[$roleruleevaluation[0]];
-
-  switch ($roleruleevaluation[1]) {
-    case '=' :
-      return in_array($roleruleevaluation[2], $attribute);
-
-    case '@=' :
-      $dc = explode('@', $attribute[0]);
-      if (count($dc) != 2) {
-        return FALSE;
-      }
-      return ($dc[1] == $roleruleevaluation[2]);
-  }
-
-  return FALSE;
-}
-
-/**
- * Performs role population.
- *
- * @param $rolemap
- *   A string containing the role map.
- *
- * @return
- *   An array containing user's roles.
- */
-function _surf_conext_rolepopulation($rolemap) {
-  global $_surf_conext_as;
-  global $_surf_conext_saml_attributes;
-  $roles = array();
-
-  _simplesaml_auth_debug(t('Rolemap: %rolemap', array('%rolemap' => $rolemap)));
-
-  // Check if valid local session exists..
-  if ($_surf_conext_as->isAuthenticated()) {
-    $attributes = $_surf_conext_saml_attributes;
-
-    if (empty($rolemap)) return $roles;
-
-    _simplesaml_auth_debug(t('Evaluate rolemap: %rolemap', array('%rolemap' => $rolemap)));
-
-    $rolerules = explode('|', $rolemap);
-
-    foreach ($rolerules AS $rolerule) {
-      _simplesaml_auth_debug(t('Evaluate role rule: %rolerule', array('%rolerule' => $rolerule)));
-
-      $roleruledecompose = explode(':', $rolerule);
-
-      $roleid = $roleruledecompose[0];
-      $roleruleevaluations = explode(';', $roleruledecompose[1]);
-
-      $addnew = TRUE;
-      foreach ($roleruleevaluations AS $roleruleevaluation) {
-
-        _simplesaml_auth_debug(t('Evaluate role evaulation: %roleruleeval', array('%roleruleeval' => $roleruleevaluation)));
-
-        $roleruleevaluationdc = explode(',', $roleruleevaluation);
-        if (!_surf_conext_evaulaterolerule($roleruleevaluationdc, $attributes)) {
-          $addnew = FALSE;
-        }
-      }
-      if ($addnew) {
-        $roles[$roleid] = $roleid;
-        _simplesaml_auth_debug(t('Add new role: %roleid', array('%roleid' => $roleid)));
-      }
-
-    }
-  }
-  return $roles;
-}
-
-/**
- * This helper function is used by developers to debug the form API workflow in this module.
- */
-function _simplesaml_auth_debug($message) {
-  watchdog('simplesamlphp', $message, NULL, WATCHDOG_DEBUG);
-}
-
-/**
- * Helper function for logging out a user that is has a active session in Drupal but not with simpleSAML.
- */
-function _surf_conext_destroy_drupal_session() {
-  global $user;
-
-  watchdog('user', 'Session closed for %name.', array('%name' => $user->name));
-
-  // Destroy the current session:
-  session_destroy();
-  // Only variables can be passed by reference workaround.
-  $NULL = NULL;
-  user_module_invoke('logout', $NULL, $user);
-
-  // Load the anonymous user.
-  $user = drupal_anonymous_user();
-
-  drupal_goto();
 }

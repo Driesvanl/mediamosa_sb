@@ -44,3 +44,10 @@
   <?php print $fields['videotimestamp']->content; ?>
   <?php print $fields['videotimestamp']->wrapper_suffix; ?>
 </div>
+
+<?php if (_mediamosa_sb_access_asset_edit($fields['asset_id']->raw)): ?>
+  <ul class="asset-options">
+    <li><?php print l(t('edit'), 'asset/edit/' . $fields['asset_id']->raw); ?></li>
+    <li><?php print l(t('delete'), 'asset/delete/' . $fields['asset_id']->raw); ?></li>
+  </ul>
+<?php endif; ?>

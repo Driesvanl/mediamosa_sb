@@ -4,4 +4,7 @@ package = "MediaMosa Site Builder"
 version = "7.x-1.0-dev"
 core = 7.x
 
+files[] = surfconext.class.inc
+files[] = surfconext.exception.class.inc
+
 configure = admin/config/people/surfconext

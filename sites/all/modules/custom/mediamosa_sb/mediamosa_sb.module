@@ -44,6 +44,10 @@ function mediamosa_sb_permission() {
       'title' => t('Allow user to admin the collections.'),
       'description' => t('Users with this permission may delete any collection, even when they are not owner.'),
     ),
+    mediamosa_sb::MEDIAMOSA_SB_PERMISSION_ALTER_FEATURED => array(
+      'title' => t('Allow user to change the featured status of any asset.'),
+      'description' => t('Users with this permission can change the featured status of any asset. Featured assets are shown in the featured view & block.'),
+    ),
   );
 }
 
@@ -186,6 +190,10 @@ function mediamosa_sb_theme() {
     ),
     'mediamosa_sb_quota_bar' => array(
       'variables' => array('percent' => NULL, 'message' => NULL, 'used' => NULL, 'total' => NULL),
+    ),
+    'mediamosa_sb_title_header' => array(
+      'render element' => 'element',
+      'file' => 'mediamosa_sb.theme.inc'
     ),
   );
 }

@@ -177,3 +177,52 @@ function theme_mediamosa_sb_upload_quota($variables) {
   );
   return drupal_render_children($form);
 }
+
+/**
+ * Custom theme for showing subtitle in upload forms.
+ *
+ * @param $variables
+ *   Theme variables.
+ *
+ * @return
+ *   The rendered HTML.
+ */
+function theme_mediamosa_sb_title_header($variables) {
+  // Shortcut to element.
+  $element = $variables['element'];
+  $options = $element['#options'];
+  $i = 1;
+  $steps = '';
+
+  while ($i <= $options['total']) {
+    $steps .= '<span class="step' . ($i == $options['current'] ? ' active'  : '') . '">' . $i . '</span>';
+    $i++;
+  }
+
+  $form = array();
+
+  $form['title_header'] = array(
+    '#prefix' => '<div class="mediamosasb-title-header">',
+    '#suffix' => '</div>',
+  );
+
+  $form['title_header']['title_header_next'] = array(
+    '#markup' => (empty($options['subtitle_next']) ? '' : t('Next step: @next', array('@next' => $options['subtitle_next']))),
+    '#prefix' => '<div class="mediamosasb-title-header-next">',
+    '#suffix' => '</div>',
+  );
+
+  $form['title_header']['title_header_step'] = array(
+    '#markup' => t('Step @current / @total: @subtitle', array('@current' => $options['current'], '@total' => $options['total'], '@subtitle' => $options['subtitle'])),
+    '#prefix' => '<div class="mediamosasb-title-header-step">',
+    '#suffix' => '</div>',
+  );
+
+  $form['title_header']['steps'] = array(
+    '#markup' => $steps,
+    '#prefix' => '<div class="mediamosasb-title-header-steps">',
+    '#suffix' => '</div>',
+  );
+
+  return drupal_render_children($form);
+}

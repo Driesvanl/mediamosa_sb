@@ -40,11 +40,13 @@ class mediamosa_sb_asset_forms {
    *
    * @param $values
    *   The values of the form.
+   * @param $asset_id
+   *   The ID of the asset.
    *
    * @return
    *   Returns the form array.
    */
-  static public function info_form($values, $asset_id = '') {
+  static public function info_form($values, $asset_id) {
     $form = array();
 
     // Add basic information form.
@@ -68,7 +70,7 @@ class mediamosa_sb_asset_forms {
    * @return
    *   Returns the form array.
    */
-  static protected function info_basicinfo_form($values) {
+  static protected function info_basicinfo_form($values, $asset_id) {
     $form = array();
 
     $form['basic'] = array(
@@ -91,6 +93,18 @@ class mediamosa_sb_asset_forms {
       '#required' => FALSE,
       '#default_value' => self::default_value($values, 'dc_description'),
     );
+
+    if (user_access('mediamosa_sb::MEDIAMOSA_SB_PERMISSION_ALTER_FEATURED')) {
+      $asset_ids_featured = mediamosa_ck_views_rest_asset_featured::get_featured_ids();
+
+      $form['basic']['asset_featured'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Is featured'),
+        '#description' => t('When checked, this asset will show up in the featured listing.'),
+        '#required' => FALSE,
+        '#default_value' => isset($asset_ids_featured[$asset_id]),
+      );
+    }
 
     return $form;
   }
@@ -421,9 +435,9 @@ class mediamosa_sb_asset_forms {
 
     // is_visible = !isprivate
     $form['visibility']['is_visible'] = array(
-      '#prefix' => t('Visible in lists'),
       '#type' => 'checkbox',
       '#title' => t('Visible in lists'),
+      '#description' => t('Enabling this switch will allow the video to be shown on the front page.'),
       '#required' => FALSE,
       '#default_value' => self::default_value($values, 'is_visible', TRUE),
     );

@@ -151,8 +151,34 @@ html.js .page-collection #content form .form-wrapper fieldset.collapsible .field
  * Asset upload
  *********************************************************/
 
-.page-asset form#mediamosa-sb-asset-upload-form {
+.page-asset form#mediamosa-sb-asset-upload-form,
+.page-asset form#mediamosa-sb-asset-upload-steps-form {
+  padding-top: 125px;
+  position: relative;
   overflow: hidden;
+}
+
+.page-asset form#mediamosa-sb-asset-upload-form .mediamosasb-title-header,
+.page-asset form#mediamosa-sb-asset-upload-steps-form .mediamosasb-title-header {
+  width: 778px;
+  padding: 10px 13px;
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-bottom: 1px solid #ededf5;
+}
+
+.page-asset form#mediamosa-sb-asset-upload-form .mediamosasb-title-header .mediamosasb-title-header-next,
+.page-asset form#mediamosa-sb-asset-upload-steps-form .mediamosasb-title-header .mediamosasb-title-header-next {
+  font-size: 18px;
+  color: #b5b5b5;
+  float: right;
+}
+
+.page-asset form#mediamosa-sb-asset-upload-form .mediamosasb-title-header .mediamosasb-title-header-step,
+.page-asset form#mediamosa-sb-asset-upload-steps-form .mediamosasb-title-header .mediamosasb-title-header-step {
+  color: #404040;
 }
 
 .page-asset form#mediamosa-sb-asset-upload-form label {
@@ -160,6 +186,30 @@ html.js .page-collection #content form .form-wrapper fieldset.collapsible .field
   font-size: 12px;
   font-weight: bold;
 }
+
+.page-asset form#mediamosa-sb-asset-upload-form .mediamosasb-title-header .mediamosasb-title-header-steps,
+.page-asset form#mediamosa-sb-asset-upload-steps-form .mediamosasb-title-header .mediamosasb-title-header-steps {
+  padding: 6px 0;
+  overflow: hidden;
+}
+
+.page-asset form#mediamosa-sb-asset-upload-form .mediamosasb-title-header .mediamosasb-title-header-steps .step,
+.page-asset form#mediamosa-sb-asset-upload-steps-form .mediamosasb-title-header .mediamosasb-title-header-steps .step {
+  background: #f5f5f5;
+  margin-right: 3px;
+  padding: 5px 10px;
+  color: #000;
+  font-size: 14px;
+  border-radius: 250px;
+}
+
+.page-asset form#mediamosa-sb-asset-upload-form .mediamosasb-title-header .mediamosasb-title-header-steps .step.active,
+.page-asset form#mediamosa-sb-asset-upload-steps-form .mediamosasb-title-header .mediamosasb-title-header-steps .step.active {
+  color: #fff;
+  background: #000;
+}
+
+
 
 .page-asset form#mediamosa-sb-asset-upload-form #edit-file {
   margin-bottom: 20px;

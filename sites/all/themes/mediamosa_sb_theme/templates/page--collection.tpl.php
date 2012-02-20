@@ -10,7 +10,11 @@
     </div>
     <?php print l(t('Upload'), 'asset/upload', array('attributes' => array('class' => array('user-login-button')))); ?>
     <?php else:?>
-      <?php print l(t('Sign in'), 'user', array('attributes' => array('class' => array('user-login-button')))); ?>
+      <?php
+      $user_url = 'user';
+      drupal_alter('mediamosa_sb_theme_user_url', $user_url);
+      print l(t('Sign in'), $user_url, array('attributes' => array('class' => array('user-login-button'))));
+      ?>
     <?php endif;?>
 
     <select id="language-picker">
