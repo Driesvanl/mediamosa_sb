@@ -61,3 +61,13 @@ function mediamosa_sb_theme_breadcrumb($variables) {
 
   return '<ul class="breadcrumb">' . implode($items) . '</ul>';
 }
+
+
+/**
+ * Returns HTML for the Powered by Drupal text.
+ *
+ * @ingroup themeable
+ */
+ function mediamosa_sb_theme_system_powered_by() {
+  return '<span>' . t('Powered by <a href="@poweredby">Mediamosa</a>', array('@poweredby' => 'http://mediamosa.org/')) . '</span>';
+ }

@@ -35,6 +35,12 @@
   margin-top: 9px;
 }
 
+.page-asset #content form .form-type-checkbox .description,
+.page-collection #content form .form-type-checkbox .description {
+  margin-left: 0;
+  display: inline-block;
+}
+
 .page-asset #content form .form-wrapper .form-wrapper,
 .page-collection #content form .form-wrapper .form-wrapper {
   padding: 0;
@@ -296,4 +302,20 @@ html.js .page-collection #content form .form-wrapper fieldset.collapsible .field
 
 .page-asset form #quota .bar .filled.almost-everything {
   border-right: none;
+}
+
+.page-asset form #edit-next {
+  margin-left: 300px;
+}
+
+/**********************************************************
+ * Collection delete
+ *********************************************************/
+
+.page-collection-delete #content form .form-actions {
+  padding: 0;
+}
+
+#edit-cancel {
+  margin-left: 10px;
 }

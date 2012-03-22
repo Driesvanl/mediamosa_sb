@@ -91,13 +91,33 @@
 }
 
 .view .asset-information .views-field-played .field-content {
-  display: block;
-  margin-top: 6px;
-  color: #000;
-  font-size: 18px;
+  color: #686868;
+  font-size: 12px;
 }
 
-.view .asset-information .views-field-videotimestamp {
+#page_content .view .asset-information .views-field-owner-id {
+  position: absolute;
+  bottom: 24px;
+  left: 250px;
+  font-size: 12px;
+}
+
+#page_content .view .asset-information .views-field-videotimestamp {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  font-size: 12px;
+}
+
+#page_content .view .asset-information .views-field-owner-id .field-content,
+#page_content .view .asset-information .views-field-videotimestamp span {
+  color: #686868;
+}
+
+.view .asset-information .views-field-played {
+  position: absolute;
+  bottom: 10px;
+  left: 250px;
   font-size: 12px;
 }
 
@@ -197,6 +217,8 @@ html.js .views-exposed-form .views-exposed-widget .form-autocomplete.throbbing {
 }
 
 #spotlight .view .views-field-still-url:after {
+  height: 25px;
+  overflow: hidden;
   content: url('../images/sprite.png');
   position: absolute;
   left: -205px;
@@ -232,13 +254,22 @@ html.js .views-exposed-form .views-exposed-widget .form-autocomplete.throbbing {
 }
 
 #spotlight .view .asset-information .views-field-videotimestamp {
-  font-size: 12px;
+  float: right;
+  clear: both;
 }
 
-#spotlight .view .asset-information .views-field-videotimestamp .field-content {
+#spotlight .view .asset-information .views-field-videotimestamp .field-content,
+#spotlight .view .asset-information .views-field-owner-id .field-content {
+  font-size: 12px;
   color: #666;
 }
 
+#spotlight .view .asset-information .views-field-owner-id {
+  float: right;
+  display: block;
+  padding-left: 25px;
+  background: url('../images/sprite.png') no-repeat -454px -593px;
+}
 
 /**********************************************************
  * Asset / collection detail Page
