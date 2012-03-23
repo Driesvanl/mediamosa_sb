@@ -23,6 +23,7 @@
  * The main module file for MediaMosa Site Builder.
  */
 
+
 /**
  * Implements hook_permission().
  */
@@ -176,6 +177,35 @@ function mediamosa_sb_menu() {
 }
 
 /**
+ * Implements hook_block_info().
+ */
+function mediamosa_sb_block_info() {
+  $blocks['powered-by-mediamosa'] = array(
+    'info' => t('Powered by MediaMosa'),
+    'weight' => '10',
+    'cache' => DRUPAL_NO_CACHE,
+  );
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ *
+ * Generate a block with a promotional link to MediaMosa.org and
+ * all system menu blocks.
+ */
+function mediamosa_sb_block_view($delta = '') {
+  $block = array();
+  switch ($delta) {
+    case 'powered-by-mediamosa':
+      $block['subject'] = NULL;
+      $block['content'] = theme('mediamosa_sb_powered_by_mediamosa');
+      return $block;
+  }
+}
+
+
+/**
  * Implements hook_theme().
  */
 function mediamosa_sb_theme() {
@@ -194,6 +224,9 @@ function mediamosa_sb_theme() {
     'mediamosa_sb_title_header' => array(
       'render element' => 'element',
       'file' => 'mediamosa_sb.theme.inc'
+    ),
+    'mediamosa_sb_powered_by_mediamosa' => array(
+       'arguments' => array('element' => NULL)
     ),
   );
 }
@@ -422,4 +455,18 @@ function mediamosa_sb_search_execute($keys = NULL, $conditions = NULL) {
 
   // Because we use a view, we pass this as results for the page hook.
   return array('cql' => $cql, 'keys' => $keys, 'conditions' => $conditions);
+}
+
+/**
+ * Returns HTML for the Powered by MediaMosa text.
+ *
+ * @ingroup themeable
+ */
+function theme_mediamosa_sb_powered_by_mediamosa() {
+  $output = '<div class="mediamosa_logo">';
+  $output .= '<div>' . theme('image', array('path' => drupal_get_path('module', 'mediamosa_sb') . '/logo.png')) . '</div>';
+  $output .= t('<small>Powered by<br /><a href="@poweredby">MediaMosa</a>', array('@poweredby' => 'http://mediamosa.org')) . '</small>';
+  $output .= '</div>';
+
+  return $output;
 }

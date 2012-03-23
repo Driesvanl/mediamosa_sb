@@ -103,7 +103,18 @@ h2 {
   border-style: solid;
 }
 
-#footer .mm_logo {
+#footer .site_logo {
   padding: 5px 10px;
   float: left;
+}
+#footer .mediamosa_logo {
+  padding: 5px 10px;
+  float: left;
+  vertical-align: top;
+}
+#footer .mediamosa_logo div {
+  float: left;
+}
+#footer .mediamosa_logo small {
+  font-size: 90%;
 }

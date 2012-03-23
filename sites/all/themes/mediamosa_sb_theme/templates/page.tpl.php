@@ -51,8 +51,12 @@
     </div>
   </div>
   <div id="footer">
-    <div class="mm_logo">
-      <?php print theme('image', array('path' => $logo)); ?>
+    <div class="site_logo">
+      <?php
+        if (substr($logo, -27) !=  'mediamosa_sb_theme/logo.png') {
+          print theme('image', array('path' => $logo));
+        }
+      ?>
     </div>
     <?php print render($page['footer']); ?>
   </div>
