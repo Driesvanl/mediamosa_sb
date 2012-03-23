@@ -202,7 +202,7 @@ function mediamosa_sb_collection_delete_confirm_form($form, &$form_state, $coll_
 
   return confirm_form($form,
                       t('Are you sure you want to delete this collection?'),
-                      url('collection/' . rawurlencode($coll_id), array('absolute' => TRUE)),
+                      url('collection/detail/' . rawurlencode($coll_id), array('absolute' => TRUE)),
                       t('This action cannot be undone.'),
                       t('Delete'), t('Cancel')
   );
