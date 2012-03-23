@@ -38,7 +38,7 @@ function _mediamosa_sb_collection_form($values) {
   );
 
   $form['basic']['description'] = array(
-    '#type' => 'textfield',
+    '#type' => 'textarea',
     '#title' => t('Description'),
     '#required' => FALSE,
     '#default_value' => empty($values['description']) ? '' : $values['description'],
