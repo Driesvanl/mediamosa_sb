@@ -251,7 +251,7 @@ html.js .views-exposed-form .views-exposed-widget .form-autocomplete.throbbing {
 }
 
 #spotlight .view .asset-information {
-  min-height: 70px;
+  min-height: 60px;
   padding: 9px;
   position: relative;
 }

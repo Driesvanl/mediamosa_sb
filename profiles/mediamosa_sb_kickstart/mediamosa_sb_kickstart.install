@@ -236,13 +236,13 @@ function mediamosa_sb_kickstart_install() {
       'title' => '',
       'cache' => -1,
     ),
-    // Footer in footer.
+    // Footer menu in footer block.
     array(
-      'module' => 'system',
-      'delta' => 'footer',
+      'module' => 'menu',
+      'delta' => 'menu-footer',
       'theme' => $default_theme,
       'status' => 1,
-      'weight' => 0,
+      'weight' => -16,
       'region' => 'footer',
       'visibility' => 0,
       'pages' => '',
@@ -482,7 +482,7 @@ function mediamosa_sb_kickstart_install() {
   menu_rebuild();
 
   // Set the Slogan.
-  variable_set('site_slogan', 'MediaMosa Video Channel.');
+  variable_set('site_slogan', 'MediaMosa Video Channel');
 
   // Set the SB search engine as default. Turn off others.
   variable_set('search_active_modules', array('node' => 'node', 'user' => 'user', 'mediamosa_sb' => 'mediamosa_sb'));
