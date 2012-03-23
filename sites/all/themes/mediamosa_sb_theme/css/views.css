@@ -121,6 +121,12 @@
   font-size: 12px;
 }
 
+.view .views-field-owner-id {
+  padding-left: 15px;
+  background: url('../images/sprite.png') no-repeat -463px -598px;
+}
+
+
 
 /**********************************************************
  * Views exposed forms
@@ -182,6 +188,7 @@ html.js .views-exposed-form .views-exposed-widget .form-autocomplete.throbbing {
   margin-top: 8px;
   float: right;
 }
+
 
 /**********************************************************
  * Featured assets
@@ -258,6 +265,10 @@ html.js .views-exposed-form .views-exposed-widget .form-autocomplete.throbbing {
   clear: both;
 }
 
+#spotlight .view .asset-information .views-field-played {
+  left: 10px;
+}
+
 #spotlight .view .asset-information .views-field-videotimestamp .field-content,
 #spotlight .view .asset-information .views-field-owner-id .field-content {
   font-size: 12px;
@@ -265,11 +276,9 @@ html.js .views-exposed-form .views-exposed-widget .form-autocomplete.throbbing {
 }
 
 #spotlight .view .asset-information .views-field-owner-id {
-  float: right;
-  display: block;
-  padding-left: 25px;
-  background: url('../images/sprite.png') no-repeat -454px -593px;
+  background: url('../images/sprite.png') no-repeat -463px -595px;
 }
+
 
 /**********************************************************
  * Asset / collection detail Page

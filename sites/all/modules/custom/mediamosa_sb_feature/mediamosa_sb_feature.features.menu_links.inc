@@ -60,9 +60,85 @@ function mediamosa_sb_feature_menu_default_menu_links() {
     'expanded' => '0',
     'weight' => '-48',
   );
+  // Exported menu link: menu-footer:node/2
+  $menu_links['menu-footer:node/2'] = array(
+    'menu_name' => 'menu-footer',
+    'link_path' => 'node/2',
+    'router_path' => 'node/%',
+    'link_title' => 'Contact',
+    'options' => array(
+      'attributes' => array(
+        'title' => '',
+      ),
+    ),
+    'module' => 'menu',
+    'hidden' => '0',
+    'external' => '0',
+    'has_children' => '0',
+    'expanded' => '0',
+    'weight' => '0',
+  );
+  // Exported menu link: menu-footer:node/3
+  $menu_links['menu-footer:node/3'] = array(
+    'menu_name' => 'menu-footer',
+    'link_path' => 'node/3',
+    'router_path' => 'node/%',
+    'link_title' => 'Colofon',
+    'options' => array(
+      'attributes' => array(
+        'title' => '',
+      ),
+    ),
+    'module' => 'menu',
+    'hidden' => '0',
+    'external' => '0',
+    'has_children' => '0',
+    'expanded' => '0',
+    'weight' => '0',
+  );
+  // Exported menu link: menu-footer:node/4
+  $menu_links['menu-footer:node/4'] = array(
+    'menu_name' => 'menu-footer',
+    'link_path' => 'node/4',
+    'router_path' => 'node/%',
+    'link_title' => 'Disclaimer',
+    'options' => array(
+      'attributes' => array(
+        'title' => '',
+      ),
+    ),
+    'module' => 'menu',
+    'hidden' => '0',
+    'external' => '0',
+    'has_children' => '0',
+    'expanded' => '0',
+    'weight' => '0',
+  );
+  // Exported menu link: menu-footer:node/5
+  $menu_links['menu-footer:node/5'] = array(
+    'menu_name' => 'menu-footer',
+    'link_path' => 'node/5',
+    'router_path' => 'node/%',
+    'link_title' => 'Copyrights',
+    'options' => array(
+      'attributes' => array(
+        'title' => '',
+      ),
+    ),
+    'module' => 'menu',
+    'hidden' => '0',
+    'external' => '0',
+    'has_children' => '0',
+    'expanded' => '0',
+    'weight' => '0',
+  );
   // Translatables
   // Included for use with string extractors like potx.
   t('Collections');
+  t('Colofon');
+  t('Contact');
+  t('Copyrights');
+  t('Disclaimer');
   t('Home');
   t('Videos');
 

@@ -27,6 +27,11 @@ function mediamosa_sb_kickstart_install_tasks() {
     '_mediamosa_sb_kickstart_setup_intro_page' => array(
       'run' => INSTALL_TASK_RUN_IF_REACHED,
     ),
+
+    '_mediamosa_sb_kickstart_setup_footer_menu' => array(
+      'run' => INSTALL_TASK_RUN_IF_REACHED,
+    ),
+
   );
   return $tasks;
 }
@@ -168,4 +173,58 @@ function _mediamosa_sb_kickstart_setup_intro_page() {
 
   // Save it.
   node_save($node);
+}
+
+
+/**
+ * Create footer pages and menu for it.
+ */
+function _mediamosa_sb_kickstart_setup_footer_menu() {
+
+  function _set_page_defaults(&$node) {
+    $node->uid = 1; // Admin
+    $node->status = 1; // Published
+    $node->promote = 0; // On front page.
+    $node->type = 'page';
+    $node->locked = 0;
+    $node->has_title = 1;
+    $node->has_body = 1;
+    $node->title_label = 'Title';
+    $node->body_label = 'Body';
+    $node->custom = 1;
+    $node->language = LANGUAGE_NONE;
+  }
+
+  // Create Contact, Colofon, Disclaimer, Copyrights pages.
+  $node = new stdClass();
+  _set_page_defaults($node);
+  $node->title = t('Contact');
+  $node->body[$node->language][0]['value'] = '';
+  node_save($node);
+  $alias = array('source' => 'node/'. $node->nid, 'alias' => 'contact');
+  path_save($alias);
+
+  $node = new stdClass();
+  _set_page_defaults($node);
+  $node->title = st('Colofon');
+  $node->body[$node->language][0]['value'] = '';
+  node_save($node);
+  $alias = array('source' => 'node/'. $node->nid, 'alias' => 'colofon');
+  path_save($alias);
+
+  $node = new stdClass();
+  _set_page_defaults($node);
+  $node->title = st('Disclaimer');
+  $node->body[$node->language][0]['value'] = '';
+  node_save($node);
+  $alias = array('source' => 'node/'. $node->nid, 'alias' => 'disclaimer');
+  path_save($alias);
+
+  $node = new stdClass();
+  _set_page_defaults($node);
+  $node->title = st('Copyrights');
+  $node->body[$node->language][0]['value'] = '';
+  node_save($node);
+  $alias = array('source' => 'node/'. $node->nid, 'alias' => 'copyrights');
+  path_save($alias);
 }
