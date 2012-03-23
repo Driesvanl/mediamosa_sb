@@ -291,7 +291,7 @@ class mediamosa_sb {
    */
   static public function get_metdata_languages_options() {
     return array(
-      '' => t('Undefined'),
+      '' => t('<none>'),
       'ab' => t('Abkhaz'),
       'aa' => t('Afar'),
       'af' => t('Afrikaans'),

@@ -134,15 +134,23 @@ class mediamosa_sb_asset_forms {
       '#title' => t('Collections'),
     );
 
-    $form['collections']['mycollections'] = array(
-      '#type' => 'select',
-      '#title' => t('My collections'),
-      '#required' => FALSE,
-      '#multiple' => TRUE,
-      '#size'=> 5,
-      '#options' => $options_collections,
-      '#default_value' => self::default_value($values, 'mycollections'),
-    );
+    if (count($options_collections)) {
+      $form['collections']['mycollections'] = array(
+        '#type' => 'select',
+        '#title' => t('My collections'),
+        '#required' => FALSE,
+        '#multiple' => TRUE,
+        '#size'=> 5,
+        '#options' => $options_collections,
+        '#default_value' => self::default_value($values, 'mycollections'),
+      );
+    }
+    else {
+      $form['collections']['mycollections'] = array(
+        '#markup' => '<p><br />' . t('No Collections yet, you can add them at the <a href=@mycollections>My Collections</a> page.', array('@mycollections' => url('mycollections')))
+        . '<br /><br /></p>',
+      );
+    }
 
     return $form;
   }
@@ -437,7 +445,7 @@ class mediamosa_sb_asset_forms {
     $form['visibility']['is_visible'] = array(
       '#type' => 'checkbox',
       '#title' => t('Visible in lists'),
-      '#description' => t('Enabling this switch will allow the video to be shown on the front page.'),
+      '#description' => t('If checked, the video will be visible on the frontpage (new/popular).'),
       '#required' => FALSE,
       '#default_value' => self::default_value($values, 'is_visible', TRUE),
     );
@@ -466,7 +474,7 @@ class mediamosa_sb_asset_forms {
       '#type' => 'textfield',
       '#title' => t('Domain'),
       '#required' => FALSE,
-      '#description' => t('Define which domains can view this video. Example; uu.nl, example.com'),
+      '#description' => t('Define which domains can view this video. Example; mediamosa.org, example.com'),
       '#default_value' => self::default_value($values, 'acl_domain'),
     );
 
@@ -474,7 +482,7 @@ class mediamosa_sb_asset_forms {
       '#type' => 'textfield',
       '#title' => t('By realm'),
       '#required' => FALSE,
-      '#description' => t('Select wich registered users based on their email domain have access to this video. Example; @uu.nl, @example.com'),
+      '#description' => t('Select wich registered users based on their e-mail domain have access to this video. Example; @mediamosa.org, @example.com'),
       '#default_value' => self::default_value($values, 'acl_realm'),
     );
 
@@ -482,7 +490,7 @@ class mediamosa_sb_asset_forms {
       '#type' => 'textfield',
       '#title' => t('By email'),
       '#required' => FALSE,
-      '#description' => t('Select wich registered users based on their email adress have access to this video. Example; naam@uu.nl, name@example.com'),
+      '#description' => t('Select which registered users based on their e-mail adress have access to this video. Example; info@mediamosa.org, name@example.com'),
       '#default_value' => self::default_value($values, 'acl_user'),
     );
 
