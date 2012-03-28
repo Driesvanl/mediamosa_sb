@@ -50,7 +50,7 @@ function surfconext_theme() {
 }
 
 /**
- * Implements hook_mediamosa_acl_alter.
+ * Implements hook_mediamosa_ck_acl_alter.
  *
  * @param $acl
  *   Array contains the basic ACL settings for viewer;
@@ -64,15 +64,7 @@ function surfconext_theme() {
  *    Array of group ids.
  *
  */
-function surfconext_mediamosa_acl_alter(&$acl, $type) {
-
-  $hostname = &drupal_static('surfconext_hostname');
-  if (empty($hostname)) {
-    $hostname = gethostbyaddr($_SERVER['REMOTE_ADDR']);
-  }
-
-  // Set the host name as our domain.
-  $acl['acl_domain'] = $hostname;
+function surfconext_mediamosa_ck_acl_alter(&$acl, $type) {
 
   // Set realm.
 

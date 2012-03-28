@@ -470,3 +470,29 @@ function theme_mediamosa_sb_powered_by_mediamosa() {
 
   return $output;
 }
+
+/**
+ * Implements hook_mediamosa_ck_acl_alter.
+ *
+ * @param $acl
+ *   Array contains the basic ACL settings for viewer;
+ *  - acl_domain
+ *    The domain of the user.
+ *  - acl_realm
+ *    Realm information of the user.
+ *  - acl_user_id
+ *    The current user.
+ *  - acl_group_id[]
+ *    Array of group ids.
+ *
+ */
+function mediamosa_sb_mediamosa_ck_acl_alter(&$acl, $type) {
+
+  $hostname = &drupal_static('mediamosa_ck_hostname');
+  if (empty($hostname)) {
+    $hostname = gethostbyaddr($_SERVER['REMOTE_ADDR']);
+  }
+
+  // Set the host name as our domain.
+  $acl['acl_domain'] = $hostname;
+}
