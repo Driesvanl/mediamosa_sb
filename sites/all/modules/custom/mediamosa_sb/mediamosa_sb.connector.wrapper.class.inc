@@ -191,7 +191,7 @@ class MediaMosaSbConnectorWrapper extends MediaMosaCkConnectorWrapper {
    *
    * @return type
    */
-  static public function update_mediafile($asset_id, $mediafile_id, array $options = array()) {
+  static public function update_mediafile_asset($asset_id, $mediafile_id, array $options = array()) {
     // Need edit right.
     if (mediamosa_sb::access_asset_edit($asset_id)) {
       $options += array('user_id' => mediamosa_sb::get_owner_mediafile($mediafile_id));
@@ -237,7 +237,7 @@ class MediaMosaSbConnectorWrapper extends MediaMosaCkConnectorWrapper {
    *   A string with users. This can be anything as MediaMosa does not care
    *   about the content of a user_id.
    */
-  static public function set_access_control($asset_id, $mediafile_id, $user_id, $acl_domain_realm, $acl_user_id = '') {
+  static public function set_access_control_asset($asset_id, $mediafile_id, $user_id, $acl_domain_realm, $acl_user_id = '') {
     // Need edit right.
     if (mediamosa_sb::access_asset_edit($asset_id)) {
       $user_id = mediamosa_sb::get_owner_mediafile($mediafile_id);
@@ -278,7 +278,7 @@ class MediaMosaSbConnectorWrapper extends MediaMosaCkConnectorWrapper {
    * @return
    *   Returns TRUE when delete was successful.
    */
-  static public function delete_mediafile($asset_id, $mediafile_id, $user_id) {
+  static public function delete_mediafile_asset($asset_id, $mediafile_id, $user_id) {
     // Need edit right.
     if (mediamosa_sb::access_asset_edit($asset_id)) {
       $user_id = mediamosa_sb::get_owner_asset($asset_id);
@@ -343,7 +343,7 @@ class MediaMosaSbConnectorWrapper extends MediaMosaCkConnectorWrapper {
    * @return mediamosa_connector_response
    *   Returns FALSE when failure or mediamosa_connector_response.
    */
-  static public function create_mediafile_still($asset_id, $mediafile_id, $user_id, $data = array()) {
+  static public function create_mediafile_still_asset($asset_id, $mediafile_id, $user_id, $data = array()) {
     // Need edit right.
     if (mediamosa_sb::access_asset_edit($asset_id)) {
       $user_id = mediamosa_sb::get_owner_mediafile($mediafile_id);
@@ -365,7 +365,7 @@ class MediaMosaSbConnectorWrapper extends MediaMosaCkConnectorWrapper {
    * @return
    *   Returns FALSE for failure.
    */
-  static public function create_transcode($asset_id, $mediafile_id, $options = array()) {
+  static public function create_transcode_asset($asset_id, $mediafile_id, $options = array()) {
     // Need edit right.
     if (mediamosa_sb::access_asset_edit($asset_id)) {
       $options['user_id'] = mediamosa_sb::get_owner_mediafile($mediafile_id);

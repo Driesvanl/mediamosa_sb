@@ -640,7 +640,7 @@ class mediamosa_sb {
     $acl_domain_realm = implode(',', $acl_domain_realm);
 
     foreach ($mediafile_ids as $mediafile_id) {
-      if (!MediaMosaSbConnectorWrapper::set_access_control($asset_id, $mediafile_id, mediamosa_ck::session_user_id(), $acl_domain_realm, $acl_user)) {
+      if (!MediaMosaSbConnectorWrapper::set_access_control_asset($asset_id, $mediafile_id, mediamosa_ck::session_user_id(), $acl_domain_realm, $acl_user)) {
         mediamosa_sb::watchdog_error('Unable to save access for mediafile with ID @mediafile_id.', array('@mediafile_id' => $mediafile_id));
       }
     }
@@ -701,7 +701,7 @@ class mediamosa_sb {
    */
   static protected function submit_media_still($values, $asset_id) {
     // Get the original mediafile_id.
-    $mediafile_id_original = reset(MediaMosaSbConnectorWrapper::get_asset_mediafile_ids_original($asset_id));
+    $mediafile_id_original = MediaMosaSbConnectorWrapper::get_asset_mediafile_id_first_original($asset_id);
 
     // Check if we need to generate still.
     if ($values['still_start_time'] != mediamosa_sb_asset_forms::DEFAULT_START_TIME_STILL_FORM) {
@@ -715,7 +715,7 @@ class mediamosa_sb {
       );
 
       // Create still.
-      MediaMosaSbConnectorWrapper::create_mediafile_still($asset_id, $mediafile_id_original, $data);
+      MediaMosaSbConnectorWrapper::create_mediafile_still_asset($asset_id, $mediafile_id_original, $data);
     }
   }
 
@@ -732,7 +732,7 @@ class mediamosa_sb {
    */
   static protected function submit_media_transcoding($values, $asset_id, $is_upload = FALSE) {
     // Get the original mediafile_id.
-    $mediafile_id_original = reset(MediaMosaSbConnectorWrapper::get_asset_mediafile_ids_original($asset_id));
+    $mediafile_id_original = MediaMosaSbConnectorWrapper::get_asset_mediafile_id_first_original($asset_id);
 
     // Get existing mediafiles transcodes.
     $current_used_transcode_profiles = MediaMosaSbConnectorWrapper::get_asset_current_used_transcode_profiles($asset_id);
@@ -770,7 +770,7 @@ class mediamosa_sb {
             $is_downloadable = !empty($values['downloadable_' . $profile_id]);
 
             // Start transcode job.
-            $job_id = MediaMosaSbConnectorWrapper::create_transcode($asset_id, $mediafile_id_original, array('profile_id' => $profile_id));
+            $job_id = MediaMosaSbConnectorWrapper::create_transcode_asset($asset_id, $mediafile_id_original, array('profile_id' => $profile_id));
           }
         }
       }
@@ -786,7 +786,7 @@ class mediamosa_sb {
           );
 
           // Is checked, so set download status.
-          MediaMosaSbConnectorWrapper::update_mediafile($asset_id, $profile['mediafile_id'], $options);
+          MediaMosaSbConnectorWrapper::update_mediafile_asset($asset_id, $profile['mediafile_id'], $options);
           continue;
         }
 
@@ -801,7 +801,7 @@ class mediamosa_sb {
         }
 
         // Remove transcode, for now we ignore the result.
-        MediaMosaSbConnectorWrapper::delete_mediafile($asset_id, $profile['mediafile_id'], mediamosa_ck::session_user_id());
+        MediaMosaSbConnectorWrapper::delete_mediafile_asset($asset_id, $profile['mediafile_id'], mediamosa_ck::session_user_id());
       }
     }
   }
