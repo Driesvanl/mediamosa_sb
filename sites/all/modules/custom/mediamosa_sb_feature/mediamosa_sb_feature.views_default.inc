@@ -604,7 +604,6 @@ function mediamosa_sb_feature_views_default_views() {
   $handler->display->display_options['fields']['asset_id']['table'] = 'mediamosa_asset_featured';
   $handler->display->display_options['fields']['asset_id']['field'] = 'asset_id';
   $handler->display->display_options['fields']['asset_id']['label'] = '';
-  $handler->display->display_options['fields']['asset_id']['exclude'] = TRUE;
   $handler->display->display_options['fields']['asset_id']['alter']['alter_text'] = 0;
   $handler->display->display_options['fields']['asset_id']['alter']['make_link'] = 0;
   $handler->display->display_options['fields']['asset_id']['alter']['absolute'] = 0;
@@ -627,7 +626,6 @@ function mediamosa_sb_feature_views_default_views() {
   $handler->display->display_options['fields']['granted']['table'] = 'mediamosa_asset_featured';
   $handler->display->display_options['fields']['granted']['field'] = 'granted';
   $handler->display->display_options['fields']['granted']['label'] = '';
-  $handler->display->display_options['fields']['granted']['exclude'] = TRUE;
   $handler->display->display_options['fields']['granted']['alter']['alter_text'] = 0;
   $handler->display->display_options['fields']['granted']['alter']['make_link'] = 0;
   $handler->display->display_options['fields']['granted']['alter']['absolute'] = 0;
@@ -762,6 +760,29 @@ function mediamosa_sb_feature_views_default_views() {
   $handler->display->display_options['fields']['mediafile_duration']['empty_zero'] = 0;
   $handler->display->display_options['fields']['mediafile_duration']['hide_alter_empty'] = 1;
   $handler->display->display_options['fields']['mediafile_duration']['date_format'] = 'mediamosa_ck_mf_duration';
+  /* Field: MediaMosa: Played */
+  $handler->display->display_options['fields']['played']['id'] = 'played';
+  $handler->display->display_options['fields']['played']['table'] = 'mediamosa_asset_featured';
+  $handler->display->display_options['fields']['played']['field'] = 'played';
+  $handler->display->display_options['fields']['played']['label'] = '';
+  $handler->display->display_options['fields']['played']['alter']['alter_text'] = 1;
+  $handler->display->display_options['fields']['played']['alter']['text'] = '[played] views';
+  $handler->display->display_options['fields']['played']['alter']['make_link'] = 0;
+  $handler->display->display_options['fields']['played']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['played']['alter']['external'] = 0;
+  $handler->display->display_options['fields']['played']['alter']['replace_spaces'] = 0;
+  $handler->display->display_options['fields']['played']['alter']['trim_whitespace'] = 0;
+  $handler->display->display_options['fields']['played']['alter']['nl2br'] = 0;
+  $handler->display->display_options['fields']['played']['alter']['word_boundary'] = 1;
+  $handler->display->display_options['fields']['played']['alter']['ellipsis'] = 1;
+  $handler->display->display_options['fields']['played']['alter']['strip_tags'] = 0;
+  $handler->display->display_options['fields']['played']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['played']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['played']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['played']['element_default_classes'] = 1;
+  $handler->display->display_options['fields']['played']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['played']['empty_zero'] = 0;
+  $handler->display->display_options['fields']['played']['hide_alter_empty'] = 1;
   /* Sort criterion: MediaMosa: Created */
   $handler->display->display_options['sorts']['videotimestamp']['id'] = 'videotimestamp';
   $handler->display->display_options['sorts']['videotimestamp']['table'] = 'mediamosa_asset_featured';
@@ -805,7 +826,6 @@ function mediamosa_sb_feature_views_default_views() {
   $handler->display->display_options['fields']['asset_id']['table'] = 'mediamosa_asset_new';
   $handler->display->display_options['fields']['asset_id']['field'] = 'asset_id';
   $handler->display->display_options['fields']['asset_id']['label'] = '';
-  $handler->display->display_options['fields']['asset_id']['exclude'] = TRUE;
   $handler->display->display_options['fields']['asset_id']['alter']['alter_text'] = 0;
   $handler->display->display_options['fields']['asset_id']['alter']['make_link'] = 0;
   $handler->display->display_options['fields']['asset_id']['alter']['absolute'] = 0;
@@ -828,7 +848,6 @@ function mediamosa_sb_feature_views_default_views() {
   $handler->display->display_options['fields']['granted']['table'] = 'mediamosa_asset_new';
   $handler->display->display_options['fields']['granted']['field'] = 'granted';
   $handler->display->display_options['fields']['granted']['label'] = '';
-  $handler->display->display_options['fields']['granted']['exclude'] = TRUE;
   $handler->display->display_options['fields']['granted']['alter']['alter_text'] = 0;
   $handler->display->display_options['fields']['granted']['alter']['make_link'] = 0;
   $handler->display->display_options['fields']['granted']['alter']['absolute'] = 0;
@@ -1055,7 +1074,6 @@ function mediamosa_sb_feature_views_default_views() {
   $handler->display->display_options['fields']['asset_id']['table'] = 'mediamosa_asset_popular';
   $handler->display->display_options['fields']['asset_id']['field'] = 'asset_id';
   $handler->display->display_options['fields']['asset_id']['label'] = '';
-  $handler->display->display_options['fields']['asset_id']['exclude'] = TRUE;
   $handler->display->display_options['fields']['asset_id']['alter']['alter_text'] = 0;
   $handler->display->display_options['fields']['asset_id']['alter']['make_link'] = 0;
   $handler->display->display_options['fields']['asset_id']['alter']['absolute'] = 0;
@@ -1078,7 +1096,6 @@ function mediamosa_sb_feature_views_default_views() {
   $handler->display->display_options['fields']['granted']['table'] = 'mediamosa_asset_popular';
   $handler->display->display_options['fields']['granted']['field'] = 'granted';
   $handler->display->display_options['fields']['granted']['label'] = '';
-  $handler->display->display_options['fields']['granted']['exclude'] = TRUE;
   $handler->display->display_options['fields']['granted']['alter']['alter_text'] = 0;
   $handler->display->display_options['fields']['granted']['alter']['make_link'] = 0;
   $handler->display->display_options['fields']['granted']['alter']['absolute'] = 0;
@@ -1657,7 +1674,7 @@ Consider loosening your query with OR. bike OR shed will often show more results
   $handler->display->display_options['fields']['played']['field'] = 'played';
   $handler->display->display_options['fields']['played']['label'] = '';
   $handler->display->display_options['fields']['played']['alter']['alter_text'] = 1;
-  $handler->display->display_options['fields']['played']['alter']['text'] = '[played] <span>views</span>';
+  $handler->display->display_options['fields']['played']['alter']['text'] = '[played] views';
   $handler->display->display_options['fields']['played']['alter']['make_link'] = 0;
   $handler->display->display_options['fields']['played']['alter']['absolute'] = 0;
   $handler->display->display_options['fields']['played']['alter']['external'] = 0;
@@ -1717,7 +1734,7 @@ Consider loosening your query with OR. bike OR shed will often show more results
   $handler->display->display_options['fields']['mediafile_duration']['alter']['html'] = 0;
   $handler->display->display_options['fields']['mediafile_duration']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['mediafile_duration']['element_default_classes'] = 1;
-  $handler->display->display_options['fields']['mediafile_duration']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['mediafile_duration']['hide_empty'] = 1;
   $handler->display->display_options['fields']['mediafile_duration']['empty_zero'] = 0;
   $handler->display->display_options['fields']['mediafile_duration']['hide_alter_empty'] = 1;
   $handler->display->display_options['fields']['mediafile_duration']['date_format'] = 'custom';
@@ -2059,7 +2076,7 @@ Consider loosening your query with OR. bike OR shed will often show more results
   $handler->display->display_options['fields']['mediafile_duration']['alter']['html'] = 0;
   $handler->display->display_options['fields']['mediafile_duration']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['mediafile_duration']['element_default_classes'] = 1;
-  $handler->display->display_options['fields']['mediafile_duration']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['mediafile_duration']['hide_empty'] = 1;
   $handler->display->display_options['fields']['mediafile_duration']['empty_zero'] = 0;
   $handler->display->display_options['fields']['mediafile_duration']['hide_alter_empty'] = 1;
   $handler->display->display_options['fields']['mediafile_duration']['date_format'] = 'custom';
@@ -2213,7 +2230,7 @@ Consider loosening your query with OR. bike OR shed will often show more results
   $handler->display->display_options['fields']['videotimestamp']['hide_empty'] = 0;
   $handler->display->display_options['fields']['videotimestamp']['empty_zero'] = 0;
   $handler->display->display_options['fields']['videotimestamp']['hide_alter_empty'] = 1;
-  $handler->display->display_options['fields']['videotimestamp']['date_format'] = 'short';
+  $handler->display->display_options['fields']['videotimestamp']['date_format'] = 'mediamosa_ck_normal';
   /* Field: MediaMosa: Mediafile duration */
   $handler->display->display_options['fields']['mediafile_duration']['id'] = 'mediafile_duration';
   $handler->display->display_options['fields']['mediafile_duration']['table'] = 'mediamosa_assets_in_collection';
@@ -2233,34 +2250,34 @@ Consider loosening your query with OR. bike OR shed will often show more results
   $handler->display->display_options['fields']['mediafile_duration']['alter']['html'] = 0;
   $handler->display->display_options['fields']['mediafile_duration']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['mediafile_duration']['element_default_classes'] = 1;
-  $handler->display->display_options['fields']['mediafile_duration']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['mediafile_duration']['hide_empty'] = 1;
   $handler->display->display_options['fields']['mediafile_duration']['empty_zero'] = 0;
   $handler->display->display_options['fields']['mediafile_duration']['hide_alter_empty'] = 1;
-  $handler->display->display_options['fields']['mediafile_duration']['date_format'] = 'custom';
+  $handler->display->display_options['fields']['mediafile_duration']['date_format'] = 'mediamosa_ck_mf_duration';
   $handler->display->display_options['fields']['mediafile_duration']['custom_date_format'] = 's:i';
-  /* Field: MediaMosa: Viewed */
-  $handler->display->display_options['fields']['viewed']['id'] = 'viewed';
-  $handler->display->display_options['fields']['viewed']['table'] = 'mediamosa_assets_in_collection';
-  $handler->display->display_options['fields']['viewed']['field'] = 'viewed';
-  $handler->display->display_options['fields']['viewed']['label'] = '';
-  $handler->display->display_options['fields']['viewed']['alter']['alter_text'] = 1;
-  $handler->display->display_options['fields']['viewed']['alter']['text'] = '[viewed] <span>views</span>';
-  $handler->display->display_options['fields']['viewed']['alter']['make_link'] = 0;
-  $handler->display->display_options['fields']['viewed']['alter']['absolute'] = 0;
-  $handler->display->display_options['fields']['viewed']['alter']['external'] = 0;
-  $handler->display->display_options['fields']['viewed']['alter']['replace_spaces'] = 0;
-  $handler->display->display_options['fields']['viewed']['alter']['trim_whitespace'] = 0;
-  $handler->display->display_options['fields']['viewed']['alter']['nl2br'] = 0;
-  $handler->display->display_options['fields']['viewed']['alter']['word_boundary'] = 1;
-  $handler->display->display_options['fields']['viewed']['alter']['ellipsis'] = 1;
-  $handler->display->display_options['fields']['viewed']['alter']['strip_tags'] = 0;
-  $handler->display->display_options['fields']['viewed']['alter']['trim'] = 0;
-  $handler->display->display_options['fields']['viewed']['alter']['html'] = 0;
-  $handler->display->display_options['fields']['viewed']['element_label_colon'] = FALSE;
-  $handler->display->display_options['fields']['viewed']['element_default_classes'] = 1;
-  $handler->display->display_options['fields']['viewed']['hide_empty'] = 0;
-  $handler->display->display_options['fields']['viewed']['empty_zero'] = 0;
-  $handler->display->display_options['fields']['viewed']['hide_alter_empty'] = 1;
+  /* Field: MediaMosa: Played */
+  $handler->display->display_options['fields']['played']['id'] = 'played';
+  $handler->display->display_options['fields']['played']['table'] = 'mediamosa_assets_in_collection';
+  $handler->display->display_options['fields']['played']['field'] = 'played';
+  $handler->display->display_options['fields']['played']['label'] = '';
+  $handler->display->display_options['fields']['played']['alter']['alter_text'] = 1;
+  $handler->display->display_options['fields']['played']['alter']['text'] = '[played] views';
+  $handler->display->display_options['fields']['played']['alter']['make_link'] = 0;
+  $handler->display->display_options['fields']['played']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['played']['alter']['external'] = 0;
+  $handler->display->display_options['fields']['played']['alter']['replace_spaces'] = 0;
+  $handler->display->display_options['fields']['played']['alter']['trim_whitespace'] = 0;
+  $handler->display->display_options['fields']['played']['alter']['nl2br'] = 0;
+  $handler->display->display_options['fields']['played']['alter']['word_boundary'] = 1;
+  $handler->display->display_options['fields']['played']['alter']['ellipsis'] = 1;
+  $handler->display->display_options['fields']['played']['alter']['strip_tags'] = 0;
+  $handler->display->display_options['fields']['played']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['played']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['played']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['played']['element_default_classes'] = 1;
+  $handler->display->display_options['fields']['played']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['played']['empty_zero'] = 0;
+  $handler->display->display_options['fields']['played']['hide_alter_empty'] = 1;
   $export['mediamosa_assets_in_collection'] = $view;
 
   $view = new view;
@@ -2755,7 +2772,6 @@ Consider loosening your query with OR. bike OR shed will often show more results
   $handler->display->display_options['fields']['granted']['table'] = 'mediamosa_asset_search';
   $handler->display->display_options['fields']['granted']['field'] = 'granted';
   $handler->display->display_options['fields']['granted']['label'] = '';
-  $handler->display->display_options['fields']['granted']['exclude'] = TRUE;
   $handler->display->display_options['fields']['granted']['alter']['alter_text'] = 0;
   $handler->display->display_options['fields']['granted']['alter']['make_link'] = 0;
   $handler->display->display_options['fields']['granted']['alter']['absolute'] = 0;
@@ -2779,7 +2795,8 @@ Consider loosening your query with OR. bike OR shed will often show more results
   $handler->display->display_options['fields']['still_url']['field'] = 'still_url';
   $handler->display->display_options['fields']['still_url']['label'] = '';
   $handler->display->display_options['fields']['still_url']['alter']['alter_text'] = 0;
-  $handler->display->display_options['fields']['still_url']['alter']['make_link'] = 0;
+  $handler->display->display_options['fields']['still_url']['alter']['make_link'] = 1;
+  $handler->display->display_options['fields']['still_url']['alter']['path'] = 'asset/detail/[asset_id]';
   $handler->display->display_options['fields']['still_url']['alter']['absolute'] = 0;
   $handler->display->display_options['fields']['still_url']['alter']['external'] = 0;
   $handler->display->display_options['fields']['still_url']['alter']['replace_spaces'] = 0;
@@ -2825,7 +2842,7 @@ Consider loosening your query with OR. bike OR shed will often show more results
   $handler->display->display_options['fields']['played']['field'] = 'played';
   $handler->display->display_options['fields']['played']['label'] = '';
   $handler->display->display_options['fields']['played']['alter']['alter_text'] = 1;
-  $handler->display->display_options['fields']['played']['alter']['text'] = '[played] <span>views</span>';
+  $handler->display->display_options['fields']['played']['alter']['text'] = '[played] views';
   $handler->display->display_options['fields']['played']['alter']['make_link'] = 0;
   $handler->display->display_options['fields']['played']['alter']['absolute'] = 0;
   $handler->display->display_options['fields']['played']['alter']['external'] = 0;
@@ -2883,7 +2900,7 @@ Consider loosening your query with OR. bike OR shed will often show more results
   $handler->display->display_options['fields']['mediafile_duration']['alter']['html'] = 0;
   $handler->display->display_options['fields']['mediafile_duration']['element_label_colon'] = 1;
   $handler->display->display_options['fields']['mediafile_duration']['element_default_classes'] = 1;
-  $handler->display->display_options['fields']['mediafile_duration']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['mediafile_duration']['hide_empty'] = 1;
   $handler->display->display_options['fields']['mediafile_duration']['empty_zero'] = 0;
   $handler->display->display_options['fields']['mediafile_duration']['hide_alter_empty'] = 1;
   $handler->display->display_options['fields']['mediafile_duration']['date_format'] = 'mediamosa_ck_mf_duration';

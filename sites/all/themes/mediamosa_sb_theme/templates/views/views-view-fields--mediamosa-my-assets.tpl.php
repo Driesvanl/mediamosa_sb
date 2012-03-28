@@ -23,18 +23,27 @@
  * @ingroup views_templates
  */
 ?>
+
 <?php if (isset($fields['still_url']) && !empty($fields['still_url']->content)): ?>
-  <?php print $fields['still_url']->content; ?>
+  <?php if ($fields['granted']->raw == 'TRUE'): ?>
+    <?php print $fields['still_url']->content; ?>
+  <?php else: ?>
+<?php print l(theme('image', array('path' => drupal_get_path('theme', 'mediamosa_sb_theme') . '/images/notgranted.png', 'alt' => t("You don't have the right permissions to access this video"))), 'asset/detail/' . $fields['asset_id']->raw, array('html' => TRUE, 'attributes' => array('class' => 'views-field-still-url'))); ?>
+  <?php endif; ?>
 <?php endif; ?>
 
 <div class="asset-information">
-  <?php print $fields['mediafile_duration']->wrapper_prefix; ?>
-  <?php print $fields['mediafile_duration']->content; ?>
-  <?php print $fields['mediafile_duration']->wrapper_suffix; ?>
+  <?php if (isset($fields['mediafile_duration'])): ?>
+    <?php print $fields['mediafile_duration']->wrapper_prefix; ?>
+    <?php print $fields['mediafile_duration']->content; ?>
+    <?php print $fields['mediafile_duration']->wrapper_suffix; ?>
+  <?php endif; ?>
 
-  <?php print $fields['played']->wrapper_prefix; ?>
-  <?php print $fields['played']->content; ?>
-  <?php print $fields['played']->wrapper_suffix; ?>
+  <?php if (isset($fields['played'])): ?>
+    <?php print $fields['played']->wrapper_prefix; ?>
+    <?php print $fields['played']->content; ?>
+    <?php print $fields['played']->wrapper_suffix; ?>
+  <?php endif; ?>
 
   <?php print $fields['title']->wrapper_prefix; ?>
   <?php print $fields['title']->content; ?>

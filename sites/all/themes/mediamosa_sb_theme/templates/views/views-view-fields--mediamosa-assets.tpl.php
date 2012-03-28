@@ -33,9 +33,11 @@
 
 <div class="asset-information">
   <?php if ($fields['granted']->raw == 'TRUE'): ?>
-    <?php print $fields['mediafile_duration']->wrapper_prefix; ?>
-    <?php print $fields['mediafile_duration']->content; ?>
-    <?php print $fields['mediafile_duration']->wrapper_suffix; ?>
+    <?php if (isset($fields['mediafile_duration'])): ?>
+      <?php print $fields['mediafile_duration']->wrapper_prefix; ?>
+      <?php print $fields['mediafile_duration']->content; ?>
+      <?php print $fields['mediafile_duration']->wrapper_suffix; ?>
+    <?php endif; ?>
   <?php endif; ?>
 
   <?php print $fields['played']->wrapper_prefix; ?>
