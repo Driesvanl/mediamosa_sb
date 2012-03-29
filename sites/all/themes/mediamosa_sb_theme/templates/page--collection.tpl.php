@@ -18,8 +18,8 @@
     <?php endif;?>
 
     <select id="language-picker">
-      <option>EN</option>
-      <option selected>NL</option>
+      <option selected>EN</option>
+      <option>NL</option>
     </select>
 
     <?php print render($page['header']); ?>
